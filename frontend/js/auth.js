@@ -2,7 +2,7 @@
 const loginForm    = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
 
-const API = path => `https://yourbackend.com/api${path}`;
+const API = path => `https://json4ai.onrender.com/api${path}`;
 
 if (loginForm) {
   loginForm.addEventListener('submit', async e => {

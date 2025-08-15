@@ -8,7 +8,7 @@ logoutBtn && logoutBtn.addEventListener('click', () => {
 });
 
 // Populate profile
-fetch('https://yourbackend.com/api/user/profile', {
+fetch('https://json4ai.onrender.com/api/user/profile', {
   headers: { 'Authorization': `Bearer ${token}` }
 })
   .then(r => r.ok ? r.json() : Promise.reject(r))
@@ -31,7 +31,7 @@ document.getElementById('profile-form')?.addEventListener('submit', async e => {
     firstName: document.getElementById('firstName').value,
     lastName:  document.getElementById('lastName').value
   };
-  const res = await fetch('https://yourbackend.com/api/user/profile', {
+  const res = await fetch('https://json4ai.onrender.com/api/user/profile', {
     method: 'PUT',
     headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` },
     body: JSON.stringify(body)

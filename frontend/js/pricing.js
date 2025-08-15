@@ -3,7 +3,7 @@ document.querySelectorAll('[data-plan]').forEach(btn => {
     const plan = btn.dataset.plan;
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('https://yourbackend.com/api/create-checkout-session', {
+      const res = await fetch('https://json4ai.onrender.com/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type':'application/json', ...(token && { 'Authorization': `Bearer ${token}` }) },
         body: JSON.stringify({ plan })

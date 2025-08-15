@@ -20,99 +20,6 @@
   <link rel="stylesheet" href="css/responsive.css"/>
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js" defer></script>
   <script src="js/utils.js" defer></script>
-  <script>
-    // Lottie error handling and fallback
-    function handleLottieError(event) {
-      console.error('Lottie animation failed to load:', event);
-      console.error('Error details:', {
-        target: event.target,
-        src: event.target.src,
-        error: event.detail
-      });
-      showLottieFallback();
-    }
-    
-    function handleLottieLoad(event) {
-      console.log('Lottie animation loaded successfully');
-      console.log('Lottie player details:', {
-        target: event.target,
-        src: event.target.src,
-        shadowRoot: event.target.shadowRoot
-      });
-      hideLottieFallback();
-    }
-    
-    function showLottieFallback() {
-      const fallback = document.getElementById('lottie-fallback');
-      const lottiePlayer = document.querySelector('lottie-player');
-      if (fallback && lottiePlayer) {
-        console.log('Showing Lottie fallback animation');
-        lottiePlayer.style.display = 'none';
-        fallback.style.display = 'block';
-      }
-    }
-    
-    function hideLottieFallback() {
-      const fallback = document.getElementById('lottie-fallback');
-      if (fallback) {
-        fallback.style.display = 'none';
-      }
-    }
-    
-    // Check if Lottie player script loaded
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOM loaded, checking Lottie player...');
-      
-      // Check if lottie-player element exists
-      const lottiePlayer = document.querySelector('lottie-player');
-      if (lottiePlayer) {
-        console.log('Lottie player element found:', lottiePlayer);
-        console.log('Lottie player src:', lottiePlayer.src);
-        
-        // Check if the script loaded properly
-        if (customElements.get('lottie-player')) {
-          console.log('Lottie player custom element registered');
-        } else {
-          console.error('Lottie player custom element not registered');
-          showLottieFallback();
-        }
-      } else {
-        console.error('Lottie player element not found');
-      }
-    });
-    
-    // Show fallback after 5 seconds if Lottie doesn't load
-    setTimeout(() => {
-      const lottiePlayer = document.querySelector('lottie-player');
-      if (lottiePlayer && !lottiePlayer.shadowRoot) {
-        console.log('Lottie player timeout - showing fallback');
-        showLottieFallback();
-      }
-    }, 5000);
-    
-    // Function to test alternative Lottie source
-    function testAlternativeLottie() {
-      const mainLottie = document.querySelector('lottie-player');
-      const alternativeLottie = document.getElementById('alternative-lottie');
-      const fallback = document.getElementById('lottie-fallback');
-      
-      if (mainLottie && alternativeLottie && fallback) {
-        console.log('Testing alternative Lottie source...');
-        mainLottie.style.display = 'none';
-        fallback.style.display = 'none';
-        alternativeLottie.style.display = 'block';
-      }
-    }
-    
-    // Add test button to page for debugging
-    document.addEventListener('DOMContentLoaded', () => {
-      const testButton = document.createElement('button');
-      testButton.textContent = 'Test Alternative Lottie';
-      testButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 8px 16px; background: var(--accent-purple); color: white; border: none; border-radius: 4px; cursor: pointer;';
-      testButton.onclick = testAlternativeLottie;
-      document.body.appendChild(testButton);
-    });
-  </script>
 </head>
 <body>
 <header class="navbar">
@@ -147,33 +54,8 @@
           loop 
           autoplay 
           role="img" 
-          aria-label="AI prompt generation animation"
-          onerror="handleLottieError(event)"
-          onload="handleLottieLoad(event)">
+          aria-label="AI prompt generation animation">
         </lottie-player>
-        
-        <!-- Alternative Lottie source for testing -->
-        <div id="alternative-lottie" style="display: none;">
-          <lottie-player 
-            src="https://assets2.lottiefiles.com/packages/lf20_UJNc2t.json" 
-            background="transparent" 
-            speed="1" 
-            style="width: 400px; height: 400px;" 
-            loop 
-            autoplay>
-          </lottie-player>
-        </div>
-        <div id="lottie-fallback" class="lottie-fallback" style="display: none;">
-          <div class="fallback-animation">
-            <div class="ai-icon">🤖</div>
-            <div class="loading-dots">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-            <p>AI Processing...</p>
-          </div>
-        </div>
       </div>
     </div>
   </section>

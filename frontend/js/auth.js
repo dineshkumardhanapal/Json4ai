@@ -9,13 +9,17 @@ if (loginForm) {
     e.preventDefault();
     const fd = new FormData(loginForm);
     const body = { email: fd.get('email'), password: fd.get('password') };
-    const res = await fetch(API('/login'), { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
-    const data = await res.json();
-    if (res.ok) {
-      localStorage.setItem('token', data.token);
-      location.href = 'dashboard.html';
-    } else {
-      alert(data.message || 'Login failed');
+    try {
+      const res = await fetch(API('/login'), { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem('token', data.token);
+        location.href = 'dashboard.html';
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    } catch (_) {
+      alert('Network error. Please try again.');
     }
   });
 }
@@ -30,13 +34,17 @@ if (registerForm) {
       email:     fd.get('email'),
       password:  fd.get('password')
     };
-    const res = await fetch(API('/register'), { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
-    const data = await res.json();
-    if (res.ok) {
-      localStorage.setItem('token', data.token);
-      location.href = 'dashboard.html';
-    } else {
-      alert(data.message || 'Registration failed');
+    try {
+      const res = await fetch(API('/register'), { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem('token', data.token);
+        location.href = 'dashboard.html';
+      } else {
+        alert(data.message || 'Registration failed');
+      }
+    } catch (_) {
+      alert('Network error. Please try again.');
     }
   });
 }

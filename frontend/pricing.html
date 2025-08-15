@@ -5,6 +5,9 @@
   <title>Pricing – JSON4AI</title>
   <meta name="description" content="Choose the JSON4AI plan that fits you."/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css"/>
   <link rel="stylesheet" href="css/purple-silver.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
@@ -14,46 +17,97 @@
 <header class="navbar">
   <div class="container flex-between">
     <a href="index.html" class="logo">JSON4<span>AI</span></a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="login.html">Login</a>
+    </nav>
   </div>
 </header>
 
-<main class="container center">
-  <h1>Choose your plan</h1>
-  <div class="pricing-grid">
-    <div class="plan-card">
-      <h3>Starter</h3>
-      <p class="price">$9<span>/mo</span></p>
-      <ul>
-        <li>100 prompts / mo</li>
-        <li>Email support</li>
-      </ul>
-      <button class="btn-primary" data-plan="starter">Select</button>
+<main>
+  <div class="container">
+    <div class="pricing-header text-center">
+      <h1>Choose Your Plan</h1>
+      <p>Select the perfect plan for your prompt generation needs</p>
     </div>
-    <div class="plan-card featured">
-      <h3>Pro</h3>
-      <p class="price">$19<span>/mo</span></p>
-      <ul>
-        <li>1 000 prompts / mo</li>
-        <li>Priority support</li>
-        <li>Advanced templates</li>
-      </ul>
-      <button class="btn-primary" data-plan="pro">Select</button>
+    
+    <div class="pricing-grid">
+      <div class="plan-card">
+        <div class="plan-header">
+          <h3>Starter</h3>
+          <p class="plan-description">Perfect for individuals and small projects</p>
+        </div>
+        <div class="price">$9<span>/month</span></div>
+        <ul class="plan-features">
+          <li>100 prompts per month</li>
+          <li>Basic templates</li>
+          <li>Email support</li>
+          <li>Standard accuracy</li>
+        </ul>
+        <button class="btn-primary" data-plan="starter">Get Started</button>
+      </div>
+      
+      <div class="plan-card featured">
+        <div class="plan-badge">Most Popular</div>
+        <div class="plan-header">
+          <h3>Pro</h3>
+          <p class="plan-description">Ideal for teams and growing businesses</p>
+        </div>
+        <div class="price">$19<span>/month</span></div>
+        <ul class="plan-features">
+          <li>1,000 prompts per month</li>
+          <li>Advanced templates</li>
+          <li>Priority support</li>
+          <li>Enhanced accuracy</li>
+          <li>Team collaboration</li>
+          <li>API access</li>
+        </ul>
+        <button class="btn-primary" data-plan="pro">Get Started</button>
+      </div>
+      
+      <div class="plan-card">
+        <div class="plan-header">
+          <h3>Enterprise</h3>
+          <p class="plan-description">For large organizations and high-volume usage</p>
+        </div>
+        <div class="price">$49<span>/month</span></div>
+        <ul class="plan-features">
+          <li>Unlimited prompts</li>
+          <li>Custom templates</li>
+          <li>Dedicated support</li>
+          <li>Maximum accuracy</li>
+          <li>SSO integration</li>
+          <li>Custom integrations</li>
+          <li>SLA guarantee</li>
+        </ul>
+        <button class="btn-primary" data-plan="enterprise">Get Started</button>
+      </div>
     </div>
-    <div class="plan-card">
-      <h3>Enterprise</h3>
-      <p class="price">$49<span>/mo</span></p>
-      <ul>
-        <li>Unlimited prompts</li>
-        <li>SLA & SSO</li>
-        <li>Dedicated manager</li>
-      </ul>
-      <button class="btn-primary" data-plan="enterprise">Select</button>
+    
+    <div class="pricing-faq text-center">
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h4>Can I change plans anytime?</h4>
+          <p>Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.</p>
+        </div>
+        <div class="faq-item">
+          <h4>What happens if I exceed my limit?</h4>
+          <p>You'll receive a notification and can upgrade your plan or wait until the next billing cycle.</p>
+        </div>
+        <div class="faq-item">
+          <h4>Is there a free trial?</h4>
+          <p>Yes, all plans come with a 7-day free trial. No credit card required to start.</p>
+        </div>
+      </div>
     </div>
   </div>
 </main>
 
 <footer>
-  <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+  <div class="container">
+    <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+  </div>
 </footer>
 </body>
 </html>

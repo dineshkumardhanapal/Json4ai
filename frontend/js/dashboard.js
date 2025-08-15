@@ -2,7 +2,7 @@ const token = localStorage.getItem('token');
 if (!token) location.href = 'login.html';
 
 const logoutBtn = document.getElementById('logout');
-logoutBtn.addEventListener('click', () => {
+logoutBtn && logoutBtn.addEventListener('click', () => {
   localStorage.clear();
   location.href = 'index.html';
 });
@@ -11,16 +11,21 @@ logoutBtn.addEventListener('click', () => {
 fetch('https://yourbackend.com/api/user/profile', {
   headers: { 'Authorization': `Bearer ${token}` }
 })
-  .then(r => r.json())
+  .then(r => r.ok ? r.json() : Promise.reject(r))
   .then(user => {
-    document.getElementById('firstName').value = user.firstName;
-    document.getElementById('lastName').value  = user.lastName;
-    document.getElementById('email').value     = user.email;
-    document.getElementById('plan').textContent = user.plan || 'Free';
-  });
+    const first = document.getElementById('firstName');
+    const last  = document.getElementById('lastName');
+    const email = document.getElementById('email');
+    const plan  = document.getElementById('plan');
+    if (first) first.value = user.firstName || '';
+    if (last)  last.value  = user.lastName  || '';
+    if (email) email.value = user.email     || '';
+    if (plan)  plan.textContent = user.plan || 'Free';
+  })
+  .catch(() => { /* optionally surface error UI */ });
 
 // Update profile
-document.getElementById('profile-form').addEventListener('submit', async e => {
+document.getElementById('profile-form')?.addEventListener('submit', async e => {
   e.preventDefault();
   const body = {
     firstName: document.getElementById('firstName').value,

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://json4ai.com/</loc><lastmod>2025-08-15</lastmod></url>
-  <url><loc>https://json4ai.com/login</loc><lastmod>2025-08-15</lastmod></url>
-  <url><loc>https://json4ai.com/register</loc><lastmod>2025-08-15</lastmod></url>
-  <url><loc>https://json4ai.com/dashboard</loc><lastmod>2025-08-15</lastmod></url>
-  <url><loc>https://json4ai.com/pricing</loc><lastmod>2025-08-15</lastmod></url>
-  <url><loc>https://json4ai.com/privacy</loc><lastmod>2025-08-15</lastmod></url>
-  <url><loc>https://json4ai.com/terms</loc><lastmod>2025-08-15</lastmod></url>
-  <url><loc>https://json4ai.com/gdpr</loc><lastmod>2025-08-15</lastmod></url>
-  <url><loc>https://json4ai.com/cookies</loc><lastmod>2025-08-15</lastmod></url>
+  <url><loc>https://json4ai.com/login.html</loc><lastmod>2025-08-15</lastmod></url>
+  <url><loc>https://json4ai.com/register.html</loc><lastmod>2025-08-15</lastmod></url>
+  <url><loc>https://json4ai.com/dashboard.html</loc><lastmod>2025-08-15</lastmod></url>
+  <url><loc>https://json4ai.com/pricing.html</loc><lastmod>2025-08-15</lastmod></url>
+  <url><loc>https://json4ai.com/privacy.html</loc><lastmod>2025-08-15</lastmod></url>
+  <url><loc>https://json4ai.com/terms.html</loc><lastmod>2025-08-15</lastmod></url>
+  <url><loc>https://json4ai.com/gdpr.html</loc><lastmod>2025-08-15</lastmod></url>
+  <url><loc>https://json4ai.com/cookies.html</loc><lastmod>2025-08-15</lastmod></url>
 </urlset>

@@ -5,6 +5,9 @@
   <title>Dashboard – JSON4AI</title>
   <meta name="description" content="Manage your profile and subscriptions."/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css"/>
   <link rel="stylesheet" href="css/purple-silver.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
@@ -14,34 +17,90 @@
 <header class="navbar">
   <div class="container flex-between">
     <a href="index.html" class="logo">JSON4<span>AI</span></a>
-    <nav>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="pricing.html">Pricing</a>
       <button id="logout" class="btn-secondary">Logout</button>
     </nav>
   </div>
 </header>
 
-<main class="container">
-  <h1>Dashboard</h1>
+<main>
+  <div class="container">
+    <div class="dashboard-header">
+      <h1>Welcome to Your Dashboard</h1>
+      <p>Manage your profile, view usage, and upgrade your plan</p>
+    </div>
 
-  <section class="card">
-    <h2>Profile</h2>
-    <form id="profile-form">
-      <input id="firstName" placeholder="First name"/>
-      <input id="lastName" placeholder="Last name"/>
-      <input id="email" type="email" placeholder="Email" disabled/>
-      <button class="btn-primary">Update Profile</button>
-    </form>
-  </section>
+    <div class="dashboard-grid">
+      <section class="card">
+        <h2>Profile Information</h2>
+        <form id="profile-form" class="form">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input id="firstName" type="text" placeholder="Enter your first name" required/>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input id="lastName" type="text" placeholder="Enter your last name" required/>
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input id="email" type="email" placeholder="your@email.com" disabled/>
+            <small>Email cannot be changed</small>
+          </div>
+          <button type="submit" class="btn-primary">Update Profile</button>
+        </form>
+      </section>
 
-  <section class="card">
-    <h2>Subscription</h2>
-    <p id="plan">Free</p>
-    <a href="pricing.html" class="btn-primary">Upgrade</a>
-  </section>
+      <section class="card">
+        <h2>Subscription Details</h2>
+        <div class="subscription-info">
+          <div class="current-plan">
+            <h3>Current Plan</h3>
+            <div class="plan-badge" id="plan">Free</div>
+          </div>
+          <div class="plan-features">
+            <h4>Plan Features</h4>
+            <ul>
+              <li>Basic prompt generation</li>
+              <li>Standard templates</li>
+              <li>Community support</li>
+            </ul>
+          </div>
+          <a href="pricing.html" class="btn-primary">Upgrade Plan</a>
+        </div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Recent Activity</h2>
+      <div class="activity-list">
+        <div class="activity-item">
+          <div class="activity-icon">📝</div>
+          <div class="activity-content">
+            <h4>Prompt Generated</h4>
+            <p>API endpoint schema converted to prompt</p>
+            <span class="activity-time">2 hours ago</span>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">✅</div>
+          <div class="activity-content">
+            <h4>Profile Updated</h4>
+            <p>Your profile information was updated</p>
+            <span class="activity-time">1 day ago</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 </main>
 
 <footer>
-  <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+  <div class="container">
+    <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+  </div>
 </footer>
 </body>
 </html>

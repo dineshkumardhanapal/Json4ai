@@ -5,6 +5,9 @@
   <title>Register – JSON4AI</title>
   <meta name="description" content="Create your JSON4AI account."/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css"/>
   <link rel="stylesheet" href="css/purple-silver.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
@@ -14,23 +17,49 @@
 <header class="navbar">
   <div class="container flex-between">
     <a href="index.html" class="logo">JSON4<span>AI</span></a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="pricing.html">Pricing</a>
+    </nav>
   </div>
 </header>
 
-<main class="center card">
-  <form id="register-form" class="form">
-    <h2>Create account</h2>
-    <input type="text" placeholder="First name" required/>
-    <input type="text" placeholder="Last name" required/>
-    <input type="email" placeholder="Email" required/>
-    <input type="password" placeholder="Password" required minlength="6"/>
-    <button class="btn-primary">Register</button>
-    <p>Already have an account? <a href="login.html">Login</a></p>
-  </form>
+<main class="center">
+  <div class="auth-container">
+    <div class="auth-header">
+      <h1>Create Account</h1>
+      <p>Join JSON4AI and start generating accurate prompts today</p>
+    </div>
+    
+    <form id="register-form" class="form card">
+      <div class="form-group">
+        <label for="firstName" class="visually-hidden">First Name</label>
+        <input id="firstName" name="firstName" type="text" placeholder="Enter your first name" required/>
+      </div>
+      <div class="form-group">
+        <label for="lastName" class="visually-hidden">Last Name</label>
+        <input id="lastName" name="lastName" type="text" placeholder="Enter your last name" required/>
+      </div>
+      <div class="form-group">
+        <label for="email" class="visually-hidden">Email</label>
+        <input id="email" name="email" type="email" placeholder="Enter your email address" required/>
+      </div>
+      <div class="form-group">
+        <label for="password" class="visually-hidden">Password</label>
+        <input id="password" name="password" type="password" placeholder="Create a password" required minlength="6"/>
+      </div>
+      <button type="submit" class="btn-primary">Create Account</button>
+      <div class="auth-footer">
+        <p>Already have an account? <a href="login.html">Sign in</a></p>
+      </div>
+    </form>
+  </div>
 </main>
 
 <footer>
-  <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+  <div class="container">
+    <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+  </div>
 </footer>
 </body>
 </html>

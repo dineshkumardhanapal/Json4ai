@@ -7,11 +7,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <link rel="canonical" href="https://json4ai.com"/>
   <meta property="og:title" content="JSON4AI – Accurate AI Prompt Generator"/>
-  <meta property="og:description" content="Generate accurate prompts with JSON4AI."/>
+  <meta property="og:description" content="Generate accurate prompts with JSON4AI. AI-ready JSON schema to prompt translator in seconds."/>
   <meta property="og:type" content="website"/>
   <meta property="og:url" content="https://json4ai.com"/>
   <meta property="og:image" content="https://json4ai.com/assets/og-image.png"/>
   <meta name="twitter:card" content="summary_large_image"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css"/>
   <link rel="stylesheet" href="css/purple-silver.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
@@ -28,45 +31,88 @@
       <a href="login.html" id="login-link">Login</a>
       <a href="dashboard.html" id="dashboard-link" class="hidden">Dashboard</a>
     </nav>
-    <button id="hamburger" class="hamburger" aria-label="Toggle navigation">
+    <button id="hamburger" class="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-links">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
 
 <main>
-  <section class="hero center">
-    <h1>Generate your accurate prompt with <span>JSON4AI</span></h1>
-    <p>Turn any JSON schema into a precise AI prompt in seconds.</p>
-    <a href="register.html" class="btn-primary">Get Started Free</a>
-    <lottie-player src="assets/lottie/hero-animation.json" background="transparent" speed="1" style="width: 300px; height: 300px;" autoplay></lottie-player>
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1>Generate your accurate prompt with <span class="highlight">JSON4AI</span></h1>
+        <p>Turn any JSON schema into a precise AI prompt in seconds. Our advanced AI-powered system ensures accuracy and consistency in every generated prompt.</p>
+        <a href="register.html" class="btn-primary">Get Started Free</a>
+      </div>
+      <div class="hero-visual">
+        <lottie-player 
+          src="https://lottie.host/c4128924-66ba-49de-90d3-b8a748016f9d/aLghtKak2n.lottie" 
+          background="transparent" 
+          speed="1" 
+          style="width: 400px; height: 400px;" 
+          loop 
+          autoplay 
+          role="img" 
+          aria-label="AI prompt generation animation">
+        </lottie-player>
+      </div>
+    </div>
+  </section>
+  
+  <section class="features">
+    <div class="container">
+      <div class="features-header text-center">
+        <h2>Why Choose JSON4AI?</h2>
+        <p>Powerful features that make prompt generation effortless</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🚀</div>
+          <h3>Lightning Fast</h3>
+          <p>Generate prompts in seconds, not minutes. Our optimized AI engine delivers results instantly.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Pinpoint Accuracy</h3>
+          <p>Advanced algorithms ensure your prompts are precise and contextually relevant every time.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Enterprise Ready</h3>
+          <p>Built with security and scalability in mind. Perfect for teams and large-scale operations.</p>
+        </div>
+      </div>
+    </div>
   </section>
 </main>
 
 <footer>
-  <div class="container grid-4">
-    <div>
-      <h3>JSON4AI</h3>
-      <p>Generate your accurate prompt with our JSON4AI.</p>
+  <div class="container">
+    <div class="grid-4">
+      <div>
+        <h4>JSON4AI</h4>
+        <p>Generate your accurate prompt with our advanced AI-powered system.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="pricing.html">Pricing</a>
+        <a href="dashboard.html">Dashboard</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms</a>
+        <a href="gdpr.html">GDPR</a>
+        <a href="cookies.html">Cookie Policy</a>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="mailto:hello@json4ai.com">Contact</a>
+      </div>
     </div>
-    <div>
-      <h4>Product</h4>
-      <a href="pricing.html">Pricing</a>
-      <a href="dashboard.html">Dashboard</a>
-    </div>
-    <div>
-      <h4>Legal</h4>
-      <a href="privacy.html">Privacy Policy</a>
-      <a href="terms.html">Terms</a>
-      <a href="gdpr.html">GDPR</a>
-      <a href="cookies.html">Cookie Policy</a>
-    </div>
-    <div>
-      <h4>Support</h4>
-      <a href="mailto:hello@json4ai.com">Contact</a>
-    </div>
+    <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
   </div>
-  <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
 </footer>
 </body>
 </html>

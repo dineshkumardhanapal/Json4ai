@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Dashboard – JSON4AI</title>
+  <meta name="description" content="Manage your profile and subscriptions."/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="stylesheet" href="css/main.css"/>
+  <link rel="stylesheet" href="css/purple-silver.css"/>
+  <link rel="stylesheet" href="css/responsive.css"/>
+  <script src="js/dashboard.js" defer></script>
+</head>
+<body>
+<header class="navbar">
+  <div class="container flex-between">
+    <a href="index.html" class="logo">JSON4<span>AI</span></a>
+    <nav>
+      <button id="logout" class="btn-secondary">Logout</button>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>Dashboard</h1>
+
+  <section class="card">
+    <h2>Profile</h2>
+    <form id="profile-form">
+      <input id="firstName" placeholder="First name"/>
+      <input id="lastName" placeholder="Last name"/>
+      <input id="email" type="email" placeholder="Email" disabled/>
+      <button class="btn-primary">Update Profile</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Subscription</h2>
+    <p id="plan">Free</p>
+    <a href="pricing.html" class="btn-primary">Upgrade</a>
+  </section>
+</main>
+
+<footer>
+  <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+</footer>
+</body>
+</html>

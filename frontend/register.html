@@ -22,18 +22,51 @@
 
 <main class="center">
   <div class="auth-container">
-    <h1>Create Account</h1>
+    <!-- Registration form -->
     <form id="register-form" class="form card">
-      <input name="firstName" type="text" placeholder="First name" required/>
-      <input name="lastName"  type="text" placeholder="Last name" required/>
-      <input name="email"     type="email" placeholder="Email" required/>
-      <input name="password"  type="password" placeholder="Password" required minlength="6"/>
-      <button type="submit" class="btn-primary">Create Account</button>
-      <div id="success-message" style="display:none;color:green">
-        ✅ Check your email and click the verification link.
+      <h1>Create Account</h1>
+
+      <div class="form-group">
+        <label for="firstName">First Name</label>
+        <input id="firstName" name="firstName" type="text" placeholder="Enter your first name" required/>
       </div>
-      <p>Already have an account? <a href="login.html">Login</a></p>
+
+      <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <input id="lastName" name="lastName" type="text" placeholder="Enter your last name" required/>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="Enter your email address" required/>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" placeholder="Create a password" required minlength="6"/>
+      </div>
+
+      <button type="submit" class="btn-primary">Create Account</button>
     </form>
+
+    <!-- Success message (hidden by default) -->
+    <div id="success-message" class="success-message" style="display:none;">
+      <div class="success-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#10b981" stroke-width="2"/>
+          <path d="M9 12l2 2 4-4" stroke="#10b981" stroke-width="2"/>
+        </svg>
+      </div>
+      <h3>Check Your Email!</h3>
+      <p>
+        We've sent you a verification email. Please check your inbox and click the verification link to activate your account.
+      </p>
+      <a href="login.html" class="btn-primary">Go to Login</a>
+    </div>
+
+    <p class="auth-footer">
+      Already have an account? <a href="login.html">Sign in</a>
+    </p>
   </div>
 </main>
 

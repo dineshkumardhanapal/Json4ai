@@ -83,8 +83,115 @@ router.get('/verify/:token', async (req, res) => {
     user.verifyToken = undefined;
     await user.save();
 
-    // Redirect to the frontend verification success page
-    res.redirect('https://json4ai.onrender.com/email-verified.html');
+    // Send HTML response directly instead of redirecting
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="utf-8"/>
+        <title>Email Verified – JSON4AI</title>
+        <meta name="description" content="Your email has been verified successfully."/>
+        <meta name="viewport" content="width=device-width,initial-scale=1"/>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <style>
+          :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #1e1e1e;
+            --bg-gradient-start: #1a0b2e;
+            --bg-gradient-end: #4c1d95;
+            --accent-purple: #8b5cf6;
+            --accent-purple-light: #a78bfa;
+            --text-primary: #ffffff;
+            --text-secondary: #e5e7eb;
+            --text-muted: #9ca3af;
+            --border-color: #374151;
+            --radius-lg: 0.75rem;
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+          }
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+          }
+          .container {
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+          }
+          .success-icon {
+            text-align: center;
+            margin-bottom: 1.5rem;
+          }
+          .success-icon svg {
+            filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.3));
+          }
+          h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+          }
+          p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+          }
+          .btn {
+            display: inline-block;
+            padding: 0.875rem 2rem;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin: 0.5rem;
+          }
+          .btn-primary {
+            background: linear-gradient(135deg, var(--accent-purple), #7c3aed);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-lg);
+          }
+          .btn-primary:hover {
+            transform: translateY(-2px);
+          }
+          .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--border-color);
+            color: var(--text-secondary);
+          }
+          .btn-secondary:hover {
+            border-color: var(--accent-purple);
+            color: var(--accent-purple);
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="success-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="#10b981" stroke-width="2"/>
+              <path d="M9 12l2 2 4-4" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h1>Email Verified!</h1>
+          <p>Your account has been successfully verified. You can now log in to access your dashboard.</p>
+          <a href="https://json4ai.onrender.com/login.html" class="btn btn-primary">Continue to Login</a>
+          <a href="https://json4ai.onrender.com/index.html" class="btn btn-secondary">Back to Home</a>
+        </div>
+      </body>
+      </html>
+    `);
   } catch (err) {
     res.status(500).send('Verification failed. Please try again.');
   }

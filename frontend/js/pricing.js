@@ -13,10 +13,10 @@ document.querySelectorAll('[data-plan]').forEach(btn => {
       if (url) {
         location.href = url;
       } else {
-        alert('Unable to start checkout.');
+        showError('Unable to start checkout.');
       }
     } catch (_) {
-      alert('Checkout unavailable. Please try again later.');
+      showError('Checkout unavailable. Please try again later.');
     }
   });
 });

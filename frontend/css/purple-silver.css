@@ -430,10 +430,30 @@ body {
 .plan-card.featured {
   border-color: var(--accent-purple);
   transform: scale(1.05);
+  position: relative;
+  z-index: 2;
 }
 
 .plan-card.featured::before {
   opacity: 1;
+}
+
+/* Better alignment for featured cards */
+.pricing-grid {
+  align-items: stretch;
+}
+
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.plan-card .btn-primary {
+  margin-top: auto;
+  align-self: center;
+  width: 100%;
+  max-width: 200px;
 }
 
 .plan-badge {
@@ -707,6 +727,44 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
+/* Error message styles */
+.error-message {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.error-message h3 {
+  color: #ef4444;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.error-message p {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+/* Loading states */
+.form input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn-primary:disabled:hover {
+  transform: none !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
 /* Success message styles */
 .success-message {
   text-align: center;
@@ -942,10 +1000,17 @@ footer {
   
   .pricing-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
   
   .plan-card.featured {
     transform: none;
+    order: -1; /* Show featured plan first on mobile */
+  }
+  
+  .plan-card {
+    margin: 0 auto;
+    max-width: 400px;
   }
   
   .dashboard-grid {
@@ -955,6 +1020,13 @@ footer {
   .container {
     width: 95%;
     padding: 0 0.5rem;
+  }
+  
+  /* Notification adjustments for mobile */
+  .notification-container {
+    left: 20px;
+    right: 20px;
+    max-width: none;
   }
 }
 
@@ -1092,6 +1164,96 @@ footer {
 .content-body em {
   color: var(--text-muted);
   font-style: italic;
+}
+
+/* Custom Notifications */
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  max-width: 400px;
+}
+
+.notification {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-xl);
+  backdrop-filter: blur(10px);
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.notification.show {
+  transform: translateX(0);
+}
+
+.notification.success {
+  border-left: 4px solid #10b981;
+}
+
+.notification.error {
+  border-left: 4px solid #ef4444;
+}
+
+.notification.info {
+  border-left: 4px solid #3b82f6;
+}
+
+.notification-icon {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  margin-top: 0.125rem;
+}
+
+.notification.success .notification-icon {
+  color: #10b981;
+}
+
+.notification.error .notification-icon {
+  color: #ef4444;
+}
+
+.notification.info .notification-icon {
+  color: #3b82f6;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary);
+}
+
+.notification-message {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.notification-close:hover {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
 }
 
 /* 404 Error Page */

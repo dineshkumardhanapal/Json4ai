@@ -12,6 +12,7 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error(err));
 
 app.use('/api', require('./routes/auth'));
+app.use('/api/user', require('./routes/user'));
 // (prompt & stripe routes added later)
 
 const PORT = process.env.PORT || 5000;

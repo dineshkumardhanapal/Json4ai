@@ -18,19 +18,19 @@ if (loginForm) {
     try {
       const res = await fetch(API('/login'), { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
       const data = await res.json();
-      if (res.ok) {
-        localStorage.setItem('token', data.token);
-        location.href = 'dashboard.html';
-      } else {
-        if (data.message === 'Please verify your email') {
-          // Show resend verification section
-          verificationSection.style.display = 'block';
+              if (res.ok) {
+          localStorage.setItem('token', data.token);
+          location.href = 'dashboard.html';
+        } else {
+          if (data.message === 'Please verify your email') {
+            // Show resend verification section
+            verificationSection.style.display = 'block';
+          }
+          showError(data.message || 'Login failed');
         }
-        alert(data.message || 'Login failed');
+      } catch (_) {
+        showError('Network error. Please try again.');
       }
-    } catch (_) {
-      alert('Network error. Please try again.');
-    }
   });
   
   // Handle resend verification
@@ -53,13 +53,13 @@ if (loginForm) {
         const data = await res.json();
         
         if (res.ok) {
-          alert(data.message);
+          showSuccess(data.message);
           verificationSection.style.display = 'none';
         } else {
-          alert(data.message || 'Failed to resend verification email');
+          showError(data.message || 'Failed to resend verification email');
         }
       } catch (_) {
-        alert('Network error. Please try again.');
+        showError('Network error. Please try again.');
       } finally {
         resendBtn.disabled = false;
         resendBtn.textContent = 'Resend Verification Email';
@@ -84,7 +84,7 @@ if (registerForm) {
     
     // Check if terms are accepted
     if (!termsCheckbox.checked) {
-      alert('Please accept the Terms of Service and Privacy Policy to continue.');
+      showError('Please accept the Terms of Service and Privacy Policy to continue.');
       return;
     }
     
@@ -111,11 +111,11 @@ if (registerForm) {
           alert(data.message);
           location.href = 'login.html';
         }
-      } else {
-        alert(data.message || 'Registration failed');
+              } else {
+          showError(data.message || 'Registration failed');
+        }
+      } catch (_) {
+        showError('Network error. Please try again.');
       }
-    } catch (_) {
-      alert('Network error. Please try again.');
-    }
   });
 }

@@ -19,7 +19,7 @@ router.post('/register', async (req, res) => {
 
     const verifyLink = `https://json4ai.onrender.com/api/verify/${token}`;
     await transporter.sendMail({
-      from: '"JSON4AI" <noreply@json4ai.onrender.com>',
+      from: '"JSON4AI" <json4ai@gmail.com>',
       to: email,
       subject: 'Verify your account',
       html: `<p>Click to verify: <a href="${verifyLink}">${verifyLink}</a></p>`

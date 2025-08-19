@@ -1,3 +1,14 @@
+const cron = require('node-cron');
+const User = require('./models/User');
+
+cron.schedule('0 0 * * *', async () => {
+  await User.updateMany(
+    { plan: 'free' },
+    { credits: 3, lastFreeReset: new Date() }
+  );
+  console.log('Free credits reset');
+});
+
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -17,3 +28,4 @@ app.use('/api/user', require('./routes/user'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server on ${PORT}`));
+app.use('/api/prompt', require('./routes/prompt'));

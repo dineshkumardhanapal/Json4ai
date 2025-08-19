@@ -4,6 +4,11 @@ const registerForm = document.getElementById('register-form');
 
 const API = path => `https://json4ai.onrender.com/api${path}`;
 
+// Debug logging
+console.log('Auth.js loaded');
+console.log('Login form found:', !!loginForm);
+console.log('Register form found:', !!registerForm);
+
 if (loginForm) {
   const verificationSection = document.querySelector('.verification-section');
   const resendBtn = document.getElementById('resend-verification');
@@ -71,16 +76,25 @@ if (loginForm) {
 if (registerForm) {
   const termsCheckbox = document.getElementById('terms');
   const submitBtn = document.getElementById('submit-btn');
+  const successMessage = document.getElementById('success-message');
+  
+  console.log('Register form elements found:', {
+    termsCheckbox: !!termsCheckbox,
+    submitBtn: !!submitBtn,
+    successMessage: !!successMessage
+  });
   
   // Enable/disable submit button based on terms checkbox
   if (termsCheckbox && submitBtn) {
     termsCheckbox.addEventListener('change', () => {
       submitBtn.disabled = !termsCheckbox.checked;
+      console.log('Terms checkbox changed:', termsCheckbox.checked);
     });
   }
   
   registerForm.addEventListener('submit', async e => {
     e.preventDefault();
+    console.log('Registration form submitted');
     
     // Check if terms are accepted
     if (!termsCheckbox.checked) {
@@ -96,26 +110,49 @@ if (registerForm) {
       password:  fd.get('password')
     };
     
+    console.log('Registration data:', { ...body, password: '[HIDDEN]' });
+    
     try {
+      // Show loading state
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating Account...';
+      
       const res = await fetch(API('/register'), { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
       const data = await res.json();
+      
+      console.log('Registration response:', { status: res.status, data });
+      
       if (res.ok) {
-        // Show success message
-        const form = document.getElementById('register-form');
-        const successMessage = document.getElementById('success-message');
-        if (form && successMessage) {
-          form.style.display = 'none';
+        // Hide the form and show success message
+        console.log('Registration successful, hiding form and showing success message');
+        registerForm.style.display = 'none';
+        
+        if (successMessage) {
           successMessage.style.display = 'block';
+          // Scroll to top to show the success message
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          console.log('Success message displayed');
         } else {
-          // Fallback to alert and redirect
-          alert(data.message);
-          location.href = 'login.html';
+          console.error('Success message element not found, using fallback');
+          // Fallback if success message element not found
+          showSuccess(data.message);
+          setTimeout(() => {
+            location.href = 'login.html';
+          }, 3000);
         }
-              } else {
-          showError(data.message || 'Registration failed');
-        }
-      } catch (_) {
-        showError('Network error. Please try again.');
+      } else {
+        console.error('Registration failed:', data.message);
+        showError(data.message || 'Registration failed');
+        // Reset button state
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Account';
       }
+    } catch (error) {
+      console.error('Registration error:', error);
+      showError('Network error. Please try again.');
+      // Reset button state
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Create Account';
+    }
   });
 }

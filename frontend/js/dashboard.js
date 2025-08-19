@@ -33,7 +33,11 @@ const loadProfile = async () => {
     const first = document.getElementById('firstName');
     const last  = document.getElementById('lastName');
     const email = document.getElementById('email');
-    const plan  = document.getElementById('plan');
+    const planBadge = document.getElementById('plan-badge');
+    const planDescription = document.getElementById('plan-description');
+    const usageProgress = document.getElementById('usage-progress');
+    const usageText = document.getElementById('usage-text');
+    const planFeaturesList = document.getElementById('plan-features-list');
     
     if (first) {
       first.value = user.firstName || '';
@@ -49,7 +53,70 @@ const loadProfile = async () => {
       email.value = user.email || '';
       email.placeholder = 'your@email.com';
     }
-    if (plan) plan.textContent = user.plan || 'Free';
+    
+    // Update plan information
+    if (planBadge) {
+      planBadge.textContent = user.plan ? user.plan.charAt(0).toUpperCase() + user.plan.slice(1) : 'Free';
+      planBadge.className = `plan-badge plan-${user.plan || 'free'}`;
+    }
+    
+    if (planDescription) {
+      const descriptions = {
+        free: '3 prompts per day',
+        starter: '30 prompts per day',
+        premium: 'Unlimited prompts'
+      };
+      planDescription.textContent = descriptions[user.plan] || descriptions.free;
+    }
+    
+    // Update usage information
+    if (usageProgress && usageText) {
+      const dailyLimit = user.dailyLimit || 3;
+      const remainingCredits = user.remainingCredits || 0;
+      
+      if (user.plan === 'premium') {
+        usageProgress.style.width = '100%';
+        usageProgress.style.backgroundColor = '#10b981';
+        usageText.textContent = 'Unlimited access - No daily limits';
+      } else {
+        const used = dailyLimit - remainingCredits;
+        const percentage = Math.min((used / dailyLimit) * 100, 100);
+        usageProgress.style.width = `${percentage}%`;
+        usageProgress.style.backgroundColor = percentage > 80 ? '#ef4444' : percentage > 60 ? '#f59e0b' : '#10b981';
+        usageText.textContent = `${used} of ${dailyLimit} prompts used today (${remainingCredits} remaining)`;
+      }
+    }
+    
+    // Update plan features
+    if (planFeaturesList) {
+      const features = {
+        free: [
+          '3 prompts per day',
+          'Basic JSON templates',
+          'Community support',
+          'Standard response time'
+        ],
+        starter: [
+          '30 prompts per day',
+          'Advanced JSON templates',
+          'Priority support',
+          'Faster response time',
+          'Custom prompt history'
+        ],
+        premium: [
+          'Unlimited prompts',
+          'All JSON templates',
+          'Premium support',
+          'Fastest response time',
+          'Full prompt history',
+          'API access',
+          'Custom integrations'
+        ]
+      };
+      
+      const currentFeatures = features[user.plan] || features.free;
+      planFeaturesList.innerHTML = currentFeatures.map(feature => `<li>${feature}</li>`).join('');
+    }
     
     // Enable the update button
     const updateBtn = document.querySelector('#profile-form button[type="submit"]');
@@ -60,6 +127,10 @@ const loadProfile = async () => {
     if (subtitle) subtitle.textContent = `Welcome back, ${user.firstName || 'User'}! Manage your profile, view usage, and upgrade your plan`;
     
     console.log('Profile loaded successfully:', user);
+    
+    // Load recent activity
+    loadRecentActivity();
+    
   } catch (error) {
     console.error('Error loading profile:', error);
     
@@ -69,10 +140,65 @@ const loadProfile = async () => {
     if (errorMessage && errorText) {
       errorText.textContent = error.message || 'Failed to load profile. Please refresh the page.';
       errorMessage.style.display = 'block';
-            } else {
-          showError('Failed to load profile. Please refresh the page.');
-        }
+    } else {
+      showError('Failed to load profile. Please refresh the page.');
+    }
   }
+};
+
+// Load recent activity
+const loadRecentActivity = async () => {
+  try {
+    const res = await fetch('https://json4ai.onrender.com/api/prompt/history', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (!res.ok) {
+      console.error('Failed to load activity history');
+      return;
+    }
+    
+    const prompts = await res.json();
+    const activityList = document.getElementById('activity-list');
+    
+    if (activityList && prompts.length > 0) {
+      activityList.innerHTML = prompts.slice(0, 5).map(prompt => `
+        <div class="activity-item">
+          <div class="activity-icon">📝</div>
+          <div class="activity-content">
+            <h4>Prompt Generated</h4>
+            <p>${prompt.comment || 'JSON prompt generated'}</p>
+            <span class="activity-time">${formatTimeAgo(new Date(prompt.createdAt))}</span>
+          </div>
+        </div>
+      `).join('');
+    } else if (activityList) {
+      activityList.innerHTML = `
+        <div class="activity-item">
+          <div class="activity-icon">🎯</div>
+          <div class="activity-content">
+            <h4>No Activity Yet</h4>
+            <p>Start generating prompts to see your activity here</p>
+            <span class="activity-time">Just now</span>
+          </div>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('Error loading activity:', error);
+  }
+};
+
+// Format time ago
+const formatTimeAgo = (date) => {
+  const now = new Date();
+  const diffInSeconds = Math.floor((now - date) / 1000);
+  
+  if (diffInSeconds < 60) return 'Just now';
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+  return date.toLocaleDateString();
 };
 
 // Load profile when page loads
@@ -109,11 +235,15 @@ document.getElementById('profile-form')?.addEventListener('submit', async e => {
       throw new Error('Failed to update profile');
     }
     
-            showSuccess('Profile updated successfully!');
-      } catch (error) {
-        console.error('Error updating profile:', error);
-        showError('Failed to update profile. Please try again.');
-      } finally {
+    showSuccess('Profile updated successfully!');
+    
+    // Reload profile to get updated information
+    loadProfile();
+    
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    showError('Failed to update profile. Please try again.');
+  } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = originalText;
   }

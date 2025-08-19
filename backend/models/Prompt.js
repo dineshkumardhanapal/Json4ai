@@ -1,3 +1,4 @@
+// models/Prompt.js
 const mongoose = require('mongoose');
 const promptSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },

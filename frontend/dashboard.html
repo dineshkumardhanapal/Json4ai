@@ -67,20 +67,29 @@
       </section>
 
       <section class="card">
-        <h2>Subscription Details</h2>
+        <h2>Plan & Usage</h2>
         <div class="subscription-info">
           <div class="current-plan">
             <h3>Current Plan</h3>
-            <div class="plan-badge" id="plan">Free</div>
+            <div class="plan-badge" id="plan-badge">Loading...</div>
+            <p id="plan-description">Loading plan details...</p>
           </div>
+          
+          <div class="usage-stats">
+            <h4>Daily Usage</h4>
+            <div class="usage-bar">
+              <div class="usage-progress" id="usage-progress"></div>
+            </div>
+            <p id="usage-text">Loading usage information...</p>
+          </div>
+          
           <div class="plan-features">
             <h4>Plan Features</h4>
-            <ul>
-              <li>Basic prompt generation</li>
-              <li>Standard templates</li>
-              <li>Community support</li>
+            <ul id="plan-features-list">
+              <li>Loading features...</li>
             </ul>
           </div>
+          
           <a href="pricing.html" class="btn-primary">Upgrade Plan</a>
         </div>
       </section>
@@ -88,21 +97,13 @@
 
     <section class="card">
       <h2>Recent Activity</h2>
-      <div class="activity-list">
+      <div class="activity-list" id="activity-list">
         <div class="activity-item">
           <div class="activity-icon">📝</div>
           <div class="activity-content">
-            <h4>Prompt Generated</h4>
-            <p>API endpoint schema converted to prompt</p>
-            <span class="activity-time">2 hours ago</span>
-          </div>
-        </div>
-        <div class="activity-item">
-          <div class="activity-icon">✅</div>
-          <div class="activity-content">
-            <h4>Profile Updated</h4>
-            <p>Your profile information was updated</p>
-            <span class="activity-time">1 day ago</span>
+            <h4>Loading...</h4>
+            <p>Loading recent activity...</p>
+            <span class="activity-time">Loading...</span>
           </div>
         </div>
       </div>

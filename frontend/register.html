@@ -63,23 +63,23 @@
       <div class="auth-footer">
         <p>Already have an account? <a href="login.html">Sign in</a></p>
       </div>
-      
-      <!-- Registration success message -->
-      <div id="success-message" class="success-message" style="display: none;">
-        <div class="success-icon">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="12" cy="12" r="10" stroke="#10b981" stroke-width="2"/>
-            <path d="M9 12l2 2 4-4" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <h3>Check Your Email!</h3>
-        <p>We've sent you a verification email. Please check your inbox and click the verification link to activate your account.</p>
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 1rem;">
-          <strong>Note:</strong> You won't be able to log in until you verify your email address.
-        </p>
-        <a href="login.html" class="btn-primary" style="margin-top: 1.5rem;">Go to Login</a>
-      </div>
     </form>
+    
+    <!-- Registration success message -->
+    <div id="success-message" class="success-message" style="display: none;">
+      <div class="success-icon">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" stroke="#10b981" stroke-width="2"/>
+          <path d="M9 12l2 2 4-4" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>Check Your Email!</h3>
+      <p>We've sent you a verification email. Please check your inbox and click the verification link to activate your account.</p>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 1rem;">
+        <strong>Note:</strong> You won't be able to log in until you verify your email address.
+      </p>
+      <a href="login.html" class="btn-primary" style="margin-top: 1.5rem;">Go to Login</a>
+    </div>
   </div>
 </main>
 
@@ -88,5 +88,20 @@
     <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
   </div>
 </footer>
+
+<script>
+// Additional debugging
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM loaded');
+  console.log('Success message element:', document.getElementById('success-message'));
+  console.log('Register form element:', document.getElementById('register-form'));
+  
+  // Test if elements are properly styled
+  const successMsg = document.getElementById('success-message');
+  if (successMsg) {
+    console.log('Success message styles:', window.getComputedStyle(successMsg));
+  }
+});
+</script>
 </body>
 </html>

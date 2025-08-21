@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Prompt Generator – JSON4AI</title>
+  <meta name="description" content="Generate AI-powered JSON prompts using Llama-3.1-8B"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css"/>
+  <link rel="stylesheet" href="css/purple-silver.css"/>
+  <link rel="stylesheet" href="css/responsive.css"/>
+  <script src="js/notifications.js" defer></script>
+  <script src="js/prompt-generator.js" defer></script>
+</head>
+<body>
+<header class="navbar">
+  <div class="container flex-between">
+    <a href="index.html" class="logo">JSON4<span>AI</span></a>
+    <nav class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="pricing.html">Pricing</a>
+      <button id="logout" class="btn-secondary">Logout</button>
+    </nav>
+  </nav>
+</header>
+
+<!-- Notification Container -->
+<div id="notification-container" class="notification-container"></div>
+
+<main>
+  <div class="container">
+    <div class="generator-header">
+      <h1>AI Prompt Generator</h1>
+      <p>Powered by Llama-3.1-8B • Transform your ideas into structured JSON prompts</p>
+    </div>
+
+    <!-- Usage Status Card -->
+    <div class="usage-status-card" id="usage-status">
+      <div class="status-icon">🎯</div>
+      <div class="status-content">
+        <h3>Loading usage status...</h3>
+        <p>Checking your plan and remaining credits...</p>
+      </div>
+    </div>
+
+    <!-- Prompt Generator Form -->
+    <div class="generator-card" id="generator-form">
+      <div class="card-header">
+        <h2>Generate Your Prompt</h2>
+        <p>Describe what you need, and our AI will create a structured JSON prompt for you</p>
+      </div>
+
+      <form id="prompt-form" class="prompt-form">
+        <div class="form-group">
+          <label for="prompt-input">What would you like to generate?</label>
+          <textarea 
+            id="prompt-input" 
+            placeholder="e.g., Create a JSON prompt for generating product descriptions, or Build a structured prompt for analyzing customer feedback..."
+            rows="4"
+            required
+          ></textarea>
+          <small>Be specific about your requirements, format, and expected output</small>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" id="generate-btn">
+            <span class="btn-text">Generate Prompt</span>
+            <span class="btn-loading" style="display: none;">
+              <div class="spinner"></div>
+              Generating...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Generated Result -->
+    <div class="result-card" id="result-card" style="display: none;">
+      <div class="card-header">
+        <h2>Generated Prompt</h2>
+        <div class="result-actions">
+          <button class="btn-secondary" id="copy-btn">📋 Copy</button>
+          <button class="btn-secondary" id="new-prompt-btn">🔄 New Prompt</button>
+        </div>
+      </div>
+      
+      <div class="result-content">
+        <div class="original-input">
+          <h4>Your Input:</h4>
+          <p id="original-input-text"></p>
+        </div>
+        
+        <div class="generated-output">
+          <h4>AI Generated JSON:</h4>
+          <div class="json-display">
+            <pre id="json-output"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Generations -->
+    <div class="history-card">
+      <div class="card-header">
+        <h2>Recent Generations</h2>
+        <a href="dashboard.html" class="btn-secondary">View All</a>
+      </div>
+      
+      <div class="history-list" id="history-list">
+        <div class="loading-item">
+          <div class="loading-spinner"></div>
+          <p>Loading recent generations...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+  </div>
+</footer>
+</body>
+</html>

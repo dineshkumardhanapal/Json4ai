@@ -3,7 +3,8 @@ const User = require('../models/User');
 
 module.exports = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user);
+    // req.user is set by auth middleware, so we can access req.user._id
+    const user = await User.findById(req.user._id);
     if (!user) return res.status(401).json({ message: 'User not found' });
 
     // Reset credits and usage based on plan

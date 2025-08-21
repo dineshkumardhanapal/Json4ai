@@ -12,7 +12,7 @@ const replicate = new Replicate({
 });
 
 // POST /api/prompt/generate
-router.post('/generate', creditCheck, async (req, res) => {
+router.post('/generate', auth, creditCheck, async (req, res) => {
   try {
     const { comment } = req.body;
     if (!comment) return res.status(400).json({ message: 'Missing comment' });

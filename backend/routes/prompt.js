@@ -4,6 +4,7 @@ const Replicate = require('replicate');
 const Prompt = require('../models/Prompt');
 const User   = require('../models/User');
 const creditCheck = require('../middleware/credit');
+const auth = require('../middleware/auth');
 
 // Initialize Replicate client
 const replicate = new Replicate({
@@ -114,9 +115,10 @@ Return only the JSON object, no additional text:`;
 });
 
 // GET /api/prompt/history
-router.get('/history', creditCheck, async (req, res) => {
+router.get('/history', auth, async (req, res) => {
   try {
-    const prompts = await Prompt.find({ userId: req.userObj._id }).sort({ createdAt: -1 });
+    // User is already authenticated and available as req.user from auth middleware
+    const prompts = await Prompt.find({ userId: req.user._id }).sort({ createdAt: -1 });
     res.json(prompts);
   } catch (error) {
     console.error('Prompt history error:', error);
@@ -125,9 +127,11 @@ router.get('/history', creditCheck, async (req, res) => {
 });
 
 // GET /api/prompt/usage
-router.get('/usage', creditCheck, async (req, res) => {
+router.get('/usage', auth, async (req, res) => {
   try {
-    const user = req.userObj;
+    // User is already authenticated and available as req.user from auth middleware
+    const user = req.user;
+    
     res.json({
       plan: user.plan,
       dailyLimit: user.dailyLimit,

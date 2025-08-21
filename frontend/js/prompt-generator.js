@@ -72,25 +72,37 @@ const historyList = document.getElementById('history-list');
 
 // Load usage status and check if user can generate prompts
 const loadUsageStatus = async () => {
+  console.log('📊 Starting loadUsageStatus...');
   try {
+    console.log('📡 Making API call to /api/prompt/usage...');
     const res = await fetch('https://json4ai.onrender.com/api/prompt/usage', {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     
+    console.log('📥 Usage API response status:', res.status);
+    console.log('📥 Usage API response headers:', Object.fromEntries(res.headers.entries()));
+    
     if (!res.ok) {
       if (res.status === 401) {
-        localStorage.clear();
-        location.href = 'login.html';
+        console.log('❌ Usage API returned 401 - redirecting to login');
+        console.log('⏳ Waiting 3 seconds before redirecting...');
+        setTimeout(() => {
+          localStorage.clear();
+          location.href = 'login.html';
+        }, 3000);
         return;
       }
+      console.log('❌ Usage API failed with status:', res.status);
       throw new Error('Failed to load usage information');
     }
     
+    console.log('✅ Usage API successful, parsing response...');
     const usage = await res.json();
+    console.log('📊 Usage data received:', usage);
     updateUsageStatus(usage);
     
   } catch (error) {
-    console.error('Error loading usage:', error);
+    console.error('❌ Error loading usage:', error);
     showError('Failed to load usage information');
   }
 };
@@ -270,23 +282,34 @@ const startNewPrompt = () => {
 
 // Load recent generation history
 const loadRecentHistory = async () => {
+  console.log('📜 Starting loadRecentHistory...');
   try {
+    console.log('📡 Making API call to /api/prompt/history...');
     const res = await fetch('https://json4ai.onrender.com/api/prompt/history', {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     
+    console.log('📥 History API response status:', res.status);
+    console.log('📥 History API response headers:', Object.fromEntries(res.headers.entries()));
+    
     if (!res.ok) {
       if (res.status === 401) {
+        console.log('❌ History API returned 401 - redirecting to login');
         // Token expired or invalid - redirect to login
-        localStorage.clear();
-        location.href = 'login.html';
+        console.log('⏳ Waiting 3 seconds before redirecting...');
+        setTimeout(() => {
+          localStorage.clear();
+          location.href = 'login.html';
+        }, 3000);
         return;
       }
-      console.error('Failed to load history');
+      console.error('❌ Failed to load history');
       return;
     }
     
+    console.log('✅ History API successful, parsing response...');
     const prompts = await res.json();
+    console.log('📊 History data received:', prompts);
     
     if (prompts.length > 0) {
       historyList.innerHTML = prompts.slice(0, 3).map(prompt => `
@@ -311,7 +334,7 @@ const loadRecentHistory = async () => {
     }
     
   } catch (error) {
-    console.error('Error loading history:', error);
+    console.error('❌ Error loading history:', error);
     historyList.innerHTML = `
       <div class="history-item">
         <div class="history-icon">⚠️</div>
@@ -378,6 +401,31 @@ const initializePage = async () => {
   }
   
   console.log('✅ Authentication successful, loading page content...');
+  
+  // Test each API endpoint individually to see which one fails
+  console.log('🧪 Testing individual API endpoints...');
+  
+  // Test usage API first
+  console.log('🧪 Testing usage API...');
+  try {
+    const usageRes = await fetch('https://json4ai.onrender.com/api/prompt/usage', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    console.log('🧪 Usage API test result:', usageRes.status, usageRes.ok ? 'OK' : 'FAILED');
+  } catch (error) {
+    console.log('🧪 Usage API test error:', error.message);
+  }
+  
+  // Test history API
+  console.log('🧪 Testing history API...');
+  try {
+    const historyRes = await fetch('https://json4ai.onrender.com/api/prompt/history', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    console.log('🧪 History API test result:', historyRes.status, historyRes.ok ? 'OK' : 'FAILED');
+  } catch (error) {
+    console.log('🧪 History API test error:', error.message);
+  }
   
   // Load page content
   console.log('📊 Loading usage status...');

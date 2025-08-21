@@ -45,6 +45,21 @@
       </div>
     </div>
 
+    <!-- Debug Info (remove in production) -->
+    <div class="debug-card" id="debug-card" style="display: none;">
+      <h3>🔍 Debug Information</h3>
+      <div id="debug-content">
+        <p><strong>Token Status:</strong> <span id="token-status">Checking...</span></p>
+        <p><strong>Token Length:</strong> <span id="token-length">-</span></p>
+        <p><strong>Current URL:</strong> <span id="current-url">-</span></p>
+        <p><strong>Referrer:</strong> <span id="referrer">-</span></p>
+      </div>
+      <div class="debug-actions">
+        <button onclick="testTokenValidation()" class="btn-secondary">Test Token</button>
+        <button onclick="toggleDebug()" class="btn-secondary">Hide Debug</button>
+      </div>
+    </div>
+
     <!-- Prompt Generator Form -->
     <div class="generator-card" id="generator-form">
       <div class="card-header">

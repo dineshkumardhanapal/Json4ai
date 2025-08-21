@@ -7,6 +7,33 @@ logoutBtn && logoutBtn.addEventListener('click', () => {
   location.href = 'index.html';
 });
 
+// Validate token before making API calls
+const validateToken = async () => {
+  try {
+    console.log('🔐 Validating token...');
+    console.log('🔑 Token length:', token ? token.length : 'No token');
+    console.log('🔑 Token preview:', token ? `${token.substring(0, 20)}...` : 'No token');
+    
+    const res = await fetch('https://json4ai.onrender.com/api/user/profile', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (res.status === 401) {
+      // Token is invalid or expired
+      console.log('❌ Token validation failed - redirecting to login');
+      localStorage.clear();
+      location.href = 'login.html';
+      return false;
+    }
+    
+    console.log('✅ Token validation successful');
+    return true;
+  } catch (error) {
+    console.error('❌ Token validation error:', error);
+    return false;
+  }
+};
+
 // DOM elements
 const usageStatus = document.getElementById('usage-status');
 const generatorForm = document.getElementById('generator-form');
@@ -92,6 +119,14 @@ const updateUsageStatus = (usage) => {
 
 // Handle prompt generation
 const generatePrompt = async (comment) => {
+  console.log('🚀 Starting prompt generation...');
+  
+  // Validate token before proceeding
+  const isValid = await validateToken();
+  if (!isValid) return; // Will redirect to login if invalid
+  
+  console.log('✅ Token validated, proceeding with generation...');
+  
   const generateBtn = document.getElementById('generate-btn');
   const btnText = generateBtn.querySelector('.btn-text');
   const btnLoading = generateBtn.querySelector('.btn-loading');
@@ -102,6 +137,7 @@ const generatePrompt = async (comment) => {
     btnLoading.style.display = 'flex';
     generateBtn.disabled = true;
     
+    console.log('📡 Making API call to generate prompt...');
     const res = await fetch('https://json4ai.onrender.com/api/prompt/generate', {
       method: 'POST',
       headers: {
@@ -111,11 +147,23 @@ const generatePrompt = async (comment) => {
       body: JSON.stringify({ comment })
     });
     
+    console.log('📥 API response status:', res.status);
+    
     if (!res.ok) {
       const errorData = await res.json();
+      console.log('❌ API error:', errorData);
+      
+      if (res.status === 401) {
+        // Token expired or invalid - redirect to login
+        console.log('🔐 Unauthorized - redirecting to login');
+        localStorage.clear();
+        location.href = 'login.html';
+        return;
+      }
       
       if (res.status === 402) {
         // Credit limit reached
+        console.log('💳 Credit limit reached');
         showError(errorData.message);
         loadUsageStatus(); // Refresh usage status
         return;
@@ -125,6 +173,7 @@ const generatePrompt = async (comment) => {
     }
     
     const result = await res.json();
+    console.log('✅ Prompt generated successfully:', result);
     
     // Display the result
     displayResult(comment, result.prompt);
@@ -138,7 +187,7 @@ const generatePrompt = async (comment) => {
     showSuccess('Prompt generated successfully!');
     
   } catch (error) {
-    console.error('Error generating prompt:', error);
+    console.error('❌ Error generating prompt:', error);
     showError(error.message || 'Failed to generate prompt. Please try again.');
   } finally {
     // Reset button state
@@ -198,6 +247,12 @@ const loadRecentHistory = async () => {
     });
     
     if (!res.ok) {
+      if (res.status === 401) {
+        // Token expired or invalid - redirect to login
+        localStorage.clear();
+        location.href = 'login.html';
+        return;
+      }
       console.error('Failed to load history');
       return;
     }
@@ -265,5 +320,94 @@ document.getElementById('copy-btn')?.addEventListener('click', copyToClipboard);
 document.getElementById('new-prompt-btn')?.addEventListener('click', startNewPrompt);
 
 // Initialize page
-loadUsageStatus();
-loadRecentHistory();
+const initializePage = async () => {
+  console.log('🚀 Initializing prompt generator page...');
+  
+  // Wait a bit to ensure localStorage is ready
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  // Check if we have a token
+  if (!token) {
+    console.log('❌ No token found - redirecting to login');
+    location.href = 'login.html';
+    return;
+  }
+  
+  console.log('🔑 Token found, validating...');
+  console.log('🔑 Current URL:', window.location.href);
+  console.log('🔑 Referrer:', document.referrer);
+  
+  // Validate token first
+  const isValid = await validateToken();
+  if (!isValid) return; // Will redirect to login if invalid
+  
+  console.log('✅ Authentication successful, loading page content...');
+  
+  // Load page content
+  loadUsageStatus();
+  loadRecentHistory();
+  
+  // Set up periodic token validation (every 5 minutes)
+  setInterval(async () => {
+    const stillValid = await validateToken();
+    if (!stillValid) return; // Will redirect to login if invalid
+  }, 5 * 60 * 1000); // 5 minutes
+};
+
+// Listen for storage changes (in case token is cleared from another tab/window)
+window.addEventListener('storage', (e) => {
+  if (e.key === 'token' && !e.newValue) {
+    console.log('🔑 Token cleared from storage - redirecting to login');
+    location.href = 'login.html';
+  }
+});
+
+// Debug functionality
+const debugCard = document.getElementById('debug-card');
+const debugContent = document.getElementById('debug-content');
+
+const updateDebugInfo = () => {
+  if (debugCard && debugContent) {
+    const tokenStatus = token ? 'Present' : 'Missing';
+    const tokenLength = token ? token.length : 0;
+    const currentUrl = window.location.href;
+    const referrer = document.referrer;
+    
+    debugContent.innerHTML = `
+      <p><strong>Token Status:</strong> <span id="token-status">${tokenStatus}</span></p>
+      <p><strong>Token Length:</strong> <span id="token-length">${tokenLength}</span></p>
+      <p><strong>Current URL:</strong> <span id="current-url">${currentUrl}</span></p>
+      <p><strong>Referrer:</strong> <span id="referrer">${referrer}</span></p>
+    `;
+  }
+};
+
+const toggleDebug = () => {
+  if (debugCard) {
+    debugCard.style.display = debugCard.style.display === 'none' ? 'block' : 'none';
+  }
+};
+
+const testTokenValidation = async () => {
+  console.log('🧪 Testing token validation...');
+  const isValid = await validateToken();
+  if (isValid) {
+    showSuccess('Token is valid!');
+    updateDebugInfo();
+  } else {
+    showError('Token validation failed!');
+  }
+};
+
+// Make functions global
+window.toggleDebug = toggleDebug;
+window.testTokenValidation = testTokenValidation;
+
+// Show debug info initially (remove in production)
+if (debugCard) {
+  debugCard.style.display = 'block';
+  updateDebugInfo();
+}
+
+// Start initialization
+initializePage();

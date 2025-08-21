@@ -14,15 +14,42 @@ const validateToken = async () => {
     console.log('🔑 Token length:', token ? token.length : 'No token');
     console.log('🔑 Token preview:', token ? `${token.substring(0, 20)}...` : 'No token');
     
+    console.log('📡 Making API call to validate token...');
     const res = await fetch('https://json4ai.onrender.com/api/user/profile', {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     
+    console.log('📥 Token validation response status:', res.status);
+    console.log('📥 Token validation response headers:', Object.fromEntries(res.headers.entries()));
+    
     if (res.status === 401) {
       // Token is invalid or expired
       console.log('❌ Token validation failed - redirecting to login');
-      localStorage.clear();
-      location.href = 'login.html';
+      console.log('❌ Response status was 401 (Unauthorized)');
+      
+      // Try to get error details
+      try {
+        const errorText = await res.text();
+        console.log('❌ Error response body:', errorText);
+      } catch (e) {
+        console.log('❌ Could not read error response body');
+      }
+      
+      console.log('⏳ Waiting 5 seconds before redirecting to login...');
+      console.log('⏳ Check the console logs above to see what went wrong!');
+      
+      // Wait 5 seconds before redirecting so you can see the logs
+      setTimeout(() => {
+        localStorage.clear();
+        location.href = 'login.html';
+      }, 5000);
+      
+      return false;
+    }
+    
+    if (!res.ok) {
+      console.log('⚠️ Token validation response not ok, status:', res.status);
+      console.log('⚠️ This might indicate a backend issue');
       return false;
     }
     
@@ -30,6 +57,8 @@ const validateToken = async () => {
     return true;
   } catch (error) {
     console.error('❌ Token validation error:', error);
+    console.error('❌ Error details:', error.message);
+    console.error('❌ Error stack:', error.stack);
     return false;
   }
 };
@@ -336,19 +365,29 @@ const initializePage = async () => {
   console.log('🔑 Token found, validating...');
   console.log('🔑 Current URL:', window.location.href);
   console.log('🔑 Referrer:', document.referrer);
+  console.log('🔑 Token preview:', token.substring(0, 20) + '...');
   
   // Validate token first
+  console.log('🔐 About to validate token...');
   const isValid = await validateToken();
-  if (!isValid) return; // Will redirect to login if invalid
+  console.log('🔐 Token validation result:', isValid);
+  
+  if (!isValid) {
+    console.log('❌ Token validation failed - will redirect to login');
+    return; // Will redirect to login if invalid
+  }
   
   console.log('✅ Authentication successful, loading page content...');
   
   // Load page content
+  console.log('📊 Loading usage status...');
   loadUsageStatus();
+  console.log('📜 Loading recent history...');
   loadRecentHistory();
   
   // Set up periodic token validation (every 5 minutes)
   setInterval(async () => {
+    console.log('⏰ Periodic token validation...');
     const stillValid = await validateToken();
     if (!stillValid) return; // Will redirect to login if invalid
   }, 5 * 60 * 1000); // 5 minutes
@@ -366,16 +405,42 @@ window.addEventListener('storage', (e) => {
 const debugCard = document.getElementById('debug-card');
 const debugContent = document.getElementById('debug-content');
 
+const checkTokenExpiration = () => {
+  if (!token) return 'No token';
+  
+  try {
+    // JWT tokens have 3 parts separated by dots
+    const parts = token.split('.');
+    if (parts.length !== 3) return 'Invalid token format';
+    
+    // Decode the payload (second part)
+    const payload = JSON.parse(atob(parts[1]));
+    const expiration = new Date(payload.exp * 1000);
+    const now = new Date();
+    
+    if (expiration <= now) {
+      return `Expired at ${expiration.toLocaleString()}`;
+    }
+    
+    const timeLeft = Math.floor((expiration - now) / 1000 / 60); // minutes
+    return `Valid for ${timeLeft} more minutes`;
+  } catch (error) {
+    return 'Error parsing token';
+  }
+};
+
 const updateDebugInfo = () => {
   if (debugCard && debugContent) {
     const tokenStatus = token ? 'Present' : 'Missing';
     const tokenLength = token ? token.length : 0;
     const currentUrl = window.location.href;
     const referrer = document.referrer;
+    const tokenExpiration = checkTokenExpiration();
     
     debugContent.innerHTML = `
       <p><strong>Token Status:</strong> <span id="token-status">${tokenStatus}</span></p>
       <p><strong>Token Length:</strong> <span id="token-length">${tokenLength}</span></p>
+      <p><strong>Token Expiration:</strong> <span id="token-expiration">${tokenExpiration}</span></p>
       <p><strong>Current URL:</strong> <span id="current-url">${currentUrl}</span></p>
       <p><strong>Referrer:</strong> <span id="referrer">${referrer}</span></p>
     `;
@@ -399,9 +464,35 @@ const testTokenValidation = async () => {
   }
 };
 
+const testBackendAPI = async () => {
+  console.log('🌐 Testing backend API...');
+  try {
+    const res = await fetch('https://json4ai.onrender.com/api/user/profile', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    console.log('📥 API Response Status:', res.status);
+    console.log('📥 API Response Headers:', Object.fromEntries(res.headers.entries()));
+    
+    if (res.ok) {
+      const data = await res.json();
+      console.log('✅ API Response Data:', data);
+      showSuccess(`API working! User: ${data.firstName} ${data.lastName}`);
+    } else {
+      const errorData = await res.text();
+      console.log('❌ API Error:', errorData);
+      showError(`API Error: ${res.status} - ${errorData}`);
+    }
+  } catch (error) {
+    console.error('❌ API Test Failed:', error);
+    showError(`API Test Failed: ${error.message}`);
+  }
+};
+
 // Make functions global
 window.toggleDebug = toggleDebug;
 window.testTokenValidation = testTokenValidation;
+window.testBackendAPI = testBackendAPI;
 
 // Show debug info initially (remove in production)
 if (debugCard) {

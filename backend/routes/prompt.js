@@ -86,7 +86,7 @@ Return only the JSON object, no additional text:`;
     }
     
     const output = await replicate.run(
-      "meta-llama/llama-3.1-8b-instruct:6b4c817dd9768399e6b659b8f5b2fd9f306090d80fe376e88d473c9d4ca2fcde",
+      "meta/meta-llama-3-8b-instruct",
       {
         input: {
           prompt: prompt,

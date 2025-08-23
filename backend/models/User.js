@@ -19,7 +19,11 @@ const userSchema = new mongoose.Schema({
   planEndDate: { type: Date },
   totalPromptsUsed: { type: Number, default: 0 },
   monthlyPromptsUsed: { type: Number, default: 0 },
-  lastMonthlyReset: { type: Date, default: Date.now }
+  lastMonthlyReset: { type: Date, default: Date.now },
+  // Session management fields
+  refreshToken: String,
+  lastLogin: { type: Date, default: Date.now },
+  lastActivity: { type: Date, default: Date.now }
 }, { timestamps: true });
 
 // Virtual for checking if user has unlimited access

@@ -283,10 +283,119 @@ router.post('/login', async (req, res) => {
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) return res.status(400).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token });
+    // Create access token with 15 minutes expiration (for security)
+    const accessToken = jwt.sign(
+      { 
+        id: user._id, 
+        type: 'access',
+        iat: Math.floor(Date.now() / 1000)
+      }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '15m' }
+    );
+
+    // Create refresh token with 7 days expiration
+    const refreshToken = jwt.sign(
+      { 
+        id: user._id, 
+        type: 'refresh',
+        iat: Math.floor(Date.now() / 1000)
+      }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '7d' }
+    );
+
+    // Store refresh token hash in user document
+    const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
+    user.refreshToken = refreshTokenHash;
+    user.lastLogin = new Date();
+    await user.save();
+
+    res.json({ 
+      accessToken, 
+      refreshToken,
+      expiresIn: 15 * 60, // 15 minutes in seconds
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email
+      }
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+
+// POST /api/refresh
+router.post('/refresh', async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    
+    if (!refreshToken) {
+      return res.status(400).json({ message: 'Refresh token required' });
+    }
+
+    // Verify refresh token
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    
+    if (decoded.type !== 'refresh') {
+      return res.status(401).json({ message: 'Invalid token type' });
+    }
+
+    // Find user and verify refresh token hash
+    const user = await User.findById(decoded.id);
+    if (!user || !user.refreshToken) {
+      return res.status(401).json({ message: 'Invalid refresh token' });
+    }
+
+    const isValidRefreshToken = await bcrypt.compare(refreshToken, user.refreshToken);
+    if (!isValidRefreshToken) {
+      return res.status(401).json({ message: 'Invalid refresh token' });
+    }
+
+    // Generate new access token
+    const newAccessToken = jwt.sign(
+      { 
+        id: user._id, 
+        type: 'access',
+        iat: Math.floor(Date.now() / 1000)
+      }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '15m' }
+    );
+
+    res.json({ 
+      accessToken: newAccessToken,
+      expiresIn: 15 * 60 // 15 minutes in seconds
+    });
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Refresh token expired' });
+    }
+    res.status(500).json({ message: 'Token refresh failed' });
+  }
+});
+
+// POST /api/logout
+router.post('/logout', async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    
+    if (refreshToken) {
+      const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+      if (decoded.type === 'refresh') {
+        // Invalidate refresh token
+        await User.findByIdAndUpdate(decoded.id, { 
+          $unset: { refreshToken: 1 } 
+        });
+      }
+    }
+    
+    res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    // Even if token verification fails, still return success
+    res.json({ message: 'Logged out successfully' });
   }
 });
 

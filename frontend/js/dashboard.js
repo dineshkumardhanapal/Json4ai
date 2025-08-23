@@ -1,10 +1,15 @@
-const token = localStorage.getItem('token');
-if (!token) location.href = 'login.html';
+const accessToken = localStorage.getItem('accessToken');
+const refreshToken = localStorage.getItem('refreshToken');
+if (!accessToken || !refreshToken) location.href = 'login.html';
 
 const logoutBtn = document.getElementById('logout');
-logoutBtn && logoutBtn.addEventListener('click', () => {
-  localStorage.clear();
-  location.href = 'index.html';
+logoutBtn && logoutBtn.addEventListener('click', async () => {
+  if (window.sessionManager) {
+    await window.sessionManager.logout();
+  } else {
+    localStorage.clear();
+    location.href = 'index.html';
+  }
 });
 
 // Populate profile
@@ -15,7 +20,7 @@ const loadProfile = async () => {
   
   try {
     const res = await fetch('https://json4ai.onrender.com/api/user/profile', {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
     if (!res.ok) {
@@ -150,7 +155,7 @@ const loadProfile = async () => {
 const loadRecentActivity = async () => {
   try {
     const res = await fetch('https://json4ai.onrender.com/api/prompt/history', {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
     if (!res.ok) {
@@ -230,7 +235,7 @@ document.getElementById('profile-form')?.addEventListener('submit', async e => {
     
     const res = await fetch('https://json4ai.onrender.com/api/user/profile', {
       method: 'PUT',
-      headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` },
+              headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${accessToken}` },
       body: JSON.stringify(body)
     });
     

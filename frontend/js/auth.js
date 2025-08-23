@@ -24,7 +24,8 @@ if (loginForm) {
       const res = await fetch(API('/login'), { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
       const data = await res.json();
               if (res.ok) {
-          localStorage.setItem('token', data.token);
+          localStorage.setItem('accessToken', data.accessToken);
+          localStorage.setItem('refreshToken', data.refreshToken);
           location.href = 'dashboard.html';
         } else {
           if (data.message === 'Please verify your email') {

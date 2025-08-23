@@ -7,8 +7,9 @@ if (hamburger) {
   });
 }
 // Show Dashboard link if JWT exists
-const token = localStorage.getItem('token');
-if (token) {
+const accessToken = localStorage.getItem('accessToken');
+const refreshToken = localStorage.getItem('refreshToken');
+if (accessToken && refreshToken) {
   const loginLink = document.getElementById('login-link');
   const dashLink  = document.getElementById('dashboard-link');
   if (loginLink) loginLink.classList.add('hidden');

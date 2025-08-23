@@ -1,17 +1,22 @@
-const token = localStorage.getItem('token');
-if (!token) location.href = 'login.html';
+const accessToken = localStorage.getItem('accessToken');
+const refreshToken = localStorage.getItem('refreshToken');
+if (!accessToken || !refreshToken) location.href = 'login.html';
 
 const logoutBtn = document.getElementById('logout');
-logoutBtn && logoutBtn.addEventListener('click', () => {
-  localStorage.clear();
-  location.href = 'index.html';
+logoutBtn && logoutBtn.addEventListener('click', async () => {
+  if (window.sessionManager) {
+    await window.sessionManager.logout();
+  } else {
+    localStorage.clear();
+    location.href = 'index.html';
+  }
 });
 
 // Validate token before making API calls
 const validateToken = async () => {
   try {
     const res = await fetch('https://json4ai.onrender.com/api/user/profile', {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
     if (res.status === 401) {
@@ -45,7 +50,7 @@ const historyList = document.getElementById('history-list');
 const loadUsageStatus = async () => {
   try {
     const res = await fetch('https://json4ai.onrender.com/api/prompt/usage', {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
     if (!res.ok) {
@@ -151,7 +156,7 @@ const generatePrompt = async (comment) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${accessToken}`
       },
       body: JSON.stringify({ comment })
     });
@@ -246,7 +251,7 @@ const startNewPrompt = () => {
 const loadRecentHistory = async () => {
   try {
     const res = await fetch('https://json4ai.onrender.com/api/prompt/history', {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
     if (!res.ok) {

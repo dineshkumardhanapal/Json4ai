@@ -55,3 +55,136 @@ svg {
   color: currentColor;
   stroke-width: 2;
 }
+
+/* Logo Slider Styles */
+.compatibility {
+  padding: 4rem 0;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+}
+
+.compatibility-header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.compatibility-header p {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  margin-bottom: 3rem;
+}
+
+.logo-slider {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 120px;
+  cursor: grab;
+}
+
+.logo-track {
+  display: flex;
+  animation: scroll 30s linear infinite;
+  width: calc(200px * 8); /* 8 logos total */
+}
+
+.logo-slide {
+  flex-shrink: 0;
+  width: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ai-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.ai-logo:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+}
+
+.ai-logo svg {
+  color: #8b5cf6;
+  transition: color 0.3s ease;
+}
+
+.ai-logo:hover svg {
+  color: #a855f7;
+}
+
+.ai-logo span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-200px * 4)); /* Move by half the total width */
+  }
+}
+
+/* Pause animation on hover */
+.logo-slider:hover .logo-track {
+  animation-play-state: paused;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .compatibility-header h2 {
+    font-size: 2rem;
+  }
+  
+  .logo-slider {
+    height: 100px;
+  }
+  
+  .logo-slide {
+    width: 150px;
+  }
+  
+  .ai-logo {
+    min-width: 100px;
+    padding: 0.75rem;
+  }
+  
+  .ai-logo svg {
+    width: 3rem;
+    height: 3rem;
+  }
+  
+  .logo-track {
+    width: calc(150px * 8);
+  }
+  
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-150px * 4));
+    }
+  }
+}

@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/main.css"/>
   <link rel="stylesheet" href="css/purple-silver.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
+  <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
   <script src="js/notifications.js" defer></script>
   <script src="js/prompt-generator.js" defer></script>
 </head>
@@ -38,28 +39,18 @@
 
     <!-- Usage Status Card -->
     <div class="usage-status-card" id="usage-status">
-      <div class="status-icon">🎯</div>
+      <div class="status-icon">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
       <div class="status-content">
         <h3>Loading usage status...</h3>
         <p>Checking your plan and remaining credits...</p>
       </div>
     </div>
 
-    <!-- Debug Info (remove in production) -->
-    <div class="debug-card" id="debug-card" style="display: none;">
-      <h3>🔍 Debug Information</h3>
-      <div id="debug-content">
-        <p><strong>Token Status:</strong> <span id="token-status">Checking...</span></p>
-        <p><strong>Token Length:</strong> <span id="token-length">-</span></p>
-        <p><strong>Current URL:</strong> <span id="current-url">-</span></p>
-        <p><strong>Referrer:</strong> <span id="referrer">-</span></p>
-      </div>
-      <div class="debug-actions">
-        <button onclick="testTokenValidation()" class="btn-secondary">Test Token</button>
-        <button onclick="testBackendAPI()" class="btn-secondary">Test Backend</button>
-        <button onclick="toggleDebug()" class="btn-secondary">Hide Debug</button>
-      </div>
-    </div>
+
 
     <!-- Prompt Generator Form -->
     <div class="generator-card" id="generator-form">
@@ -97,8 +88,18 @@
       <div class="card-header">
         <h2>Generated Prompt</h2>
         <div class="result-actions">
-          <button class="btn-secondary" id="copy-btn">📋 Copy</button>
-          <button class="btn-secondary" id="new-prompt-btn">🔄 New Prompt</button>
+          <button class="btn-secondary" id="copy-btn">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.666 3.889A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"></path>
+            </svg>
+            Copy
+          </button>
+          <button class="btn-secondary" id="new-prompt-btn">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.023 9.348h4.992v-.01M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M2.985 19.644l9.131-9.131a8.25 8.25 0 00-13.803 3.7m0 0l3.181-3.181m0 0l3.181 3.181"></path>
+            </svg>
+            New Prompt
+          </button>
         </div>
       </div>
       

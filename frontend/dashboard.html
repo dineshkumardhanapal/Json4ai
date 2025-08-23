@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/main.css"/>
   <link rel="stylesheet" href="css/purple-silver.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
+  <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
   <script src="js/notifications.js" defer></script>
   <script src="js/dashboard.js" defer></script>
 </head>
@@ -39,7 +40,12 @@
     <!-- Error message display -->
     <div id="error-message" class="error-message" style="display: none;">
       <div class="error-content">
-        <h3>⚠️ Error Loading Profile</h3>
+        <h3>
+          <svg class="w-6 h-6 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path>
+          </svg>
+          Error Loading Profile
+        </h3>
         <p id="error-text">Something went wrong while loading your profile.</p>
         <button onclick="location.reload()" class="btn-primary">Retry</button>
       </div>

@@ -82,7 +82,7 @@ svg {
   position: relative;
   overflow: hidden;
   width: 100%;
-  height: 120px;
+  height: 140px;
   cursor: grab;
 }
 
@@ -137,6 +137,17 @@ svg {
   text-align: center;
 }
 
+.ai-logo img {
+  width: 4rem;
+  height: 4rem;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.ai-logo:hover img {
+  transform: scale(1.1);
+}
+
        @keyframes scroll {
          0% {
            transform: translateX(0);
@@ -158,7 +169,7 @@ svg {
   }
   
   .logo-slider {
-    height: 100px;
+    height: 120px;
   }
   
   .logo-slide {
@@ -171,6 +182,11 @@ svg {
   }
   
   .ai-logo svg {
+    width: 3rem;
+    height: 3rem;
+  }
+  
+  .ai-logo img {
     width: 3rem;
     height: 3rem;
   }

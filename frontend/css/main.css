@@ -86,11 +86,11 @@ svg {
   cursor: grab;
 }
 
-       .logo-track {
-         display: flex;
-         animation: scroll 30s linear infinite;
-         width: calc(200px * 10); /* 10 logos total */
-       }
+                               .logo-track {
+           display: flex;
+           animation: scroll 30s linear infinite;
+           width: calc(200px * 16); /* 16 logos total */
+         }
 
 .logo-slide {
   flex-shrink: 0;
@@ -148,14 +148,14 @@ svg {
   transform: scale(1.1);
 }
 
-       @keyframes scroll {
-         0% {
-           transform: translateX(0);
+                               @keyframes scroll {
+           0% {
+             transform: translateX(0);
+           }
+           100% {
+             transform: translateX(calc(-200px * 8)); /* Move by half the total width */
+           }
          }
-         100% {
-           transform: translateX(calc(-200px * 5)); /* Move by half the total width */
-         }
-       }
 
 /* Pause animation on hover */
 .logo-slider:hover .logo-track {
@@ -191,16 +191,16 @@ svg {
     height: 3rem;
   }
   
-           .logo-track {
-           width: calc(150px * 10);
-         }
-         
-         @keyframes scroll {
-           0% {
-             transform: translateX(0);
+                                               .logo-track {
+             width: calc(150px * 16);
            }
-           100% {
-             transform: translateX(calc(-150px * 5));
+           
+           @keyframes scroll {
+             0% {
+               transform: translateX(0);
+             }
+             100% {
+               transform: translateX(calc(-150px * 8));
+             }
            }
-         }
 }

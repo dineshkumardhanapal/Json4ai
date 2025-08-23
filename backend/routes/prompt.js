@@ -45,17 +45,51 @@ router.post('/generate', auth, creditCheck, async (req, res) => {
     }
 
     // Generate prompt using Llama-3.1-8B via Replicate
-    const prompt = `You are a JSON prompt generator. Based on the user's comment, generate a structured JSON prompt that can be used for AI applications. The response should be valid JSON format.
+    const systemPrompt = `You are an expert JSON prompt generator with deep expertise in creating highly detailed, structured prompts for AI applications. You excel at analyzing user requests and generating comprehensive JSON prompts that capture all nuances, requirements, and specifications.
 
-User Comment: "${comment}"
+Your JSON outputs should be:
+- Highly detailed and comprehensive (aim for 200+ words of structured content)
+- Well-structured with logical organization and clear hierarchy
+- Specific and actionable with concrete requirements
+- Professional and polished for enterprise use
+- Rich in detail to eliminate ambiguity
+- Include multiple nested levels when appropriate
 
-Generate a JSON prompt that includes:
-- A clear instruction or query
-- Any specific parameters or constraints
-- The expected output format
-- Context or background information if relevant
+IMPORTANT: Generate JSON that is substantial and detailed, not minimal. Think of this as creating a comprehensive specification document that leaves no room for interpretation.
 
-Return only the JSON object, no additional text:`;
+Always return valid JSON with no additional text, markdown, or explanations.`;
+
+    const userPrompt = `User Request: "${comment}"
+
+Create a detailed JSON prompt that includes:
+
+1. **Main Instruction**: A clear, specific instruction that directly addresses what the user wants
+2. **Detailed Parameters**: 
+   - Specific requirements, constraints, or preferences
+   - Technical specifications if applicable
+   - Quality standards or criteria
+   - Performance expectations
+3. **Output Format**: 
+   - Expected structure and organization
+   - Required sections or components
+   - Formatting preferences
+   - Length specifications
+4. **Context & Background**: 
+   - Relevant context to help the AI understand the request
+   - Target audience or use case
+   - Any specific industry or domain knowledge needed
+   - Prerequisites or assumptions
+5. **Additional Requirements**: 
+   - Style, tone, or voice preferences
+   - Detail level specifications
+   - Examples or references that should be included
+   - Success criteria or quality metrics
+
+The JSON should be comprehensive enough that an AI can generate a high-quality response without needing clarification. Think of this as creating a detailed specification document in JSON format.
+
+Return ONLY the JSON object:`;
+
+    const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
 
     // Check if Replicate client is available
     if (!replicate) {
@@ -69,15 +103,23 @@ Return only the JSON object, no additional text:`;
       "meta/meta-llama-3-8b-instruct",
       {
         input: {
-          prompt: prompt,
-          max_new_tokens: 500,
-          temperature: 0.7,
-          top_p: 0.9,
-          top_k: 50,
-          repetition_penalty: 1.1
+          prompt: fullPrompt,
+          max_new_tokens: 1500,
+          temperature: 0.2,
+          top_p: 0.98,
+          top_k: 30,
+          repetition_penalty: 1.2,
+          do_sample: true,
+          num_beams: 1,
+          length_penalty: 1.1,
+          no_repeat_ngram_size: 3
         }
       }
     );
+
+    // Log output for debugging (remove in production)
+    console.log('Raw AI Output:', output);
+    console.log('Output length:', Array.isArray(output) ? output.join('').length : String(output).length);
 
 
 
@@ -86,29 +128,78 @@ Return only the JSON object, no additional text:`;
     try {
       // Extract JSON from the response (remove any markdown formatting)
       const cleanOutput = Array.isArray(output) ? output.join('') : String(output);
-      const jsonMatch = cleanOutput.match(/\{[\s\S]*\}/);
+      
+      // Try multiple JSON extraction patterns
+      let jsonMatch = cleanOutput.match(/\{[\s\S]*\}/);
+      
+      if (!jsonMatch) {
+        // Try to find JSON after common prefixes
+        jsonMatch = cleanOutput.match(/(?:```json\s*|\{[\s\S]*\})/);
+        if (jsonMatch && jsonMatch[0].startsWith('```json')) {
+          jsonMatch = jsonMatch[0].replace(/```json\s*/, '').match(/\{[\s\S]*\}/);
+        }
+      }
       
       if (jsonMatch) {
-        jsonPrompt = JSON.parse(jsonMatch[0]);
+        try {
+          jsonPrompt = JSON.parse(jsonMatch[0]);
+          
+          // Validate that we got a substantial JSON response
+          const jsonString = JSON.stringify(jsonPrompt);
+          if (jsonString.length < 100) {
+            // JSON is too short, use enhanced fallback
+            throw new Error('Generated JSON too short');
+          }
+          
+        } catch (jsonError) {
+          // JSON parsing failed, use enhanced fallback
+          throw new Error('Invalid JSON format');
+        }
       } else {
-        // Fallback if no JSON found
-        jsonPrompt = {
-          user_query: comment,
-          generated_prompt: cleanOutput,
-          structured: false,
-          note: "AI response could not be parsed as JSON"
-        };
+        // No JSON found, use enhanced fallback
+        throw new Error('No JSON structure found');
       }
+      
     } catch (parseError) {
-      // Fallback if JSON parsing fails
+      // Enhanced fallback with comprehensive structure
       jsonPrompt = {
         user_query: comment,
-        generated_prompt: Array.isArray(output) ? output.join('') : String(output),
-        structured: false,
-        note: "AI response could not be parsed as valid JSON"
+        main_instruction: `Generate a comprehensive response about: ${comment}`,
+        detailed_parameters: {
+          scope: "comprehensive",
+          depth: "detailed",
+          include_examples: true,
+          include_step_by_step: true,
+          technical_level: "intermediate",
+          quality_standards: "high",
+          performance_expectations: "excellent"
+        },
+        output_format: {
+          structure: "organized_sections",
+          include_summary: true,
+          include_practical_steps: true,
+          include_resources: true,
+          formatting: "professional",
+          length: "comprehensive"
+        },
+        context: {
+          domain: "general_ai_education",
+          target_audience: "developers_and_learners",
+          use_case: "learning_and_implementation",
+          prerequisites: "basic_understanding",
+          assumptions: "user_wants_detailed_guidance"
+        },
+        additional_requirements: {
+          tone: "educational_and_practical",
+          detail_level: "comprehensive",
+          include_code_examples: true,
+          include_best_practices: true,
+          include_troubleshooting: true,
+          success_criteria: "clear_understanding_and_actionable_steps"
+        },
+        note: `AI response parsing failed (${parseError.message}) - using enhanced fallback structure`
       };
-      
-      }
+    }
 
     const doc = await Prompt.create({ 
       userId: user._id, 

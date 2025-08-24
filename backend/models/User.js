@@ -23,7 +23,22 @@ const userSchema = new mongoose.Schema({
   // Session management fields
   refreshToken: String,
   lastLogin: { type: Date, default: Date.now },
-  lastActivity: { type: Date, default: Date.now }
+  lastActivity: { type: Date, default: Date.now },
+  // PayPal subscription fields
+  paypalSubscriptionId: String,
+  paypalPlanType: String,
+  subscriptionStatus: {
+    type: String,
+    enum: ['active', 'pending', 'cancelled', 'expired', 'payment_failed', 'suspended'],
+    default: 'active'
+  },
+  currentPeriodStart: Date,
+  currentPeriodEnd: Date,
+  cancelAtPeriodEnd: { type: Boolean, default: false },
+  // Billing information
+  billingEmail: String,
+  lastPaymentDate: Date,
+  nextBillingDate: Date
 }, { timestamps: true });
 
 // Virtual for checking if user has unlimited access

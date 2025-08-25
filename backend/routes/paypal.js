@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const paypal = require('@paypal/checkout-server-sdk');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
 const { 
@@ -13,6 +12,7 @@ const {
 // PayPal configuration
 let environment;
 let client;
+let paypal;
 
 try {
   console.log('Initializing PayPal client...');
@@ -20,25 +20,91 @@ try {
   console.log('PAYPAL_CLIENT_ID exists:', !!process.env.PAYPAL_CLIENT_ID);
   console.log('PAYPAL_CLIENT_SECRET exists:', !!process.env.PAYPAL_CLIENT_SECRET);
   
+  // Try different import approaches for PayPal SDK v1.0.3
+  try {
+    // Method 1: Standard import
+    paypal = require('@paypal/checkout-server-sdk');
+    console.log('✅ PayPal SDK imported successfully (Method 1)');
+  } catch (importError1) {
+    console.log('❌ Method 1 failed:', importError1.message);
+    
+    try {
+      // Method 2: Try specific path
+      paypal = require('@paypal/checkout-server-sdk/lib');
+      console.log('✅ PayPal SDK imported successfully (Method 2)');
+    } catch (importError2) {
+      console.log('❌ Method 2 failed:', importError2.message);
+      
+      try {
+        // Method 3: Try core module
+        paypal = require('@paypal/checkout-server-sdk/lib/core');
+        console.log('✅ PayPal SDK imported successfully (Method 3)');
+      } catch (importError3) {
+        console.log('❌ Method 3 failed:', importError3.message);
+        throw new Error('All PayPal SDK import methods failed');
+      }
+    }
+  }
+  
   if (process.env.NODE_ENV === 'production') {
     environment = new paypal.core.LiveEnvironment(
       process.env.PAYPAL_CLIENT_ID,
       process.env.PAYPAL_CLIENT_SECRET
     );
-    console.log('Using PayPal Live environment');
+    console.log('✅ Live environment created');
   } else {
     environment = new paypal.core.SandboxEnvironment(
       process.env.PAYPAL_CLIENT_ID,
       process.env.PAYPAL_CLIENT_SECRET
     );
-    console.log('Using PayPal Sandbox environment');
+    console.log('✅ Sandbox environment created');
   }
   
   client = new paypal.core.PayPalHttpClient(environment);
-  console.log('PayPal client initialized successfully');
+  console.log('✅ PayPal client created successfully');
+  
+  // Test PayPal SDK structure
+  console.log('🔍 PayPal SDK structure test:');
+  console.log('- paypal.core exists:', !!paypal.core);
+  console.log('- paypal.subscriptions exists:', !!paypal.subscriptions);
+  console.log('- paypal.orders exists:', !!paypal.orders);
+  console.log('- paypal.payments exists:', !!paypal.payments);
+  
+  // Log all available properties
+  console.log('📋 Available paypal properties:', Object.keys(paypal));
+  
+  if (paypal.subscriptions) {
+    console.log('📋 Available subscription properties:', Object.keys(paypal.subscriptions));
+  }
+  
+  if (paypal.orders) {
+    console.log('📋 Available order properties:', Object.keys(paypal.orders));
+  }
+  
+  // Check for specific classes
+  const availableClasses = [];
+  if (paypal.subscriptions) {
+    ['SubscriptionsCreateRequest', 'SubscriptionsGetRequest', 'SubscriptionsCancelRequest', 'SubscriptionsActivateRequest'].forEach(className => {
+      if (paypal.subscriptions[className]) {
+        availableClasses.push(`paypal.subscriptions.${className}`);
+      }
+    });
+  }
+  
+  if (paypal.orders) {
+    ['OrdersCreateRequest', 'OrdersGetRequest'].forEach(className => {
+      if (paypal.orders[className]) {
+        availableClasses.push(`paypal.orders.${className}`);
+      }
+    });
+  }
+  
+  console.log('✅ Available PayPal classes:', availableClasses);
+  
 } catch (error) {
-  console.error('Failed to initialize PayPal client:', error);
+  console.error('❌ Failed to initialize PayPal client:', error);
   client = null;
+  paypal = null;
 }
 
 // Plan configuration
@@ -103,9 +169,36 @@ router.get('/debug', (req, res) => {
   }
 });
 
+// GET /api/paypal/test - Test PayPal SDK structure (remove in production)
+router.get('/test', (req, res) => {
+  try {
+    const testInfo = {
+      paypalSdkLoaded: !!paypal,
+      paypalClientInitialized: !!client,
+      environment: process.env.NODE_ENV,
+      availableModules: paypal ? Object.keys(paypal) : [],
+      subscriptionClasses: paypal && paypal.subscriptions ? Object.keys(paypal.subscriptions) : [],
+      orderClasses: paypal && paypal.orders ? Object.keys(paypal.orders) : [],
+      coreClasses: paypal && paypal.core ? Object.keys(paypal.core) : []
+    };
+    
+    res.json(testInfo);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // POST /api/paypal/create-subscription - Create PayPal subscription
 router.post('/create-subscription', auth, async (req, res) => {
   try {
+    // Check if PayPal SDK is available
+    if (!paypal || !client) {
+      console.error('PayPal SDK not initialized');
+      return res.status(500).json({ 
+        error: 'Payment service not available. Please try again later.' 
+      });
+    }
+
     const { planType } = req.body;
     const user = req.user;
 
@@ -143,30 +236,69 @@ router.post('/create-subscription', auth, async (req, res) => {
     }
 
     // Create PayPal subscription
-    const request = new paypal.subscriptions.SubscriptionsPostRequest();
-    request.requestBody({
-      plan_id: plan.paypal_plan_id,
-      start_time: new Date().toISOString(),
-      subscriber: {
-        name: {
-          given_name: user.firstName,
-          surname: user.lastName
-        },
-        email_address: user.email
-      },
-      application_context: {
-        brand_name: 'JSON4AI',
-        locale: 'en-US',
-        shipping_preference: 'NO_SHIPPING',
-        user_action: 'SUBSCRIBE_NOW',
-        payment_method: {
-          payer_selected: 'PAYPAL',
-          payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED'
-        },
-        return_url: `${process.env.FRONTEND_URL}/dashboard?success=true`,
-        cancel_url: `${process.env.FRONTEND_URL}/pricing?canceled=true`
+    // Note: PayPal SDK v1.0.3 uses different class names
+    let request;
+    try {
+      // Try the new SDK structure first
+      if (paypal.subscriptions && paypal.subscriptions.SubscriptionsCreateRequest) {
+        request = new paypal.subscriptions.SubscriptionsCreateRequest();
+      } else if (paypal.orders && paypal.orders.OrdersCreateRequest) {
+        // Fallback to orders if subscriptions not available
+        console.log('Using OrdersCreateRequest as fallback');
+        request = new paypal.orders.OrdersCreateRequest();
+      } else {
+        throw new Error('No suitable PayPal request class found');
       }
-    });
+      
+      // Set request body based on request type
+      if (request.constructor.name.includes('SubscriptionsCreateRequest')) {
+        request.requestBody({
+          plan_id: plan.paypal_plan_id,
+          start_time: new Date().toISOString(),
+          subscriber: {
+            name: {
+              given_name: user.firstName,
+              surname: user.lastName
+            },
+            email_address: user.email
+          },
+          application_context: {
+            brand_name: 'JSON4AI',
+            locale: 'en-US',
+            shipping_preference: 'NO_SHIPPING',
+            user_action: 'SUBSCRIBE_NOW',
+            payment_method: {
+              payer_selected: 'PAYPAL',
+              payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED'
+            },
+            return_url: `${process.env.FRONTEND_URL}/dashboard?success=true`,
+            cancel_url: `${process.env.FRONTEND_URL}/pricing?canceled=true`
+          }
+        });
+      } else {
+        // Fallback to order creation
+        request.requestBody({
+          intent: 'SUBSCRIPTION',
+          plan_id: plan.paypal_plan_id,
+          application_context: {
+            brand_name: 'JSON4AI',
+            locale: 'en-US',
+            shipping_preference: 'NO_SHIPPING',
+            user_action: 'SUBSCRIBE_NOW',
+            payment_method: {
+              payer_selected: 'PAYPAL',
+              payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED'
+            },
+            return_url: `${process.env.FRONTEND_URL}/dashboard?success=true`,
+            cancel_url: `${process.env.FRONTEND_URL}/pricing?canceled=true`
+          }
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error creating PayPal request:', error);
+      throw new Error('PayPal request creation failed: ' + error.message);
+    }
 
     console.log('Executing PayPal subscription request...');
     const subscription = await client.execute(request);
@@ -275,9 +407,14 @@ router.get('/subscription', auth, async (req, res) => {
     }
 
     // Get subscription details from PayPal
-    const request = new paypal.subscriptions.SubscriptionsGetRequest(user.paypalSubscriptionId);
-    const subscription = await client.execute(request);
+    let request;
+    if (paypal.subscriptions && paypal.subscriptions.SubscriptionsGetRequest) {
+      request = new paypal.subscriptions.SubscriptionsGetRequest(user.paypalSubscriptionId);
+    } else {
+      return res.status(500).json({ error: 'PayPal subscription service not available' });
+    }
 
+    const subscription = await client.execute(request);
     res.json({ subscription: subscription.result });
   } catch (error) {
     console.error('Subscription retrieval error:', error);
@@ -295,10 +432,15 @@ router.post('/cancel', auth, async (req, res) => {
     }
 
     // Cancel subscription in PayPal
-    const request = new paypal.subscriptions.SubscriptionsCancelRequest(user.paypalSubscriptionId);
-    request.requestBody({
-      reason: 'User requested cancellation'
-    });
+    let request;
+    if (paypal.subscriptions && paypal.subscriptions.SubscriptionsCancelRequest) {
+      request = new paypal.subscriptions.SubscriptionsCancelRequest(user.paypalSubscriptionId);
+      request.requestBody({
+        reason: 'User requested cancellation'
+      });
+    } else {
+      return res.status(500).json({ error: 'PayPal subscription service not available' });
+    }
 
     await client.execute(request);
 
@@ -325,7 +467,13 @@ router.post('/reactivate', auth, async (req, res) => {
     }
 
     // Reactivate subscription in PayPal
-    const request = new paypal.subscriptions.SubscriptionsActivateRequest(user.paypalSubscriptionId);
+    let request;
+    if (paypal.subscriptions && paypal.subscriptions.SubscriptionsActivateRequest) {
+      request = new paypal.subscriptions.SubscriptionsActivateRequest(user.paypalSubscriptionId);
+    } else {
+      return res.status(500).json({ error: 'PayPal subscription service not available' });
+    }
+
     await client.execute(request);
 
     // Update user

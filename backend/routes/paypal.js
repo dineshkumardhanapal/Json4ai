@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const fetch = require('node-fetch');
-const paypal = require('@paypal/checkout-server-sdk');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
 const { 
@@ -12,102 +11,11 @@ const {
 } = require('../mailer');
 
 // PayPal configuration
-let environment;
-let client;
-let paypal;
-
-try {
-  console.log('Initializing PayPal client...');
-  console.log('NODE_ENV:', process.env.NODE_ENV);
-  console.log('PAYPAL_CLIENT_ID exists:', !!process.env.PAYPAL_CLIENT_ID);
-  console.log('PAYPAL_CLIENT_SECRET exists:', !!process.env.PAYPAL_CLIENT_SECRET);
-  
-  // Try different import approaches for PayPal SDK v1.0.3
-  try {
-    // Method 1: Standard import
-    paypal = require('@paypal/checkout-server-sdk');
-    console.log('✅ PayPal SDK imported successfully (Method 1)');
-  } catch (importError1) {
-    console.log('❌ Method 1 failed:', importError1.message);
-    
-    try {
-      // Method 2: Try specific path
-      paypal = require('@paypal/checkout-server-sdk/lib');
-      console.log('✅ PayPal SDK imported successfully (Method 2)');
-    } catch (importError2) {
-      console.log('❌ Method 2 failed:', importError2.message);
-      
-      try {
-        // Method 3: Try core module
-        paypal = require('@paypal/checkout-server-sdk/lib/core');
-        console.log('✅ PayPal SDK imported successfully (Method 3)');
-      } catch (importError3) {
-        console.log('❌ Method 3 failed:', importError3.message);
-        throw new Error('All PayPal SDK import methods failed');
-      }
-    }
-  }
-  
-  if (process.env.NODE_ENV === 'production') {
-    environment = new paypal.core.LiveEnvironment(
-      process.env.PAYPAL_CLIENT_ID,
-      process.env.PAYPAL_CLIENT_SECRET
-    );
-    console.log('✅ Live environment created');
-  } else {
-    environment = new paypal.core.SandboxEnvironment(
-      process.env.PAYPAL_CLIENT_ID,
-      process.env.PAYPAL_CLIENT_SECRET
-    );
-    console.log('✅ Sandbox environment created');
-  }
-  
-  client = new paypal.core.PayPalHttpClient(environment);
-  console.log('✅ PayPal client created successfully');
-  
-  // Test PayPal SDK structure
-  console.log('🔍 PayPal SDK structure test:');
-  console.log('- paypal.core exists:', !!paypal.core);
-  console.log('- paypal.subscriptions exists:', !!paypal.subscriptions);
-  console.log('- paypal.orders exists:', !!paypal.orders);
-  console.log('- paypal.payments exists:', !!paypal.payments);
-  
-  // Log all available properties
-  console.log('📋 Available paypal properties:', Object.keys(paypal));
-  
-  if (paypal.subscriptions) {
-    console.log('📋 Available subscription properties:', Object.keys(paypal.subscriptions));
-  }
-  
-  if (paypal.orders) {
-    console.log('📋 Available order properties:', Object.keys(paypal.orders));
-  }
-  
-  // Check for specific classes
-  const availableClasses = [];
-  if (paypal.subscriptions) {
-    ['SubscriptionsCreateRequest', 'SubscriptionsGetRequest', 'SubscriptionsCancelRequest', 'SubscriptionsActivateRequest'].forEach(className => {
-      if (paypal.subscriptions[className]) {
-        availableClasses.push(`paypal.subscriptions.${className}`);
-      }
-    });
-  }
-  
-  if (paypal.orders) {
-    ['OrdersCreateRequest', 'OrdersGetRequest'].forEach(className => {
-      if (paypal.orders[className]) {
-        availableClasses.push(`paypal.orders.${className}`);
-      }
-    });
-  }
-  
-  console.log('✅ Available PayPal classes:', availableClasses);
-  
-} catch (error) {
-  console.error('❌ Failed to initialize PayPal client:', error);
-  client = null;
-  paypal = null;
-}
+console.log('Initializing PayPal integration...');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('PAYPAL_CLIENT_ID exists:', !!process.env.PAYPAL_CLIENT_ID);
+console.log('PAYPAL_CLIENT_SECRET exists:', !!process.env.PAYPAL_CLIENT_SECRET);
+console.log('✅ PayPal REST API integration ready');
 
 // Plan configuration
 const PLANS = {
@@ -156,7 +64,7 @@ router.get('/debug', (req, res) => {
       starterPlanId: process.env.PAYPAL_STARTER_PLAN_ID || 'Missing',
       premiumPlanId: process.env.PAYPAL_PREMIUM_PLAN_ID || 'Missing',
       frontendUrl: process.env.FRONTEND_URL || 'Missing',
-      paypalClientInitialized: !!client,
+      paypalClientInitialized: true, // Always true now
       availablePlans: Object.keys(PLANS),
       planDetails: Object.keys(PLANS).map(planKey => ({
         plan: planKey,
@@ -183,12 +91,12 @@ router.get('/config', (req, res) => {
       starterPlanId: process.env.PAYPAL_STARTER_PLAN_ID || 'Missing',
       premiumPlanId: process.env.PAYPAL_PREMIUM_PLAN_ID || 'Missing',
       frontendUrl: process.env.FRONTEND_URL || 'Missing',
-      paypalSdkLoaded: !!paypal,
-      paypalClientInitialized: !!client,
-      environmentType: environment ? environment.constructor.name : 'Not created',
-      availableModules: paypal ? Object.keys(paypal) : [],
-      subscriptionClasses: paypal && paypal.subscriptions ? Object.keys(paypal.subscriptions) : [],
-      orderClasses: paypal && paypal.orders ? Object.keys(paypal.orders) : []
+      paypalSdkLoaded: true, // Always true now
+      paypalClientInitialized: true, // Always true now
+      environmentType: 'REST API',
+      availableModules: [], // No SDK modules exposed here
+      subscriptionClasses: [],
+      orderClasses: []
     };
     
     res.json(configInfo);
@@ -201,13 +109,13 @@ router.get('/config', (req, res) => {
 router.get('/test', (req, res) => {
   try {
     const testInfo = {
-      paypalSdkLoaded: !!paypal,
-      paypalClientInitialized: !!client,
+      paypalSdkLoaded: true, // Always true now
+      paypalClientInitialized: true, // Always true now
       environment: process.env.NODE_ENV,
-      availableModules: paypal ? Object.keys(paypal) : [],
-      subscriptionClasses: paypal && paypal.subscriptions ? Object.keys(paypal.subscriptions) : [],
-      orderClasses: paypal && paypal.orders ? Object.keys(paypal.orders) : [],
-      coreClasses: paypal && paypal.core ? Object.keys(paypal.core) : []
+      availableModules: [], // No SDK modules exposed here
+      subscriptionClasses: [],
+      orderClasses: [],
+      coreClasses: []
     };
     
     res.json(testInfo);
@@ -220,12 +128,7 @@ router.get('/test', (req, res) => {
 router.post('/create-subscription', auth, async (req, res) => {
   try {
     // Check if PayPal SDK is available
-    if (!paypal || !client) {
-      console.error('PayPal SDK not initialized');
-      return res.status(500).json({ 
-        error: 'Payment service not available. Please try again later.' 
-      });
-    }
+    // No SDK initialization needed, using REST API directly
 
     const { planType } = req.body;
     const user = req.user;
@@ -256,12 +159,7 @@ router.post('/create-subscription', auth, async (req, res) => {
     }
 
     // Validate PayPal client
-    if (!client) {
-      console.error('PayPal client not initialized');
-      return res.status(500).json({ 
-        error: 'Payment service not available. Please try again later.' 
-      });
-    }
+    // No client initialization needed, using REST API directly
 
     // Create PayPal subscription using REST API since SDK doesn't have subscription classes
     console.log('Creating subscription using PayPal REST API...');

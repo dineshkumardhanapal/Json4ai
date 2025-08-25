@@ -169,6 +169,32 @@ router.get('/debug', (req, res) => {
   }
 });
 
+// GET /api/paypal/config - Check PayPal configuration (remove in production)
+router.get('/config', (req, res) => {
+  try {
+    const configInfo = {
+      nodeEnv: process.env.NODE_ENV,
+      paypalClientId: process.env.PAYPAL_CLIENT_ID ? 
+        `${process.env.PAYPAL_CLIENT_ID.substring(0, 8)}...` : 'Missing',
+      paypalClientSecret: process.env.PAYPAL_CLIENT_SECRET ? 
+        `${process.env.PAYPAL_CLIENT_SECRET.substring(0, 8)}...` : 'Missing',
+      starterPlanId: process.env.PAYPAL_STARTER_PLAN_ID || 'Missing',
+      premiumPlanId: process.env.PAYPAL_PREMIUM_PLAN_ID || 'Missing',
+      frontendUrl: process.env.FRONTEND_URL || 'Missing',
+      paypalSdkLoaded: !!paypal,
+      paypalClientInitialized: !!client,
+      environmentType: environment ? environment.constructor.name : 'Not created',
+      availableModules: paypal ? Object.keys(paypal) : [],
+      subscriptionClasses: paypal && paypal.subscriptions ? Object.keys(paypal.subscriptions) : [],
+      orderClasses: paypal && paypal.orders ? Object.keys(paypal.orders) : []
+    };
+    
+    res.json(configInfo);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // GET /api/paypal/test - Test PayPal SDK structure (remove in production)
 router.get('/test', (req, res) => {
   try {

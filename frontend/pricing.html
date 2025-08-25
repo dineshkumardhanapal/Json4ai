@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8"/>
   <title>Pricing – JSON4AI</title>
-  <meta name="description" content="Choose the JSON4AI plan that fits you."/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,15 +12,18 @@
   <link rel="stylesheet" href="css/responsive.css"/>
   <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
   <script src="js/notifications.js" defer></script>
+  <script src="js/session-manager.js" defer></script>
   <script src="js/pricing.js" defer></script>
 </head>
 <body>
 <header class="navbar">
   <div class="container flex-between">
     <a href="index.html" class="logo">Json4<span>Ai</span></a>
-    <nav class="nav-links">
+    <nav class="nav-links" id="nav-links">
       <a href="index.html">Home</a>
-      <a href="login.html">Login</a>
+      <a href="login.html" id="login-link">Login</a>
+      <a href="dashboard.html" id="dashboard-link" style="display: none;">Dashboard</a>
+      <a href="#" id="logout-link" style="display: none;">Logout</a>
     </nav>
   </div>
 </header>
@@ -40,45 +42,50 @@
       <div class="plan-card">
         <div class="plan-header">
           <h3>Free</h3>
-          <p class="plan-description">Perfect for Beginners and small projects</p>
+          <p class="plan-description">Perfect for beginners and small projects</p>
         </div>
-        <div class="price">$0<span>/Day</span></div>
+        <div class="price">$0<span>/month</span></div>
         <ul class="plan-features">
-          <li>3 prompts per Day</li>
-          <li>Best Prompts</li>
+          <li>3 prompts per day</li>
+          <li>Basic prompt templates</li>
+          <li>Community support</li>
           <li>Standard accuracy</li>
         </ul>
-        <button class="btn-primary" data-plan="starter">Get Started</button>
+        <button class="btn-primary" data-plan="free" disabled>Current Plan</button>
       </div>
       
       <div class="plan-card featured">
         <div class="plan-badge">Recommended</div>
         <div class="plan-header">
-          <h3>Standard</h3>
+          <h3>Starter</h3>
           <p class="plan-description">Ideal for teams and growing businesses</p>
         </div>
         <div class="price">$1<span>/month</span></div>
         <ul class="plan-features">
-          <li>30 prompts per Day</li>
+          <li>30 prompts per month</li>
+          <li>Advanced prompt templates</li>
           <li>Priority support</li>
           <li>Enhanced accuracy</li>
-          <li>Early Access to our Products</li>
+          <li>Export functionality</li>
         </ul>
-        <button class="btn-primary" data-plan="pro">Get Started</button>
+        <button class="btn-primary" data-plan="starter">Get Started</button>
       </div>
       
       <div class="plan-card">
         <div class="plan-header">
-          <h3>Pro</h3>
+          <h3>Premium</h3>
           <p class="plan-description">For large organizations and high-volume usage</p>
         </div>
         <div class="price">$10<span>/month</span></div>
         <ul class="plan-features">
-          <li>Unlimited prompts</li>
-          <li>Dedicated support</li>
-          <li>Maximum accuracy</li>
+          <li>100 prompts per month</li>
+          <li>All Starter features</li>
+          <li>Custom prompt templates</li>
+          <li>API access</li>
+          <li>White-label options</li>
+          <li>24/7 priority support</li>
         </ul>
-        <button class="btn-primary" data-plan="enterprise">Get Started</button>
+        <button class="btn-primary" data-plan="premium">Get Started</button>
       </div>
     </div>
     
@@ -87,7 +94,7 @@
       <div class="faq-grid">
         <div class="faq-item">
           <h4>Can I change plans anytime?</h4>
-          <p>Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately. But you can't downgrade to Free plan.</p>
+          <p>Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately. You can't downgrade to the Free plan.</p>
         </div>
         <div class="faq-item">
           <h4>What happens if I exceed my limit?</h4>
@@ -95,7 +102,11 @@
         </div>
         <div class="faq-item">
           <h4>Is there a free trial?</h4>
-          <p>Yes, Free plans come with a 3 prompts per Day. No credit card required to start.</p>
+          <p>Yes, the Free plan comes with 3 prompts per day. No credit card required to start.</p>
+        </div>
+        <div class="faq-item">
+          <h4>How does billing work?</h4>
+          <p>All plans are billed monthly through PayPal. You can cancel anytime and continue using your plan until the end of the billing period.</p>
         </div>
       </div>
     </div>
@@ -104,7 +115,7 @@
 
 <footer>
   <div class="container">
-    <p class="copyright">© 2025 Json4ai. All rights reserved.</p>
+    <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
   </div>
 </footer>
 </body>

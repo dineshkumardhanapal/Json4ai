@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const paypal = require('@paypal/checkout-server-sdk');
 const User = require('../models/User');
+const auth = require('../middleware/auth');
 const { 
   sendSubscriptionConfirmation, 
   sendSubscriptionUpdated, 
@@ -11,19 +12,34 @@ const {
 
 // PayPal configuration
 let environment;
-if (process.env.NODE_ENV === 'production') {
-  environment = new paypal.core.LiveEnvironment(
-    process.env.PAYPAL_CLIENT_ID,
-    process.env.PAYPAL_CLIENT_SECRET
-  );
-} else {
-  environment = new paypal.core.SandboxEnvironment(
-    process.env.PAYPAL_CLIENT_ID,
-    process.env.PAYPAL_CLIENT_SECRET
-  );
-}
+let client;
 
-const client = new paypal.core.PayPalHttpClient(environment);
+try {
+  console.log('Initializing PayPal client...');
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('PAYPAL_CLIENT_ID exists:', !!process.env.PAYPAL_CLIENT_ID);
+  console.log('PAYPAL_CLIENT_SECRET exists:', !!process.env.PAYPAL_CLIENT_SECRET);
+  
+  if (process.env.NODE_ENV === 'production') {
+    environment = new paypal.core.LiveEnvironment(
+      process.env.PAYPAL_CLIENT_ID,
+      process.env.PAYPAL_CLIENT_SECRET
+    );
+    console.log('Using PayPal Live environment');
+  } else {
+    environment = new paypal.core.SandboxEnvironment(
+      process.env.PAYPAL_CLIENT_ID,
+      process.env.PAYPAL_CLIENT_SECRET
+    );
+    console.log('Using PayPal Sandbox environment');
+  }
+  
+  client = new paypal.core.PayPalHttpClient(environment);
+  console.log('PayPal client initialized successfully');
+} catch (error) {
+  console.error('Failed to initialize PayPal client:', error);
+  client = null;
+}
 
 // Plan configuration
 const PLANS = {
@@ -55,23 +71,76 @@ const PLANS = {
   }
 };
 
+// Log plan configuration for debugging
+console.log('PayPal Plans Configuration:');
+Object.keys(PLANS).forEach(planKey => {
+  const plan = PLANS[planKey];
+  console.log(`- ${planKey}: ${plan.name} - Plan ID: ${plan.paypal_plan_id || 'NOT SET'}`);
+});
+
+// GET /api/paypal/debug - Debug PayPal configuration (remove in production)
+router.get('/debug', (req, res) => {
+  try {
+    const debugInfo = {
+      environment: process.env.NODE_ENV,
+      paypalClientId: process.env.PAYPAL_CLIENT_ID ? 'Set' : 'Missing',
+      paypalClientSecret: process.env.PAYPAL_CLIENT_SECRET ? 'Set' : 'Missing',
+      starterPlanId: process.env.PAYPAL_STARTER_PLAN_ID || 'Missing',
+      premiumPlanId: process.env.PAYPAL_PREMIUM_PLAN_ID || 'Missing',
+      frontendUrl: process.env.FRONTEND_URL || 'Missing',
+      paypalClientInitialized: !!client,
+      availablePlans: Object.keys(PLANS),
+      planDetails: Object.keys(PLANS).map(planKey => ({
+        plan: planKey,
+        name: PLANS[planKey].name,
+        paypalPlanId: PLANS[planKey].paypal_plan_id || 'Not Set'
+      }))
+    };
+    
+    res.json(debugInfo);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // POST /api/paypal/create-subscription - Create PayPal subscription
-router.post('/create-subscription', async (req, res) => {
+router.post('/create-subscription', auth, async (req, res) => {
   try {
     const { planType } = req.body;
     const user = req.user;
 
+    console.log('Creating subscription for user:', user.email, 'plan:', planType);
+
     // Validate plan type
     if (!PLANS[planType]) {
+      console.error('Invalid plan type:', planType);
       return res.status(400).json({ error: 'Invalid plan type' });
     }
+
+    const plan = PLANS[planType];
+    
+    // Validate PayPal plan ID
+    if (!plan.paypal_plan_id || plan.paypal_plan_id === 'P-XXXXXXXXXX') {
+      console.error('PayPal plan ID not configured for plan:', planType);
+      return res.status(500).json({ 
+        error: 'PayPal plan not configured. Please contact support.' 
+      });
+    }
+
+    console.log('Using PayPal plan ID:', plan.paypal_plan_id);
 
     // Check if user already has an active subscription
     if (user.paypalSubscriptionId && user.subscriptionStatus === 'active') {
       return res.status(400).json({ error: 'You already have an active subscription' });
     }
 
-    const plan = PLANS[planType];
+    // Validate PayPal client
+    if (!client) {
+      console.error('PayPal client not initialized');
+      return res.status(500).json({ 
+        error: 'Payment service not available. Please try again later.' 
+      });
+    }
 
     // Create PayPal subscription
     const request = new paypal.subscriptions.SubscriptionsPostRequest();
@@ -99,7 +168,9 @@ router.post('/create-subscription', async (req, res) => {
       }
     });
 
+    console.log('Executing PayPal subscription request...');
     const subscription = await client.execute(request);
+    console.log('PayPal subscription created:', subscription.result.id);
 
     // Update user with PayPal subscription details
     await User.findByIdAndUpdate(user._id, {
@@ -111,14 +182,41 @@ router.post('/create-subscription', async (req, res) => {
       nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
     });
 
+    // Find approval URL
+    const approvalLink = subscription.result.links.find(link => link.rel === 'approve');
+    if (!approvalLink) {
+      console.error('No approval URL found in PayPal response');
+      return res.status(500).json({ 
+        error: 'PayPal approval URL not found. Please try again.' 
+      });
+    }
+
+    console.log('Subscription created successfully, redirecting to:', approvalLink.href);
+
     res.json({ 
       subscriptionId: subscription.result.id,
-      approvalUrl: subscription.result.links.find(link => link.rel === 'approve').href
+      approvalUrl: approvalLink.href
     });
 
   } catch (error) {
     console.error('PayPal subscription creation error:', error);
-    res.status(500).json({ error: 'Failed to create subscription' });
+    
+    // Provide more specific error messages
+    if (error.message.includes('PAYPAL_CLIENT_ID') || error.message.includes('PAYPAL_CLIENT_SECRET')) {
+      return res.status(500).json({ 
+        error: 'PayPal configuration error. Please contact support.' 
+      });
+    }
+    
+    if (error.message.includes('plan_id')) {
+      return res.status(500).json({ 
+        error: 'Invalid PayPal plan configuration. Please contact support.' 
+      });
+    }
+    
+    res.status(500).json({ 
+      error: 'Failed to create subscription. Please try again later.' 
+    });
   }
 });
 
@@ -168,7 +266,7 @@ router.post('/webhook', async (req, res) => {
 });
 
 // GET /api/paypal/subscription - Get current subscription
-router.get('/subscription', async (req, res) => {
+router.get('/subscription', auth, async (req, res) => {
   try {
     const user = req.user;
     
@@ -188,7 +286,7 @@ router.get('/subscription', async (req, res) => {
 });
 
 // POST /api/paypal/cancel - Cancel subscription
-router.post('/cancel', async (req, res) => {
+router.post('/cancel', auth, async (req, res) => {
   try {
     const user = req.user;
     
@@ -218,7 +316,7 @@ router.post('/cancel', async (req, res) => {
 });
 
 // POST /api/paypal/reactivate - Reactivate subscription
-router.post('/reactivate', async (req, res) => {
+router.post('/reactivate', auth, async (req, res) => {
   try {
     const user = req.user;
     

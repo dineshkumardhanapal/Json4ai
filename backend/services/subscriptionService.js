@@ -19,7 +19,7 @@ class SubscriptionService {
         currentPeriodEnd: user.currentPeriodEnd,
         nextBillingDate: user.nextBillingDate,
         cancelAtPeriodEnd: user.cancelAtPeriodEnd,
-        stripeSubscriptionId: user.stripeSubscriptionId,
+        paypalSubscriptionId: user.paypalSubscriptionId,
         hasActiveSubscription: user.subscriptionStatus === 'active',
         remainingCredits: user.plan === 'premium' ? 'Unlimited' : user.credits,
         planFeatures: this.getPlanFeatures(user.plan)

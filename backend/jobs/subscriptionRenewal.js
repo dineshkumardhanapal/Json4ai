@@ -77,7 +77,7 @@ const subscriptionStatusCheck = cron.schedule('0 9 * * *', async () => {
     const threeDaysFromNow = new Date(now.getTime() + (3 * 24 * 60 * 60 * 1000));
     
     const endingSubscriptions = await User.find({
-      stripeSubscriptionId: { $exists: true },
+      paypalSubscriptionId: { $exists: true },
       currentPeriodEnd: { 
         $gte: now,
         $lte: threeDaysFromNow

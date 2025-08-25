@@ -9,8 +9,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Raw body parsing for Stripe webhooks
-app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
+// Raw body parsing for PayPal webhooks (if needed)
+app.use('/api/paypal/webhook', express.raw({ type: 'application/json' }));
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI)

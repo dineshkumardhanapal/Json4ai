@@ -58,7 +58,7 @@ async function testSubscriptionSystem() {
 
     // Test 6: Simulate plan upgrade
     console.log('\n🧪 Test 6: Plan upgrade simulation');
-    const upgradeResult = await SubscriptionService.upgradeUserPlan(user._id, 'starter', 'admin');
+    const upgradeResult = await SubscriptionService.upgradeUserPlan(user._id, 'starter');
     console.log('Upgrade result:', upgradeResult);
 
     // Test 7: Check upgraded status

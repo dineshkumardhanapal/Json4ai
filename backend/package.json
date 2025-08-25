@@ -18,7 +18,8 @@
     "nodemon": "^3.1.4",
     "node-cron": "^3.0.3",
     "replicate": "^0.25.2",
-    "@paypal/checkout-server-sdk": "^1.0.3"
+    "@paypal/checkout-server-sdk": "^1.0.3",
+    "node-fetch": "^2.7.0"
   },
   "engines": { "node": ">=18 <23" }
 }

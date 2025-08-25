@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const fetch = require('node-fetch');
+const paypal = require('@paypal/checkout-server-sdk');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
 const { 
@@ -261,78 +263,80 @@ router.post('/create-subscription', auth, async (req, res) => {
       });
     }
 
-    // Create PayPal subscription
-    // Note: PayPal SDK v1.0.3 uses different class names
-    let request;
-    try {
-      // Try the new SDK structure first
-      if (paypal.subscriptions && paypal.subscriptions.SubscriptionsCreateRequest) {
-        request = new paypal.subscriptions.SubscriptionsCreateRequest();
-      } else if (paypal.orders && paypal.orders.OrdersCreateRequest) {
-        // Fallback to orders if subscriptions not available
-        console.log('Using OrdersCreateRequest as fallback');
-        request = new paypal.orders.OrdersCreateRequest();
-      } else {
-        throw new Error('No suitable PayPal request class found');
+    // Create PayPal subscription using REST API since SDK doesn't have subscription classes
+    console.log('Creating subscription using PayPal REST API...');
+    
+    const subscriptionData = {
+      plan_id: plan.paypal_plan_id,
+      start_time: new Date().toISOString(),
+      subscriber: {
+        name: {
+          given_name: user.firstName,
+          surname: user.lastName
+        },
+        email_address: user.email
+      },
+      application_context: {
+        brand_name: 'JSON4AI',
+        locale: 'en-US',
+        shipping_preference: 'NO_SHIPPING',
+        user_action: 'SUBSCRIBE_NOW',
+        payment_method: {
+          payer_selected: 'PAYPAL',
+          payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED'
+        },
+        return_url: `${process.env.FRONTEND_URL}/dashboard?success=true`,
+        cancel_url: `${process.env.FRONTEND_URL}/pricing?canceled=true`
       }
-      
-      // Set request body based on request type
-      if (request.constructor.name.includes('SubscriptionsCreateRequest')) {
-        request.requestBody({
-          plan_id: plan.paypal_plan_id,
-          start_time: new Date().toISOString(),
-          subscriber: {
-            name: {
-              given_name: user.firstName,
-              surname: user.lastName
-            },
-            email_address: user.email
-          },
-          application_context: {
-            brand_name: 'JSON4AI',
-            locale: 'en-US',
-            shipping_preference: 'NO_SHIPPING',
-            user_action: 'SUBSCRIBE_NOW',
-            payment_method: {
-              payer_selected: 'PAYPAL',
-              payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED'
-            },
-            return_url: `${process.env.FRONTEND_URL}/dashboard?success=true`,
-            cancel_url: `${process.env.FRONTEND_URL}/pricing?canceled=true`
-          }
-        });
-      } else {
-        // Fallback to order creation
-        request.requestBody({
-          intent: 'SUBSCRIPTION',
-          plan_id: plan.paypal_plan_id,
-          application_context: {
-            brand_name: 'JSON4AI',
-            locale: 'en-US',
-            shipping_preference: 'NO_SHIPPING',
-            user_action: 'SUBSCRIBE_NOW',
-            payment_method: {
-              payer_selected: 'PAYPAL',
-              payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED'
-            },
-            return_url: `${process.env.FRONTEND_URL}/dashboard?success=true`,
-            cancel_url: `${process.env.FRONTEND_URL}/pricing?canceled=true`
-          }
-        });
-      }
-      
-    } catch (error) {
-      console.error('Error creating PayPal request:', error);
-      throw new Error('PayPal request creation failed: ' + error.message);
+    };
+
+    // Make direct HTTP request to PayPal subscription API
+    const paypalUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://api-m.paypal.com' 
+      : 'https://api-m.sandbox.paypal.com';
+
+    // First, get access token
+    const authResponse = await fetch(`${paypalUrl}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`).toString('base64')}`,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'grant_type=client_credentials'
+    });
+
+    if (!authResponse.ok) {
+      const authError = await authResponse.text();
+      console.error('PayPal auth failed:', authError);
+      throw new Error('PayPal authentication failed');
     }
 
-    console.log('Executing PayPal subscription request...');
-    const subscription = await client.execute(request);
-    console.log('PayPal subscription created:', subscription.result.id);
+    const authData = await authResponse.json();
+    const accessToken = authData.access_token;
+
+    // Create subscription
+    const subscriptionResponse = await fetch(`${paypalUrl}/v1/billing/subscriptions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify(subscriptionData)
+    });
+
+    if (!subscriptionResponse.ok) {
+      const errorData = await subscriptionResponse.text();
+      console.error('PayPal subscription creation failed:', errorData);
+      throw new Error(`PayPal subscription creation failed: ${errorData}`);
+    }
+
+    const subscription = await subscriptionResponse.json();
+    console.log('PayPal subscription created:', subscription.id);
 
     // Update user with PayPal subscription details
     await User.findByIdAndUpdate(user._id, {
-      paypalSubscriptionId: subscription.result.id,
+      paypalSubscriptionId: subscription.id,
       paypalPlanType: planType,
       subscriptionStatus: 'pending',
       plan: planType,
@@ -341,7 +345,7 @@ router.post('/create-subscription', auth, async (req, res) => {
     });
 
     // Find approval URL
-    const approvalLink = subscription.result.links.find(link => link.rel === 'approve');
+    const approvalLink = subscription.links.find(link => link.rel === 'approve');
     if (!approvalLink) {
       console.error('No approval URL found in PayPal response');
       return res.status(500).json({ 
@@ -352,7 +356,7 @@ router.post('/create-subscription', auth, async (req, res) => {
     console.log('Subscription created successfully, redirecting to:', approvalLink.href);
 
     res.json({ 
-      subscriptionId: subscription.result.id,
+      subscriptionId: subscription.id,
       approvalUrl: approvalLink.href
     });
 
@@ -432,16 +436,41 @@ router.get('/subscription', auth, async (req, res) => {
       return res.json({ subscription: null });
     }
 
-    // Get subscription details from PayPal
-    let request;
-    if (paypal.subscriptions && paypal.subscriptions.SubscriptionsGetRequest) {
-      request = new paypal.subscriptions.SubscriptionsGetRequest(user.paypalSubscriptionId);
-    } else {
-      return res.status(500).json({ error: 'PayPal subscription service not available' });
+    // Get subscription details from PayPal using REST API
+    const paypalUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://api-m.paypal.com' 
+      : 'https://api-m.sandbox.paypal.com';
+
+    // Get access token
+    const authResponse = await fetch(`${paypalUrl}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`).toString('base64')}`,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'grant_type=client_credentials'
+    });
+
+    if (!authResponse.ok) {
+      throw new Error('PayPal authentication failed');
     }
 
-    const subscription = await client.execute(request);
-    res.json({ subscription: subscription.result });
+    const authData = await authResponse.json();
+    const accessToken = authData.access_token;
+
+    // Get subscription
+    const subscriptionResponse = await fetch(`${paypalUrl}/v1/billing/subscriptions/${user.paypalSubscriptionId}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    if (!subscriptionResponse.ok) {
+      return res.json({ subscription: null });
+    }
+
+    const subscription = await subscriptionResponse.json();
+    res.json({ subscription });
   } catch (error) {
     console.error('Subscription retrieval error:', error);
     res.status(500).json({ error: 'Failed to retrieve subscription' });
@@ -457,18 +486,45 @@ router.post('/cancel', auth, async (req, res) => {
       return res.status(400).json({ error: 'No subscription found' });
     }
 
-    // Cancel subscription in PayPal
-    let request;
-    if (paypal.subscriptions && paypal.subscriptions.SubscriptionsCancelRequest) {
-      request = new paypal.subscriptions.SubscriptionsCancelRequest(user.paypalSubscriptionId);
-      request.requestBody({
-        reason: 'User requested cancellation'
-      });
-    } else {
-      return res.status(500).json({ error: 'PayPal subscription service not available' });
+    // Cancel subscription in PayPal using REST API
+    const paypalUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://api-m.paypal.com' 
+      : 'https://api-m.sandbox.paypal.com';
+
+    // Get access token
+    const authResponse = await fetch(`${paypalUrl}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`).toString('base64')}`,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'grant_type=client_credentials'
+    });
+
+    if (!authResponse.ok) {
+      throw new Error('PayPal authentication failed');
     }
 
-    await client.execute(request);
+    const authData = await authResponse.json();
+    const accessToken = authData.access_token;
+
+    // Cancel subscription
+    const cancelResponse = await fetch(`${paypalUrl}/v1/billing/subscriptions/${user.paypalSubscriptionId}/cancel`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        reason: 'User requested cancellation'
+      })
+    });
+
+    if (!cancelResponse.ok) {
+      const errorData = await cancelResponse.text();
+      console.error('PayPal cancel failed:', errorData);
+      throw new Error('Failed to cancel subscription in PayPal');
+    }
 
     // Update user
     await User.findByIdAndUpdate(user._id, {
@@ -492,15 +548,42 @@ router.post('/reactivate', auth, async (req, res) => {
       return res.status(400).json({ error: 'No subscription found' });
     }
 
-    // Reactivate subscription in PayPal
-    let request;
-    if (paypal.subscriptions && paypal.subscriptions.SubscriptionsActivateRequest) {
-      request = new paypal.subscriptions.SubscriptionsActivateRequest(user.paypalSubscriptionId);
-    } else {
-      return res.status(500).json({ error: 'PayPal subscription service not available' });
+    // Reactivate subscription in PayPal using REST API
+    const paypalUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://api-m.paypal.com' 
+      : 'https://api-m.sandbox.paypal.com';
+
+    // Get access token
+    const authResponse = await fetch(`${paypalUrl}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`).toString('base64')}`,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'grant_type=client_credentials'
+    });
+
+    if (!authResponse.ok) {
+      throw new Error('PayPal authentication failed');
     }
 
-    await client.execute(request);
+    const authData = await authResponse.json();
+    const accessToken = authData.access_token;
+
+    // Reactivate subscription
+    const reactivateResponse = await fetch(`${paypalUrl}/v1/billing/subscriptions/${user.paypalSubscriptionId}/activate`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!reactivateResponse.ok) {
+      const errorData = await reactivateResponse.text();
+      console.error('PayPal reactivate failed:', errorData);
+      throw new Error('Failed to reactivate subscription in PayPal');
+    }
 
     // Update user
     await User.findByIdAndUpdate(user._id, {

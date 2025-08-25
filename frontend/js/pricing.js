@@ -31,7 +31,7 @@ async function handleUpgrade(e) {
     return;
   }
 
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('accessToken');
   if (!token) {
     showError('Please log in first.');
     setTimeout(() => (location.href = 'login.html'), 1500);
@@ -87,4 +87,29 @@ function handlePayPalReturn() {
 // Check if user is returning from PayPal
 if (window.location.search.includes('success') || window.location.search.includes('canceled')) {
   handlePayPalReturn();
+}
+
+// Notification functions
+function showError(message) {
+  if (window.showError) {
+    window.showError(message);
+  } else {
+    alert('Error: ' + message);
+  }
+}
+
+function showSuccess(message) {
+  if (window.showSuccess) {
+    window.showSuccess(message);
+  } else {
+    alert('Success: ' + message);
+  }
+}
+
+function showInfo(message) {
+  if (window.showInfo) {
+    window.showInfo(message);
+  } else {
+    alert('Info: ' + message);
+  }
 }

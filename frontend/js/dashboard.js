@@ -19,21 +19,28 @@ const loadProfile = async () => {
   if (errorMessage) errorMessage.style.display = 'none';
   
   try {
-    const res = await fetch('https://json4ai.onrender.com/api/user/profile', {
-      headers: { 'Authorization': `Bearer ${accessToken}` }
-    });
+    // Load both profile and usage information
+    const [profileRes, usageRes] = await Promise.all([
+      fetch('https://json4ai.onrender.com/api/user/profile', {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      }),
+      fetch('https://json4ai.onrender.com/api/user/usage', {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      })
+    ]);
     
-    if (!res.ok) {
-      if (res.status === 401) {
+    if (!profileRes.ok || !usageRes.ok) {
+      if (profileRes.status === 401 || usageRes.status === 401) {
         // Token expired or invalid
         localStorage.clear();
         location.href = 'login.html';
         return;
       }
-      throw new Error('Failed to load profile');
+      throw new Error('Failed to load profile or usage information');
     }
     
-    const user = await res.json();
+    const user = await profileRes.json();
+    const usage = await usageRes.json();
     
     const first = document.getElementById('firstName');
     const last  = document.getElementById('lastName');
@@ -43,6 +50,7 @@ const loadProfile = async () => {
     const usageProgress = document.getElementById('usage-progress');
     const usageText = document.getElementById('usage-text');
     const planFeaturesList = document.getElementById('plan-features-list');
+    const dashboardSubtitle = document.getElementById('dashboard-subtitle');
     
     if (first) {
       first.value = user.firstName || '';
@@ -57,6 +65,11 @@ const loadProfile = async () => {
     if (email) {
       email.value = user.email || '';
       email.placeholder = 'your@email.com';
+    }
+    
+    // Update dashboard subtitle
+    if (dashboardSubtitle) {
+      dashboardSubtitle.textContent = `Welcome back, ${user.firstName}! You're on the ${user.plan.charAt(0).toUpperCase() + user.plan.slice(1)} plan.`;
     }
     
     // Update plan information
@@ -76,8 +89,8 @@ const loadProfile = async () => {
     
     // Update usage information
     if (usageProgress && usageText) {
-      const dailyLimit = user.dailyLimit || 3;
-      const remainingCredits = user.remainingCredits || 0;
+      const dailyLimit = usage.dailyLimit || 3;
+      const remainingCredits = usage.remainingCredits || 0;
       
       if (user.plan === 'premium') {
         usageProgress.style.width = '100%';
@@ -89,6 +102,22 @@ const loadProfile = async () => {
         usageProgress.style.width = `${percentage}%`;
         usageProgress.style.backgroundColor = percentage > 80 ? '#ef4444' : percentage > 60 ? '#f59e0b' : '#10b981';
         usageText.textContent = `${used} of ${dailyLimit} prompts used today (${remainingCredits} remaining)`;
+      }
+    }
+    
+    // Update credit status display
+    const creditBadge = document.getElementById('credit-badge');
+    const creditText = document.getElementById('credit-text');
+    
+    if (creditBadge && creditText) {
+      if (user.plan === 'premium') {
+        creditBadge.textContent = 'Unlimited';
+        creditBadge.className = 'credit-badge credit-unlimited';
+        creditText.textContent = 'You have unlimited access to JSON prompt generation.';
+      } else {
+        creditBadge.textContent = `${usage.remainingCredits} Credits`;
+        creditBadge.className = `credit-badge credit-${usage.remainingCredits > 0 ? 'available' : 'depleted'}`;
+        creditText.textContent = `You have ${usage.remainingCredits} credits remaining today.`;
       }
     }
     

@@ -166,7 +166,6 @@ router.post('/create-subscription', auth, async (req, res) => {
     
     const subscriptionData = {
       plan_id: plan.paypal_plan_id,
-      start_time: new Date().toISOString(),
       subscriber: {
         name: {
           given_name: user.firstName,
@@ -185,7 +184,9 @@ router.post('/create-subscription', auth, async (req, res) => {
         },
         return_url: `${process.env.FRONTEND_URL}/dashboard?success=true`,
         cancel_url: `${process.env.FRONTEND_URL}/pricing?canceled=true`
-      }
+      },
+      // Add custom_id to help identify the subscription
+      custom_id: `user_${user._id}_${planType}`
     };
 
     // Make direct HTTP request to PayPal subscription API

@@ -82,19 +82,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Raw body parsing for PayPal webhooks (if needed)
 app.use('/api/paypal/webhook', express.raw({ type: 'application/json' }));
 
-// MongoDB connection with security options
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  maxPoolSize: 10,
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 45000,
-  bufferMaxEntries: 0,
-  bufferCommands: false
-})
+/// MongoDB connection (modern approach)
+mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.error('MongoDB connection error:', err));
-
 // Routes
 app.use('/api', require('./routes/auth'));
 app.use('/api/user', require('./routes/user'));
@@ -128,4 +119,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log('Subscription renewal jobs started');
+
 });

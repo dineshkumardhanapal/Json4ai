@@ -9,6 +9,26 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Add CSP headers for PayPal integration
+app.use((req, res, next) => {
+  // Only apply CSP headers to PayPal-related routes
+  if (req.path.startsWith('/api/paypal')) {
+    res.set({
+      'Content-Security-Policy': [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.paypal.com https://*.paypalobjects.com",
+        "style-src 'self' 'unsafe-inline' https://*.paypal.com https://*.paypalobjects.com",
+        "img-src 'self' data: https: blob: https://*.paypal.com https://*.paypalobjects.com",
+        "connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://api-m.sandbox.paypal.com https://api-m.paypal.com",
+        "frame-src 'self' https://*.paypal.com https://*.paypalobjects.com",
+        "frame-ancestors 'self'",
+        "form-action 'self' https://*.paypal.com"
+      ].join('; ')
+    });
+  }
+  next();
+});
+
 // Raw body parsing for PayPal webhooks (if needed)
 app.use('/api/paypal/webhook', express.raw({ type: 'application/json' }));
 

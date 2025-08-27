@@ -79,6 +79,91 @@ router.get('/debug', (req, res) => {
   }
 });
 
+// GET /api/paypal/test-plans - Test if plan IDs exist in PayPal
+router.get('/test-plans', async (req, res) => {
+  try {
+    const paypalUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://api-m.paypal.com' 
+      : 'https://api-m.sandbox.paypal.com';
+
+    // Get access token
+    const authResponse = await fetch(`${paypalUrl}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`).toString('base64')}`,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'grant_type=client_credentials'
+    });
+
+    if (!authResponse.ok) {
+      return res.status(500).json({ error: 'PayPal authentication failed' });
+    }
+
+    const authData = await authResponse.json();
+    const accessToken = authData.access_token;
+
+    // Test each plan ID
+    const planTests = {};
+    
+    for (const [planKey, plan] of Object.entries(PLANS)) {
+      if (plan.paypal_plan_id && plan.paypal_plan_id !== 'P-XXXXXXXXXX') {
+        try {
+          const planResponse = await fetch(`${paypalUrl}/v1/billing/plans/${plan.paypal_plan_id}`, {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            }
+          });
+          
+          planTests[planKey] = {
+            planId: plan.paypal_plan_id,
+            exists: planResponse.ok,
+            status: planResponse.status,
+            statusText: planResponse.statusText
+          };
+          
+          if (planResponse.ok) {
+            const planData = await planResponse.json();
+            planTests[planKey].planDetails = {
+              name: planData.name,
+              status: planData.status,
+              description: planData.description
+            };
+          }
+        } catch (error) {
+          planTests[planKey] = {
+            planId: plan.paypal_plan_id,
+            exists: false,
+            error: error.message
+          };
+        }
+      } else {
+        planTests[planKey] = {
+          planId: 'Not Set',
+          exists: false,
+          error: 'Plan ID not configured'
+        };
+      }
+    }
+
+    res.json({
+      environment: process.env.NODE_ENV,
+      paypalUrl,
+      planTests,
+      instructions: [
+        'If any plan shows "exists: false", you need to:',
+        '1. Go to PayPal Developer Dashboard',
+        '2. Create new subscription plans',
+        '3. Update your environment variables with new Plan IDs',
+        '4. Redeploy your application'
+      ]
+    });
+    
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // GET /api/paypal/config - Check PayPal configuration (remove in production)
 router.get('/config', (req, res) => {
   try {
@@ -126,6 +211,20 @@ router.get('/test', (req, res) => {
 
 // POST /api/paypal/create-subscription - Create PayPal subscription
 router.post('/create-subscription', auth, async (req, res) => {
+  // Set CSP headers to allow PayPal resources
+  res.set({
+    'Content-Security-Policy': [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.paypal.com https://*.paypalobjects.com",
+      "style-src 'self' 'unsafe-inline' https://*.paypal.com https://*.paypalobjects.com",
+      "img-src 'self' data: https: blob: https://*.paypal.com https://*.paypalobjects.com",
+      "connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://api-m.sandbox.paypal.com https://api-m.paypal.com",
+      "frame-src 'self' https://*.paypal.com https://*.paypalobjects.com",
+      "frame-ancestors 'self'",
+      "form-action 'self' https://*.paypal.com"
+    ].join('; ')
+  });
+
   try {
     // Check if PayPal SDK is available
     // No SDK initialization needed, using REST API directly
@@ -161,8 +260,68 @@ router.post('/create-subscription', auth, async (req, res) => {
     // Validate PayPal client
     // No client initialization needed, using REST API directly
 
-    // Create PayPal subscription using REST API since SDK doesn't have subscription classes
-    console.log('Creating subscription using PayPal REST API...');
+    // Make direct HTTP request to PayPal subscription API
+    // Add environment override for PayPal
+    const forcePayPalProduction = process.env.FORCE_PAYPAL_PRODUCTION === 'true';
+    const paypalUrl = (process.env.NODE_ENV === 'production' || forcePayPalProduction)
+      ? 'https://api-m.paypal.com' 
+      : 'https://api-m.sandbox.paypal.com';
+    
+    console.log('PayPal Environment Debug:');
+    console.log('- NODE_ENV:', process.env.NODE_ENV);
+    console.log('- FORCE_PAYPAL_PRODUCTION:', process.env.FORCE_PAYPAL_PRODUCTION);
+    console.log('- Using PayPal URL:', paypalUrl);
+
+    console.log('Step 1: Getting PayPal access token...');
+    
+    // First, get access token
+    console.log('PayPal Auth Debug:');
+    console.log('- Client ID length:', process.env.PAYPAL_CLIENT_ID ? process.env.PAYPAL_CLIENT_ID.length : 'Missing');
+    console.log('- Client Secret length:', process.env.PAYPAL_CLIENT_SECRET ? process.env.PAYPAL_CLIENT_SECRET.length : 'Missing');
+    console.log('- Auth URL:', `${paypalUrl}/v1/oauth2/token`);
+    
+    const authResponse = await fetch(`${paypalUrl}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`).toString('base64')}`,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'grant_type=client_credentials'
+    });
+
+    if (!authResponse.ok) {
+      const authError = await authResponse.text();
+      console.error('PayPal auth failed:', authError);
+      console.error('Response status:', authResponse.status);
+      console.error('Response headers:', Object.fromEntries(authResponse.headers.entries()));
+      throw new Error(`PayPal authentication failed: ${authError}`);
+    }
+
+    const authData = await authResponse.json();
+    const accessToken = authData.access_token;
+    console.log('✅ PayPal access token obtained successfully');
+
+    // Let's first verify the plan exists before creating subscription
+    console.log('Step 2: Verifying plan exists...');
+    const planCheckResponse = await fetch(`${paypalUrl}/v1/billing/plans/${plan.paypal_plan_id}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    if (!planCheckResponse.ok) {
+      const planError = await planCheckResponse.text();
+      console.error('Plan verification failed:', planError);
+      console.error('Plan ID:', plan.paypal_plan_id);
+      console.error('PayPal URL:', paypalUrl);
+      console.error('Response status:', planCheckResponse.status);
+      throw new Error(`Plan verification failed: ${planError}`);
+    }
+
+    const planData = await planCheckResponse.json();
+    console.log('✅ Plan verified successfully:', planData.name, 'Status:', planData.status);
+
+    console.log('Step 3: Creating subscription...');
     
     const subscriptionData = {
       plan_id: plan.paypal_plan_id,
@@ -189,29 +348,7 @@ router.post('/create-subscription', auth, async (req, res) => {
       custom_id: `user_${user._id}_${planType}`
     };
 
-    // Make direct HTTP request to PayPal subscription API
-    const paypalUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://api-m.paypal.com' 
-      : 'https://api-m.sandbox.paypal.com';
-
-    // First, get access token
-    const authResponse = await fetch(`${paypalUrl}/v1/oauth2/token`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`).toString('base64')}`,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: 'grant_type=client_credentials'
-    });
-
-    if (!authResponse.ok) {
-      const authError = await authResponse.text();
-      console.error('PayPal auth failed:', authError);
-      throw new Error('PayPal authentication failed');
-    }
-
-    const authData = await authResponse.json();
-    const accessToken = authData.access_token;
+    console.log('Subscription data being sent:', JSON.stringify(subscriptionData, null, 2));
 
     // Create subscription
     const subscriptionResponse = await fetch(`${paypalUrl}/v1/billing/subscriptions`, {

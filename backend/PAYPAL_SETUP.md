@@ -31,6 +31,9 @@ PAYPAL_CLIENT_SECRET=your_paypal_client_secret_here
 PAYPAL_STARTER_PLAN_ID=P-XXXXXXXXXX
 PAYPAL_PREMIUM_PLAN_ID=P-XXXXXXXXXX
 
+# PayPal Environment Override (set to 'true' to force production API even in development)
+FORCE_PAYPAL_PRODUCTION=false
+
 # Other required variables
 MONGO_URI=mongodb://localhost:27017/json4ai
 FRONTEND_URL=http://localhost:3000
@@ -93,11 +96,18 @@ EMAIL_PASS=your_gmail_app_password_here
 - Use sandbox credentials for development
 - Test with sandbox PayPal accounts
 - Sandbox plans and webhooks
+- Set `NODE_ENV=development` and `FORCE_PAYPAL_PRODUCTION=false`
 
 ### **2. Production Environment**
 - Switch to live credentials
 - Use real PayPal accounts
 - Live plans and webhooks
+- Set `NODE_ENV=production` OR `FORCE_PAYPAL_PRODUCTION=true`
+
+### **3. Environment Override**
+- Use `FORCE_PAYPAL_PRODUCTION=true` to force production API even when `NODE_ENV=development`
+- Useful for testing production credentials in development environment
+- Helps avoid environment mismatch issues
 
 ## 📱 **Frontend Integration**
 
@@ -205,7 +215,19 @@ PAYPAL_STARTER_PLAN_ID=P-XXXXXXXXXX
 PAYPAL_PREMIUM_PLAN_ID=P-XXXXXXXXXX
 ```
 
-### **2. Test Webhooks**
+### **2. Test PayPal Configuration**
+```bash
+# Test authentication and plan verification
+node test-paypal-auth.js
+
+# This will verify:
+# - Environment configuration
+# - PayPal credentials
+# - Plan IDs
+# - API connectivity
+```
+
+### **3. Test Webhooks**
 ```bash
 # Use PayPal webhook simulator
 # Or test with sandbox environment
@@ -238,20 +260,39 @@ PAYPAL_PREMIUM_PLAN_ID=P-XXXXXXXXXX
 
 ### **Common Issues**
 
-1. **Webhook Not Received**
+1. **Client Authentication Failed**
+   - **Cause**: Environment mismatch between credentials and API endpoint
+   - **Solution**: 
+     - For production credentials: Set `FORCE_PAYPAL_PRODUCTION=true`
+     - For sandbox credentials: Ensure `NODE_ENV=development` and `FORCE_PAYPAL_PRODUCTION=false`
+   - **Test**: Run `node test-paypal-auth.js` to verify configuration
+
+2. **Webhook Not Received**
    - Check webhook URL configuration
    - Verify webhook is active
    - Check server logs
 
-2. **Subscription Not Activating**
+3. **Subscription Not Activating**
    - Verify webhook events
    - Check user database updates
    - Review PayPal subscription status
 
-3. **Payment Failures**
+4. **Payment Failures**
    - Check PayPal account status
    - Verify payment method
    - Review error logs
+
+### **Environment Configuration Issues**
+
+1. **Wrong PayPal API Endpoint**
+   - **Symptoms**: "Client Authentication failed" error
+   - **Check**: Verify `NODE_ENV` and `FORCE_PAYPAL_PRODUCTION` settings
+   - **Fix**: Align environment variables with your PayPal credentials
+
+2. **Credential Mismatch**
+   - **Symptoms**: Authentication succeeds but plans not found
+   - **Check**: Ensure plan IDs match the environment (sandbox vs production)
+   - **Fix**: Use plan IDs from the correct PayPal environment
 
 ### **Debug Mode**
 ```env

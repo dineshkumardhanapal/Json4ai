@@ -17,9 +17,9 @@ app.use((req, res, next) => {
       'Content-Security-Policy': [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.paypal.com https://*.paypalobjects.com",
-        "style-src 'self' 'unsafe-inline' https://*.paypal.com https://*.paypalobjects.com",
+        "style-src 'self' 'unsafe-inline' https://*.paypal.com https://*.paypalobjects.com https://fonts.googleapis.com https://fonts.gstatic.com",
         "img-src 'self' data: https: blob: https://*.paypal.com https://*.paypalobjects.com",
-        "connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://api-m.sandbox.paypal.com https://api-m.paypal.com",
+        "connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://api-m.sandbox.paypal.com https://api-m.paypal.com https://*.onrender.com https://json4ai.onrender.com",
         "frame-src 'self' https://*.paypal.com https://*.paypalobjects.com",
         "frame-ancestors 'self'",
         "form-action 'self' https://*.paypal.com"

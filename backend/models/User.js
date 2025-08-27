@@ -64,8 +64,17 @@ userSchema.virtual('remainingCredits').get(function() {
 
 // Method to check if user can generate prompts
 userSchema.methods.canGeneratePrompt = function() {
-  if (this.plan === 'premium') return true;
-  return this.credits > 0;
+  // CRITICAL SECURITY CHECK: Verify subscription status for paid plans
+  if (this.plan === 'premium' && this.subscriptionStatus !== 'active') {
+    return false; // Premium plan requires active subscription
+  }
+  
+  if (this.plan === 'starter' && this.subscriptionStatus !== 'active') {
+    return false; // Starter plan requires active subscription
+  }
+  
+  if (this.plan === 'premium') return true; // Premium with active subscription
+  return this.credits > 0; // Free plan or paid plan with credits
 };
 
 // Method to use a credit

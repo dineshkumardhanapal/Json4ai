@@ -61,6 +61,32 @@ const loadUsageStatus = async () => {
         }, 1000);
         return;
       }
+      
+      // Check if it's a subscription status issue
+      if (res.status === 402) {
+        const errorData = await res.json();
+        if (errorData.subscriptionStatus && errorData.subscriptionStatus !== 'active') {
+          // User has a plan but subscription is not active
+          usageStatus.className = 'usage-status-card status-limit-reached';
+          usageStatus.innerHTML = `
+            <div class="status-icon">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              </svg>
+            </div>
+            <div class="status-content">
+              <h3>Subscription Not Active</h3>
+              <p>Your subscription status is: <strong>${errorData.subscriptionStatus}</strong>. Please complete payment or contact support.</p>
+              <a href="pricing.html" class="btn-primary">Complete Payment</a>
+            </div>
+          `;
+          
+          // Disable the form
+          generatorForm.style.display = 'none';
+          return;
+        }
+      }
+      
       throw new Error('Failed to load usage information');
     }
     

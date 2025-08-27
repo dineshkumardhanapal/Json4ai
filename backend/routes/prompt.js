@@ -5,6 +5,7 @@ const Prompt = require('../models/Prompt');
 const User   = require('../models/User');
 const creditCheck = require('../middleware/credit');
 const auth = require('../middleware/auth');
+const { validatePromptGeneration } = require('../middleware/validation');
 
 // Initialize Replicate client
 let replicate;
@@ -18,7 +19,7 @@ try {
 }
 
 // POST /api/prompt/generate
-router.post('/generate', auth, creditCheck, async (req, res) => {
+router.post('/generate', auth, creditCheck, validatePromptGeneration, async (req, res) => {
   try {
     const { comment } = req.body;
     if (!comment) return res.status(400).json({ message: 'Missing comment' });
@@ -117,9 +118,7 @@ Return ONLY the JSON object:`;
       }
     );
 
-    // Log output for debugging (remove in production)
-    console.log('Raw AI Output:', output);
-    console.log('Output length:', Array.isArray(output) ? output.join('').length : String(output).length);
+    // AI output received
 
 
 

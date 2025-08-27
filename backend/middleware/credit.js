@@ -7,6 +7,16 @@ module.exports = async (req, res, next) => {
     const user = await User.findById(req.user._id);
     if (!user) return res.status(401).json({ message: 'User not found' });
 
+    // CRITICAL SECURITY CHECK: Verify subscription status before granting access
+    if (user.plan !== 'free' && user.subscriptionStatus !== 'active') {
+      return res.status(402).json({ 
+        message: 'Your subscription is not active. Please complete payment or contact support.',
+        currentPlan: user.plan,
+        subscriptionStatus: user.subscriptionStatus,
+        upgradeUrl: '/pricing.html'
+      });
+    }
+
     // Reset credits and usage based on plan
     user.resetDailyCredits();
     user.resetMonthlyUsage();

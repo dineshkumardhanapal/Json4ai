@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { validateProfileUpdate } = require('../middleware/validation');
 
 // middleware
 const auth = (req, res, next) => {
@@ -42,7 +43,7 @@ router.get('/profile', auth, async (req, res) => {
 });
 
 // Update profile
-router.put('/profile', auth, async (req, res) => {
+router.put('/profile', auth, validateProfileUpdate, async (req, res) => {
   try {
     const { firstName, lastName } = req.body;
     if (!firstName || !lastName) {

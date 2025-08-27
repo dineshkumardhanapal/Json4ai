@@ -5,9 +5,10 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const transporter = require('../mailer');
+const { validateRegistration, validateLogin } = require('../middleware/validation');
 
 // POST /api/register
-router.post('/register', async (req, res) => {
+router.post('/register', validateRegistration, async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
     if (await User.findOne({ email })) return res.status(400).json({ message: 'Email already registered' });
@@ -273,7 +274,7 @@ router.post('/resend-verification', async (req, res) => {
 });
 
 // POST /api/login
-router.post('/login', async (req, res) => {
+router.post('/login', validateLogin, async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });

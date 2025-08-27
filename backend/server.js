@@ -2,40 +2,98 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const { validateEnvironment } = require('./config/envValidation');
+
+// Validate environment variables before starting
+try {
+  validateEnvironment();
+} catch (error) {
+  console.error('❌ Environment validation failed:', error.message);
+  process.exit(1);
+}
 
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://*.paypal.com", "https://*.paypalobjects.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://*.paypal.com", "https://*.paypalobjects.com", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https:", "blob:", "https://*.paypal.com", "https://*.paypalobjects.com"],
+      connectSrc: ["'self'", "https://*.paypal.com", "https://*.paypalobjects.com", "https://api-m.sandbox.paypal.com", "https://api-m.paypal.com", "https://*.onrender.com", "https://json4ai.onrender.com"],
+      frameSrc: ["'self'", "https://*.paypal.com", "https://*.paypalobjects.com"],
+      frameAncestors: ["'self'"],
+      formAction: ["'self'", "https://*.paypal.com"]
+    }
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  },
+  noSniff: true,
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
+}));
 
-// Add CSP headers for PayPal integration
-app.use((req, res, next) => {
-  // Only apply CSP headers to PayPal-related routes
-  if (req.path.startsWith('/api/paypal')) {
-    res.set({
-      'Content-Security-Policy': [
-        "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.paypal.com https://*.paypalobjects.com",
-        "style-src 'self' 'unsafe-inline' https://*.paypal.com https://*.paypalobjects.com https://fonts.googleapis.com https://fonts.gstatic.com",
-        "img-src 'self' data: https: blob: https://*.paypal.com https://*.paypalobjects.com",
-        "connect-src 'self' https://*.paypal.com https://*.paypalobjects.com https://api-m.sandbox.paypal.com https://api-m.paypal.com https://*.onrender.com https://json4ai.onrender.com",
-        "frame-src 'self' https://*.paypal.com https://*.paypalobjects.com",
-        "frame-ancestors 'self'",
-        "form-action 'self' https://*.paypal.com"
-      ].join('; ')
-    });
-  }
-  next();
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
 });
+
+// Apply rate limiting to all routes
+app.use(limiter);
+
+// Stricter rate limiting for auth routes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 requests per windowMs
+  message: 'Too many authentication attempts, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Apply stricter rate limiting to auth routes
+app.use('/api/login', authLimiter);
+app.use('/api/register', authLimiter);
+app.use('/api/resend-verification', authLimiter);
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? [process.env.FRONTEND_URL, 'https://json4ai.onrender.com']
+    : ['http://localhost:3000', 'http://localhost:5000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Body parsing middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Raw body parsing for PayPal webhooks (if needed)
 app.use('/api/paypal/webhook', express.raw({ type: 'application/json' }));
 
-// MongoDB connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error(err));
+// MongoDB connection with security options
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  maxPoolSize: 10,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+  bufferMaxEntries: 0,
+  bufferCommands: false
+})
+.then(() => console.log('MongoDB connected'))
+.catch(err => console.error('MongoDB connection error:', err));
 
 // Routes
 app.use('/api', require('./routes/auth'));

@@ -1969,44 +1969,4 @@ footer {
   margin: 0;
 }
 
-/* Debug Card */
-.debug-card {
-  background: var(--bg-card);
-  border: 1px solid #f59e0b;
-  border-radius: var(--radius-xl);
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  box-shadow: var(--shadow-lg);
-}
-
-.debug-card h3 {
-  color: #f59e0b;
-  margin-bottom: 1rem;
-  font-size: 1.125rem;
-}
-
-.debug-card p {
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
-}
-
-.debug-card strong {
-  color: var(--text-primary);
-}
-
-.debug-card button {
-  margin-top: 1rem;
-  font-size: 0.875rem;
-  padding: 0.5rem 1rem;
-}
-
-.debug-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.debug-actions button {
-  margin-top: 0;
-}
+/* Debug Card removed for production */

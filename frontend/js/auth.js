@@ -4,10 +4,7 @@ const registerForm = document.getElementById('register-form');
 
 const API = path => `https://json4ai.onrender.com/api${path}`;
 
-// Debug logging
-console.log('Auth.js loaded');
-console.log('Login form found:', !!loginForm);
-console.log('Register form found:', !!registerForm);
+// Auth.js loaded
 
 if (loginForm) {
   const verificationSection = document.querySelector('.verification-section');
@@ -79,23 +76,17 @@ if (registerForm) {
   const submitBtn = document.getElementById('submit-btn');
   const successMessage = document.getElementById('success-message');
   
-  console.log('Register form elements found:', {
-    termsCheckbox: !!termsCheckbox,
-    submitBtn: !!submitBtn,
-    successMessage: !!successMessage
-  });
+  // Register form elements found
   
   // Enable/disable submit button based on terms checkbox
   if (termsCheckbox && submitBtn) {
     termsCheckbox.addEventListener('change', () => {
       submitBtn.disabled = !termsCheckbox.checked;
-      console.log('Terms checkbox changed:', termsCheckbox.checked);
     });
   }
   
   registerForm.addEventListener('submit', async e => {
     e.preventDefault();
-    console.log('Registration form submitted');
     
     // Check if terms are accepted
     if (!termsCheckbox.checked) {
@@ -111,7 +102,7 @@ if (registerForm) {
       password:  fd.get('password')
     };
     
-    console.log('Registration data:', { ...body, password: '[HIDDEN]' });
+    // Registration data prepared
     
     try {
       // Show loading state

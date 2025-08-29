@@ -24,13 +24,13 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://*.paypal.com", "https://*.paypalobjects.com"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://*.paypal.com", "https://*.paypalobjects.com", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:", "blob:", "https://*.paypal.com", "https://*.paypalobjects.com"],
-      connectSrc: ["'self'", "https://*.paypal.com", "https://*.paypalobjects.com", "https://api-m.sandbox.paypal.com", "https://api-m.paypal.com", "https://*.onrender.com", "https://json4ai.onrender.com", "https://*.netlify.app"],
-      frameSrc: ["'self'", "https://*.paypal.com", "https://*.paypalobjects.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      connectSrc: ["'self'", "https://*.onrender.com", "https://json4ai.onrender.com", "https://*.netlify.app"],
+      frameSrc: ["'self'"],
       frameAncestors: ["'self'"],
-      formAction: ["'self'", "https://*.paypal.com"]
+      formAction: ["'self'"]
     }
   },
   hsts: {
@@ -121,9 +121,6 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Raw body parsing for PayPal webhooks (if needed)
-app.use('/api/paypal/webhook', express.raw({ type: 'application/json' }));
-
 // MongoDB connection with security options
 mongoose.connect(process.env.MONGO_URI, {
   maxPoolSize: 10,
@@ -148,7 +145,7 @@ app.get('/api/test-cors', (req, res) => {
 app.use('/api', require('./routes/auth'));
 app.use('/api/user', require('./routes/user'));
 app.use('/api/prompt', require('./routes/prompt'));
-app.use('/api/paypal', require('./routes/paypal'));
+app.use('/api/payment', require('./routes/payment'));
 
 // Start subscription renewal jobs
 const subscriptionJobs = require('./jobs/subscriptionRenewal');

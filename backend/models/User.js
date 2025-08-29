@@ -7,16 +7,20 @@ const userSchema = new mongoose.Schema({
   password:  { type: String, required: true, minlength: 6 },
   verified:  { type: Boolean, default: false },
   verifyToken: String,
-  credits:   { type: Number, default: 3 },
+  credits:   { type: Number, default: 3 }, // Only used for free plan
   plan:      { 
     type: String, 
     enum: ['free', 'starter', 'premium'], 
     default: 'free' 
   },
+  // Plan management for one-time payments
+  planStartDate: { type: Date },
+  planEndDate: { type: Date }, // Plan expires after 30 days
+  // Daily limits tracking
+  dailyPromptsUsed: { type: Number, default: 0 },
+  lastDailyReset: { type: Date, default: Date.now },
+  // Legacy fields (keeping for backward compatibility)
   lastFreeReset: { type: Date, default: Date.now },
-  // Additional fields for better plan management
-  planStartDate: { type: Date, default: Date.now },
-  planEndDate: { type: Date },
   totalPromptsUsed: { type: Number, default: 0 },
   monthlyPromptsUsed: { type: Number, default: 0 },
   lastMonthlyReset: { type: Date, default: Date.now },
@@ -24,9 +28,9 @@ const userSchema = new mongoose.Schema({
   refreshToken: String,
   lastLogin: { type: Date, default: Date.now },
   lastActivity: { type: Date, default: Date.now },
-  // PayPal subscription fields
-  paypalSubscriptionId: String,
-  paypalPlanType: String,
+  // Subscription fields
+  subscriptionId: String,
+  subscriptionPlatform: String, // Will be 'pinelabs' for Pine Labs
   subscriptionStatus: {
     type: String,
     enum: ['active', 'pending', 'cancelled', 'expired', 'payment_failed', 'suspended'],
@@ -48,47 +52,79 @@ userSchema.virtual('hasUnlimitedAccess').get(function() {
 
 // Virtual for getting daily limit
 userSchema.virtual('dailyLimit').get(function() {
-  const limits = {
-    free: 3,
-    starter: 30,
-    premium: Infinity
-  };
-  return limits[this.plan] || 3;
+  // Check if paid plan is still active
+  if (this.plan !== 'free' && this.planEndDate && new Date(this.planEndDate) > new Date()) {
+    const limits = {
+      starter: 30,  // 30 prompts per day
+      premium: 100  // 100 prompts per day
+    };
+    return limits[this.plan] || 3;
+  }
+  return 3; // Free plan or expired paid plan
 });
 
-// Virtual for getting remaining credits
+// Virtual for getting remaining daily prompts
 userSchema.virtual('remainingCredits').get(function() {
-  if (this.plan === 'premium') return Infinity;
-  return Math.max(0, this.credits);
+  const dailyLimit = this.dailyLimit;
+  const used = this.dailyPromptsUsed || 0;
+  return Math.max(0, dailyLimit - used);
 });
 
 // Method to check if user can generate prompts
 userSchema.methods.canGeneratePrompt = function() {
-  // CRITICAL SECURITY CHECK: Verify subscription status for paid plans
-  if (this.plan === 'premium' && this.subscriptionStatus !== 'active') {
-    return false; // Premium plan requires active subscription
+  // Check if paid plan has expired
+  if (this.plan !== 'free' && this.planEndDate && new Date(this.planEndDate) <= new Date()) {
+    // Plan has expired, revert to free plan
+    this.plan = 'free';
+    this.planStartDate = null;
+    this.planEndDate = null;
   }
   
-  if (this.plan === 'starter' && this.subscriptionStatus !== 'active') {
-    return false; // Starter plan requires active subscription
-  }
+  // Reset daily usage if needed
+  this.resetDailyUsage();
   
-  if (this.plan === 'premium') return true; // Premium with active subscription
-  return this.credits > 0; // Free plan or paid plan with credits
+  // Check daily limit
+  const dailyLimit = this.dailyLimit;
+  const dailyUsed = this.dailyPromptsUsed || 0;
+  
+  return dailyUsed < dailyLimit;
 };
 
-// Method to use a credit
+// Method to use a credit/prompt
 userSchema.methods.useCredit = function() {
-  if (this.plan === 'premium') {
-    this.totalPromptsUsed += 1;
-    this.monthlyPromptsUsed += 1;
-    return true;
+  if (!this.canGeneratePrompt()) {
+    return false;
   }
   
-  if (this.credits > 0) {
-    this.credits -= 1;
-    this.totalPromptsUsed += 1;
-    this.monthlyPromptsUsed += 1;
+  // Increment daily usage
+  this.dailyPromptsUsed = (this.dailyPromptsUsed || 0) + 1;
+  this.totalPromptsUsed = (this.totalPromptsUsed || 0) + 1;
+  this.monthlyPromptsUsed = (this.monthlyPromptsUsed || 0) + 1;
+  
+  // For free plan, also decrement credits
+  if (this.plan === 'free') {
+    this.credits = Math.max(0, this.credits - 1);
+  }
+  
+  return true;
+};
+
+// Method to reset daily usage
+userSchema.methods.resetDailyUsage = function() {
+  const now = new Date();
+  const lastReset = new Date(this.lastDailyReset);
+  
+  // Reset if it's a new day
+  if (now.toDateString() !== lastReset.toDateString()) {
+    this.dailyPromptsUsed = 0;
+    this.lastDailyReset = now;
+    
+    // For free plan, also reset credits
+    if (this.plan === 'free') {
+      this.credits = 3;
+      this.lastFreeReset = now;
+    }
+    
     return true;
   }
   

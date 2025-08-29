@@ -144,9 +144,9 @@ async function handleUpgrade(e) {
 
   try {
     e.target.disabled = true;
-    e.target.textContent = 'Creating Subscription…';
+    e.target.textContent = 'Creating Order…';
 
-    const res = await fetch(API('/api/paypal/create-subscription'), {
+    const res = await fetch(API('/api/payment/create-order'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -156,48 +156,59 @@ async function handleUpgrade(e) {
     });
 
     const data = await res.json();
-    if (res.ok && data.approvalUrl) {
-      // Redirect to PayPal for subscription approval
-      location.href = data.approvalUrl;
+    if (res.ok && data.paymentUrl) {
+      // Redirect to Cashfree payment page
+      location.href = data.paymentUrl;
     } else {
-      showError(data.error || 'Unable to create subscription.');
+      // Show appropriate message for Cashfree integration
+      if (data.error && data.error.includes('Cashfree payment integration coming soon')) {
+        showInfo(`${plan.charAt(0).toUpperCase() + plan.slice(1)} plan selected. ${data.details}`);
+      } else if (data.error && data.error.includes('You already have an active plan')) {
+        showInfo(`${data.error}. ${data.details || ''}`);
+      } else {
+        showError(data.error || 'Unable to create payment order.');
+      }
     }
   } catch (err) {
     console.error(err);
     showError('Network error. Please try again later.');
   } finally {
     e.target.disabled = false;
-    e.target.textContent = 'Upgrade';
+    e.target.textContent = 'Buy Now';
   }
 }
 
-// Handle return from PayPal (add this to your dashboard or success page)
-function handlePayPalReturn() {
+// Handle return from payment gateway (Cashfree)
+function handlePaymentReturn() {
   const urlParams = new URLSearchParams(window.location.search);
   const success = urlParams.get('success');
   const canceled = urlParams.get('canceled');
+  const plan = urlParams.get('plan');
 
   if (success === 'true') {
-    showSuccess('Subscription activated successfully! Welcome to JSON4AI!');
+    const planName = plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : 'Premium';
+    showSuccess(`${planName} plan activated successfully! You now have access for 1 month.`);
     // Redirect to dashboard after a short delay
     setTimeout(() => {
       location.href = 'dashboard.html';
     }, 2000);
   } else if (canceled === 'true') {
-    showInfo('Subscription was canceled. You can try again anytime.');
+    showInfo('Payment was canceled. You can try again anytime.');
   }
 }
 
-// Check if user is returning from PayPal
+// Check if user is returning from payment gateway
 if (window.location.search.includes('success') || window.location.search.includes('canceled')) {
-  handlePayPalReturn();
+  handlePaymentReturn();
 }
 
 // Notification functions
 function showError(message) {
-  if (window.showError) {
+  // Prevent infinite recursion by checking if this is already the global function
+  if (window.showError && window.showError !== showError) {
     window.showError(message);
   } else {
+    // Use a simple alert as fallback to prevent infinite loops
     alert('Error: ' + message);
   }
 }

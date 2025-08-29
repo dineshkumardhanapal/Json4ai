@@ -5,10 +5,6 @@ const requiredEnvVars = [
   'JWT_REFRESH_SECRET',
   'EMAIL_USER',
   'EMAIL_PASS',
-  'PAYPAL_CLIENT_ID',
-  'PAYPAL_CLIENT_SECRET',
-  'PAYPAL_STARTER_PLAN_ID',
-  'PAYPAL_PREMIUM_PLAN_ID',
   'FRONTEND_URL'
 ];
 
@@ -39,14 +35,7 @@ const validateEnvironment = () => {
     throw new Error('Invalid MongoDB URI format');
   }
   
-  // Validate PayPal plan IDs
-  if (process.env.PAYPAL_STARTER_PLAN_ID && process.env.PAYPAL_STARTER_PLAN_ID === 'P-XXXXXXXXXX') {
-    throw new Error('PAYPAL_STARTER_PLAN_ID must be set to a valid PayPal plan ID');
-  }
-  
-  if (process.env.PAYPAL_PREMIUM_PLAN_ID && process.env.PAYPAL_PREMIUM_PLAN_ID === 'P-XXXXXXXXXX') {
-    throw new Error('PAYPAL_PREMIUM_PLAN_ID must be set to a valid PayPal plan ID');
-  }
+
   
   // Validate email configuration
   if (process.env.EMAIL_USER && !process.env.EMAIL_USER.includes('@')) {

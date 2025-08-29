@@ -125,8 +125,8 @@ const validateProfileUpdate = [
   }
 ];
 
-// Validation middleware for PayPal subscription
-const validatePayPalSubscription = [
+// Validation middleware for payment subscription
+const validatePaymentSubscription = [
   body('planType')
     .isIn(['starter', 'premium'])
     .withMessage('Plan type must be either starter or premium'),
@@ -159,6 +159,6 @@ module.exports = {
   validateLogin,
   validatePromptGeneration,
   validateProfileUpdate,
-  validatePayPalSubscription,
+  validatePaymentSubscription,
   sanitizeObjectId
 };

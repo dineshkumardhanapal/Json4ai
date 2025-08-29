@@ -3,6 +3,14 @@ const router = express.Router();
 const User = require('../models/User');
 const auth = require('../middleware/auth');
 const { validatePaymentSubscription } = require('../middleware/validation');
+const { Cashfree } = require('cashfree-pg-sdk-nodejs');
+
+// Initialize Cashfree
+const cashfree = new Cashfree({
+  XClientId: process.env.CASHFREE_APP_ID,
+  XClientSecret: process.env.CASHFREE_SECRET_KEY,
+  XEnvironment: process.env.NODE_ENV === 'production' ? 'PRODUCTION' : 'SANDBOX'
+});
 
 // Plan configuration for Cashfree one-time payments
 const PLANS = {
@@ -59,44 +67,63 @@ router.post('/create-order', auth, async (req, res) => {
       });
     }
 
-    // TODO: Implement Cashfree payment gateway integration
-    // For now, return a placeholder response
-    return res.status(503).json({ 
-      error: 'Cashfree payment integration coming soon!',
-      details: `${plan.name} plan (₹${plan.price} for 1 month) will be available once Cashfree integration is complete.`,
-      plan: plan
-    });
-
-    // Future Cashfree integration will go here:
-    /*
-    // 1. Create Cashfree payment order
-    // 2. Generate payment URL
-    // 3. Update user with pending payment
-    // 4. Return payment URL for redirect
+    // Generate unique order ID
+    const orderId = `order_${user._id}_${Date.now()}`;
     
-    const paymentOrder = await createCashfreeOrder({
+    // Create Cashfree payment order
+    const orderRequest = {
       order_amount: plan.price,
       order_currency: plan.currency,
-      order_id: `order_${user._id}_${Date.now()}`,
+      order_id: orderId,
       customer_details: {
         customer_id: user._id.toString(),
         customer_name: `${user.firstName} ${user.lastName}`,
-        customer_email: user.email
+        customer_email: user.email,
+        customer_phone: user.phone || '9999999999' // Default phone if not provided
       },
       order_meta: {
         plan_type: planType,
-        user_id: user._id.toString()
+        user_id: user._id.toString(),
+        plan_name: plan.name
       },
       order_note: `${plan.name} Plan - 1 Month Access`,
-      return_url: `${process.env.FRONTEND_URL}/pricing?success=true&plan=${planType}`,
-      notify_url: `${process.env.BACKEND_URL}/api/payment/webhook`
-    });
+      order_tags: {
+        source: 'json4ai',
+        plan: planType
+      }
+    };
 
-    res.json({ 
-      orderId: paymentOrder.order_id,
-      paymentUrl: paymentOrder.payment_link
-    });
-    */
+    try {
+      // Create order using Cashfree SDK
+      const response = await cashfree.PGCreateOrder('2022-09-01', orderRequest);
+      
+      if (response.data && response.data.payment_session_id) {
+        // Store order details in user record for webhook processing
+        await User.findByIdAndUpdate(user._id, {
+          pendingOrderId: orderId,
+          pendingPlanType: planType,
+          orderCreatedAt: new Date()
+        });
+
+        // Generate payment URL
+        const paymentUrl = `https://payments${process.env.NODE_ENV === 'production' ? '' : '-test'}.cashfree.com/pay/order/${response.data.payment_session_id}`;
+
+        res.json({
+          success: true,
+          orderId: orderId,
+          paymentUrl: paymentUrl,
+          paymentSessionId: response.data.payment_session_id
+        });
+      } else {
+        throw new Error('Invalid response from Cashfree');
+      }
+    } catch (cashfreeError) {
+      console.error('Cashfree API Error:', cashfreeError);
+      return res.status(500).json({
+        error: 'Failed to create payment order',
+        details: 'Please try again later or contact support if the issue persists.'
+      });
+    }
 
   } catch (error) {
     console.error('Payment creation error:', error);
@@ -109,20 +136,21 @@ router.post('/create-order', auth, async (req, res) => {
 // POST /api/payment/webhook - Cashfree webhook handler
 router.post('/webhook', async (req, res) => {
   try {
-    // TODO: Implement Cashfree webhook verification and handling
     console.log('Cashfree webhook received:', req.body);
     
-    // Future implementation will handle:
-    // - Payment success -> Activate plan for 30 days
-    // - Payment failure -> Keep user on free plan
-    // - Refund -> Deactivate plan
-    
-    const { order_id, order_status, order_amount, order_currency } = req.body;
-    
-    if (order_status === 'PAID') {
-      // Extract user ID from order_id or order_meta
-      // Activate the purchased plan
-      console.log(`Payment successful for order: ${order_id}, amount: ${order_amount} ${order_currency}`);
+    const { 
+      type, 
+      data: {
+        order = {},
+        payment = {}
+      } = {}
+    } = req.body;
+
+    // Handle different webhook events
+    if (type === 'PAYMENT_SUCCESS_WEBHOOK') {
+      await handlePaymentSuccess(order, payment);
+    } else if (type === 'PAYMENT_FAILED_WEBHOOK') {
+      await handlePaymentFailed(order, payment);
     }
     
     res.json({ received: true });
@@ -131,6 +159,81 @@ router.post('/webhook', async (req, res) => {
     res.status(500).json({ error: 'Webhook handler failed' });
   }
 });
+
+// Handle successful payment
+async function handlePaymentSuccess(order, payment) {
+  try {
+    const { order_id, order_amount, order_currency } = order;
+    console.log(`✅ Payment successful for order: ${order_id}, amount: ${order_amount} ${order_currency}`);
+    
+    // Find user by pending order ID
+    const user = await User.findOne({ pendingOrderId: order_id });
+    if (!user) {
+      console.error(`User not found for order: ${order_id}`);
+      return;
+    }
+
+    const planType = user.pendingPlanType;
+    const plan = PLANS[planType];
+    
+    if (!plan) {
+      console.error(`Invalid plan type: ${planType}`);
+      return;
+    }
+
+    // Calculate plan end date (30 days from now)
+    const planStartDate = new Date();
+    const planEndDate = new Date();
+    planEndDate.setDate(planEndDate.getDate() + plan.duration);
+
+    // Activate the plan
+    await User.findByIdAndUpdate(user._id, {
+      plan: planType,
+      planStartDate: planStartDate,
+      planEndDate: planEndDate,
+      // Reset daily usage for new plan
+      dailyPromptsUsed: 0,
+      lastDailyReset: new Date(),
+      // Clear pending order data
+      pendingOrderId: null,
+      pendingPlanType: null,
+      orderCreatedAt: null,
+      // Update activity
+      lastActivity: new Date()
+    });
+
+    console.log(`✅ Plan activated: ${planType} for user ${user.email} until ${planEndDate.toLocaleDateString()}`);
+    
+    // TODO: Send success email notification
+    // await sendPlanActivationEmail(user, plan, planEndDate);
+    
+  } catch (error) {
+    console.error('Error handling payment success:', error);
+  }
+}
+
+// Handle failed payment
+async function handlePaymentFailed(order, payment) {
+  try {
+    const { order_id } = order;
+    console.log(`❌ Payment failed for order: ${order_id}`);
+    
+    // Find user by pending order ID and clear pending data
+    const user = await User.findOne({ pendingOrderId: order_id });
+    if (user) {
+      await User.findByIdAndUpdate(user._id, {
+        pendingOrderId: null,
+        pendingPlanType: null,
+        orderCreatedAt: null
+      });
+      
+      console.log(`Cleared pending order data for user: ${user.email}`);
+    }
+    
+  } catch (error) {
+    console.error('Error handling payment failure:', error);
+  }
+}
 
 // GET /api/payment/plan - Get current plan information
 router.get('/plan', auth, async (req, res) => {

@@ -42,7 +42,11 @@ const userSchema = new mongoose.Schema({
   // Billing information
   billingEmail: String,
   lastPaymentDate: Date,
-  nextBillingDate: Date
+  nextBillingDate: Date,
+  // Pending order tracking for Cashfree
+  pendingOrderId: String,
+  pendingPlanType: String,
+  orderCreatedAt: Date
 }, { timestamps: true });
 
 // Virtual for checking if user has unlimited access

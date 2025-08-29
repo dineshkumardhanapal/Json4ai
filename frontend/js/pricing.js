@@ -156,15 +156,22 @@ async function handleUpgrade(e) {
     });
 
     const data = await res.json();
-    if (res.ok && data.paymentUrl) {
+    if (res.ok && data.success && data.paymentUrl) {
+      // Store order details for tracking
+      localStorage.setItem('pendingOrder', JSON.stringify({
+        orderId: data.orderId,
+        planType: plan,
+        timestamp: Date.now()
+      }));
+      
       // Redirect to Cashfree payment page
       location.href = data.paymentUrl;
     } else {
-      // Show appropriate message for Cashfree integration
-      if (data.error && data.error.includes('Cashfree payment integration coming soon')) {
-        showInfo(`${plan.charAt(0).toUpperCase() + plan.slice(1)} plan selected. ${data.details}`);
-      } else if (data.error && data.error.includes('You already have an active plan')) {
+      // Show appropriate error messages
+      if (data.error && data.error.includes('You already have an active plan')) {
         showInfo(`${data.error}. ${data.details || ''}`);
+      } else if (data.error && data.error.includes('Failed to create payment order')) {
+        showError(`${data.error}. ${data.details || ''}`);
       } else {
         showError(data.error || 'Unable to create payment order.');
       }
@@ -183,22 +190,42 @@ function handlePaymentReturn() {
   const urlParams = new URLSearchParams(window.location.search);
   const success = urlParams.get('success');
   const canceled = urlParams.get('canceled');
-  const plan = urlParams.get('plan');
+  const orderId = urlParams.get('order_id');
+  const orderStatus = urlParams.get('order_status');
 
-  if (success === 'true') {
-    const planName = plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : 'Premium';
-    showSuccess(`${planName} plan activated successfully! You now have access for 1 month.`);
+  // Get pending order from localStorage
+  const pendingOrder = localStorage.getItem('pendingOrder');
+  let planName = 'Premium';
+  
+  if (pendingOrder) {
+    try {
+      const orderData = JSON.parse(pendingOrder);
+      planName = orderData.planType ? orderData.planType.charAt(0).toUpperCase() + orderData.planType.slice(1) : 'Premium';
+      // Clear pending order
+      localStorage.removeItem('pendingOrder');
+    } catch (e) {
+      console.error('Error parsing pending order:', e);
+    }
+  }
+
+  if (success === 'true' || orderStatus === 'PAID') {
+    showSuccess(`${planName} plan payment successful! Your plan will be activated shortly.`);
     // Redirect to dashboard after a short delay
     setTimeout(() => {
       location.href = 'dashboard.html';
-    }, 2000);
-  } else if (canceled === 'true') {
+    }, 3000);
+  } else if (canceled === 'true' || orderStatus === 'CANCELLED') {
     showInfo('Payment was canceled. You can try again anytime.');
+  } else if (orderStatus === 'FAILED') {
+    showError('Payment failed. Please try again or contact support if the issue persists.');
   }
 }
 
 // Check if user is returning from payment gateway
-if (window.location.search.includes('success') || window.location.search.includes('canceled')) {
+if (window.location.search.includes('success') || 
+    window.location.search.includes('canceled') || 
+    window.location.search.includes('order_status') ||
+    window.location.search.includes('order_id')) {
   handlePaymentReturn();
 }
 

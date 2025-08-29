@@ -21,6 +21,33 @@ function getCashfreeHeaders() {
   };
 }
 
+// Webhook signature verification (for production security)
+function verifyWebhookSignature(payload, signature, timestamp) {
+  try {
+    if (!process.env.CASHFREE_WEBHOOK_SECRET) {
+      console.warn('CASHFREE_WEBHOOK_SECRET not set, skipping signature verification');
+      return true;
+    }
+    
+    // Create expected signature
+    const payloadString = JSON.stringify(payload);
+    const signaturePayload = timestamp + payloadString;
+    const expectedSignature = crypto
+      .createHmac('sha256', process.env.CASHFREE_WEBHOOK_SECRET)
+      .update(signaturePayload)
+      .digest('hex');
+    
+    // Compare signatures
+    return crypto.timingSafeEqual(
+      Buffer.from(signature, 'hex'),
+      Buffer.from(expectedSignature, 'hex')
+    );
+  } catch (error) {
+    console.error('Webhook signature verification error:', error);
+    return false;
+  }
+}
+
 // Plan configuration for Cashfree one-time payments
 const PLANS = {
   'starter': {
@@ -153,7 +180,23 @@ router.post('/create-order', auth, async (req, res) => {
 // POST /api/payment/webhook - Cashfree webhook handler
 router.post('/webhook', async (req, res) => {
   try {
-    console.log('Cashfree webhook received:', req.body);
+    console.log('Cashfree webhook received:', {
+      headers: req.headers,
+      body: req.body,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Verify webhook signature (optional but recommended for production)
+    const signature = req.headers['x-webhook-signature'];
+    const timestamp = req.headers['x-webhook-timestamp'];
+    
+    // For production, verify the webhook signature
+    if (process.env.NODE_ENV === 'production' && process.env.CASHFREE_WEBHOOK_SECRET) {
+      if (!verifyWebhookSignature(req.body, signature, timestamp)) {
+        console.error('Invalid webhook signature');
+        return res.status(401).json({ error: 'Invalid signature' });
+      }
+    }
     
     const { 
       type, 
@@ -163,11 +206,21 @@ router.post('/webhook', async (req, res) => {
       } = {}
     } = req.body;
 
+    console.log(`Processing webhook event: ${type}`);
+
     // Handle different webhook events
-    if (type === 'PAYMENT_SUCCESS_WEBHOOK') {
-      await handlePaymentSuccess(order, payment);
-    } else if (type === 'PAYMENT_FAILED_WEBHOOK') {
-      await handlePaymentFailed(order, payment);
+    switch (type) {
+      case 'PAYMENT_SUCCESS_WEBHOOK':
+        await handlePaymentSuccess(order, payment);
+        break;
+      case 'PAYMENT_FAILED_WEBHOOK':
+        await handlePaymentFailed(order, payment);
+        break;
+      case 'PAYMENT_USER_DROPPED_WEBHOOK':
+        await handlePaymentDropped(order, payment);
+        break;
+      default:
+        console.log(`Unhandled webhook event: ${type}`);
     }
     
     res.json({ received: true });
@@ -249,6 +302,29 @@ async function handlePaymentFailed(order, payment) {
     
   } catch (error) {
     console.error('Error handling payment failure:', error);
+  }
+}
+
+// Handle payment dropped (user abandoned payment)
+async function handlePaymentDropped(order, payment) {
+  try {
+    const { order_id } = order;
+    console.log(`🚫 Payment dropped for order: ${order_id}`);
+    
+    // Find user by pending order ID and clear pending data
+    const user = await User.findOne({ pendingOrderId: order_id });
+    if (user) {
+      await User.findByIdAndUpdate(user._id, {
+        pendingOrderId: null,
+        pendingPlanType: null,
+        orderCreatedAt: null
+      });
+      
+      console.log(`Cleared pending order data for dropped payment: ${user.email}`);
+    }
+    
+  } catch (error) {
+    console.error('Error handling payment drop:', error);
   }
 }
 

@@ -90,8 +90,10 @@ router.post('/create-subscription', auth, validatePayPalSubscription, async (req
     // Validate PayPal plan ID
     if (!plan.paypal_plan_id || plan.paypal_plan_id === 'P-XXXXXXXXXX') {
       // PayPal plan ID not configured
-      return res.status(500).json({ 
-        error: 'PayPal plan not configured. Please contact support.' 
+      console.log(`PayPal plan not configured for ${planType}: ${plan.paypal_plan_id}`);
+      return res.status(503).json({ 
+        error: 'PayPal plan not configured. Please contact support.',
+        details: 'Subscription service is being set up. Please try again later.'
       });
     }
 

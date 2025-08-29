@@ -3,14 +3,23 @@ const router = express.Router();
 const User = require('../models/User');
 const auth = require('../middleware/auth');
 const { validatePaymentSubscription } = require('../middleware/validation');
-const { Cashfree } = require('cashfree-pg-sdk-nodejs');
+const fetch = require('node-fetch');
+const crypto = require('crypto');
 
-// Initialize Cashfree
-const cashfree = new Cashfree({
-  XClientId: process.env.CASHFREE_APP_ID,
-  XClientSecret: process.env.CASHFREE_SECRET_KEY,
-  XEnvironment: process.env.NODE_ENV === 'production' ? 'PRODUCTION' : 'SANDBOX'
-});
+// Cashfree configuration
+const CASHFREE_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://api.cashfree.com/pg' 
+  : 'https://sandbox.cashfree.com/pg';
+
+// Helper function to create Cashfree headers
+function getCashfreeHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'x-client-id': process.env.CASHFREE_APP_ID,
+    'x-client-secret': process.env.CASHFREE_SECRET_KEY,
+    'x-api-version': '2022-09-01'
+  };
+}
 
 // Plan configuration for Cashfree one-time payments
 const PLANS = {
@@ -90,14 +99,21 @@ router.post('/create-order', auth, async (req, res) => {
       order_tags: {
         source: 'json4ai',
         plan: planType
-      }
+      },
+      order_splits: []
     };
 
     try {
-      // Create order using Cashfree SDK
-      const response = await cashfree.PGCreateOrder('2022-09-01', orderRequest);
+      // Create order using Cashfree API
+      const response = await fetch(`${CASHFREE_BASE_URL}/orders`, {
+        method: 'POST',
+        headers: getCashfreeHeaders(),
+        body: JSON.stringify(orderRequest)
+      });
+
+      const responseData = await response.json();
       
-      if (response.data && response.data.payment_session_id) {
+      if (response.ok && responseData.payment_session_id) {
         // Store order details in user record for webhook processing
         await User.findByIdAndUpdate(user._id, {
           pendingOrderId: orderId,
@@ -105,23 +121,24 @@ router.post('/create-order', auth, async (req, res) => {
           orderCreatedAt: new Date()
         });
 
-        // Generate payment URL
-        const paymentUrl = `https://payments${process.env.NODE_ENV === 'production' ? '' : '-test'}.cashfree.com/pay/order/${response.data.payment_session_id}`;
+        // Generate payment URL - Cashfree provides this directly
+        const paymentUrl = `https://payments${process.env.NODE_ENV === 'production' ? '' : '-test'}.cashfree.com/pay/order/${responseData.payment_session_id}`;
 
         res.json({
           success: true,
           orderId: orderId,
           paymentUrl: paymentUrl,
-          paymentSessionId: response.data.payment_session_id
+          paymentSessionId: responseData.payment_session_id
         });
       } else {
-        throw new Error('Invalid response from Cashfree');
+        console.error('Cashfree API Error:', responseData);
+        throw new Error(responseData.message || 'Invalid response from Cashfree');
       }
     } catch (cashfreeError) {
       console.error('Cashfree API Error:', cashfreeError);
       return res.status(500).json({
         error: 'Failed to create payment order',
-        details: 'Please try again later or contact support if the issue persists.'
+        details: cashfreeError.message || 'Please try again later or contact support if the issue persists.'
       });
     }
 

@@ -1,7 +1,6 @@
 // backend/jobs/subscriptionRenewal.js
 const cron = require('node-cron');
 const User = require('../models/User');
-const SubscriptionService = require('../services/subscriptionService');
 const { sendSubscriptionConfirmation } = require('../mailer');
 
 // Daily job to reset free plan credits
@@ -73,29 +72,28 @@ const subscriptionStatusCheck = cron.schedule('0 9 * * *', async () => {
   try {
     const now = new Date();
     
-    // Check for subscriptions ending soon (3 days)
+    // Check for plans ending soon (3 days)
     const threeDaysFromNow = new Date(now.getTime() + (3 * 24 * 60 * 60 * 1000));
     
-    const endingSubscriptions = await User.find({
-      subscriptionId: { $exists: true },
-      currentPeriodEnd: { 
+    const endingPlans = await User.find({
+      plan: { $in: ['starter', 'premium'] },
+      planEndDate: { 
         $gte: now,
         $lte: threeDaysFromNow
-      },
-      cancelAtPeriodEnd: true
+      }
     });
 
-    for (const user of endingSubscriptions) {
+    for (const user of endingPlans) {
       try {
-        // Send subscription ending reminder
+        // Send plan ending reminder
         await sendEmail(
           user.email,
-          '🔔 Your JSON4AI Subscription is Ending Soon',
+          '🔔 Your JSON4AI Plan is Ending Soon',
           `
             <h2>Hello ${user.firstName}!</h2>
-            <p>Your JSON4AI subscription will end on ${new Date(user.currentPeriodEnd).toLocaleDateString()}.</p>
-            <p>To continue enjoying premium features, please reactivate your subscription.</p>
-            <p><a href="${process.env.FRONTEND_URL}/pricing">Reactivate Subscription</a></p>
+            <p>Your JSON4AI plan will end on ${new Date(user.planEndDate).toLocaleDateString()}.</p>
+            <p>To continue enjoying premium features, please purchase a new plan.</p>
+            <p><a href="${process.env.FRONTEND_URL}/pricing">Buy New Plan</a></p>
           `
         );
         
@@ -129,7 +127,7 @@ const subscriptionStatusCheck = cron.schedule('0 9 * * *', async () => {
       }
     }
 
-    console.log(`Subscription status check completed. ${endingSubscriptions.length} ending subscriptions, ${pastDueUsers.length} past due users.`);
+    console.log(`Plan status check completed. ${endingPlans.length} ending plans, ${pastDueUsers.length} past due users.`);
   } catch (error) {
     console.error('Subscription status check job error:', error);
   }
@@ -149,10 +147,8 @@ const weeklyUsageReport = cron.schedule('0 10 * * 1', async () => {
 
     for (const user of users) {
       try {
-        const analytics = await SubscriptionService.getSubscriptionAnalytics(user._id);
-        
         // Only send if user has used prompts
-        if (analytics.monthlyPromptsUsed > 0) {
+        if (user.monthlyPromptsUsed > 0) {
           await sendEmail(
             user.email,
             '📊 Your Weekly JSON4AI Usage Report',
@@ -160,10 +156,10 @@ const weeklyUsageReport = cron.schedule('0 10 * * 1', async () => {
               <h2>Hello ${user.firstName}!</h2>
               <p>Here's your weekly usage summary:</p>
               <ul>
-                <li><strong>Current Plan:</strong> ${analytics.currentPlan}</li>
-                <li><strong>Prompts Used This Month:</strong> ${analytics.monthlyPromptsUsed}</li>
-                <li><strong>Credits Remaining:</strong> ${analytics.creditsRemaining}</li>
-                <li><strong>Next Billing Date:</strong> ${analytics.nextBillingDate ? new Date(analytics.nextBillingDate).toLocaleDateString() : 'N/A'}</li>
+                <li><strong>Current Plan:</strong> ${user.plan}</li>
+                <li><strong>Prompts Used This Month:</strong> ${user.monthlyPromptsUsed}</li>
+                <li><strong>Daily Limit:</strong> ${user.dailyLimit}</li>
+                <li><strong>Plan Valid Until:</strong> ${user.planEndDate ? new Date(user.planEndDate).toLocaleDateString() : 'N/A'}</li>
               </ul>
               <p><a href="${process.env.FRONTEND_URL}/dashboard">View Full Analytics</a></p>
             `

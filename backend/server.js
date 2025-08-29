@@ -24,7 +24,7 @@ app.use(helmet({
       scriptSrc: ["'self'", "'unsafe-inline'", "https://*.paypal.com", "https://*.paypalobjects.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://*.paypal.com", "https://*.paypalobjects.com", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:", "blob:", "https://*.paypal.com", "https://*.paypalobjects.com"],
-      connectSrc: ["'self'", "https://*.paypal.com", "https://*.paypalobjects.com", "https://api-m.sandbox.paypal.com", "https://api-m.paypal.com", "https://*.onrender.com", "https://json4ai.onrender.com"],
+      connectSrc: ["'self'", "https://*.paypal.com", "https://*.paypalobjects.com", "https://api-m.sandbox.paypal.com", "https://api-m.paypal.com", "https://*.onrender.com", "https://json4ai.onrender.com", "https://*.netlify.app"],
       frameSrc: ["'self'", "https://*.paypal.com", "https://*.paypalobjects.com"],
       frameAncestors: ["'self'"],
       formAction: ["'self'", "https://*.paypal.com"]
@@ -51,6 +51,9 @@ const limiter = rateLimit({
 // Apply rate limiting to all routes
 app.use(limiter);
 
+// Handle CORS preflight requests
+app.options('*', cors());
+
 // Stricter rate limiting for auth routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -65,11 +68,47 @@ app.use('/api/login', authLimiter);
 app.use('/api/register', authLimiter);
 app.use('/api/resend-verification', authLimiter);
 
-// CORS configuration
+// CORS configuration - more flexible for production
+const corsOrigins = process.env.NODE_ENV === 'production' 
+  ? [
+      process.env.FRONTEND_URL, 
+      'https://json4ai.onrender.com',
+      'https://rainbow-squirrel-4fcfd6.netlify.app',
+      'https://*.netlify.app',
+      /^https:\/\/.*\.netlify\.app$/,  // Allow any Netlify subdomain
+      /^https:\/\/.*\.onrender\.com$/  // Allow any Render subdomain
+    ]
+  : ['http://localhost:3000', 'http://localhost:5000'];
+
+// Log CORS configuration for debugging
+console.log('🔧 CORS Configuration:');
+console.log('Environment:', process.env.NODE_ENV);
+console.log('Frontend URL:', process.env.FRONTEND_URL);
+console.log('Allowed origins:', corsOrigins);
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.FRONTEND_URL, 'https://json4ai.onrender.com']
-    : ['http://localhost:3000', 'http://localhost:5000'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is in allowed list
+    const isAllowed = corsOrigins.some(allowedOrigin => {
+      if (typeof allowedOrigin === 'string') {
+        return origin === allowedOrigin;
+      }
+      if (allowedOrigin instanceof RegExp) {
+        return allowedOrigin.test(origin);
+      }
+      return false;
+    });
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      console.log(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -82,10 +121,29 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Raw body parsing for PayPal webhooks (if needed)
 app.use('/api/paypal/webhook', express.raw({ type: 'application/json' }));
 
-/// MongoDB connection (modern approach)
-mongoose.connect(process.env.MONGO_URI)
+// MongoDB connection with security options
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  maxPoolSize: 10,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+  bufferMaxEntries: 0,
+  bufferCommands: false
+})
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.error('MongoDB connection error:', err));
+
+// Test endpoint for CORS debugging
+app.get('/api/test-cors', (req, res) => {
+  res.json({ 
+    message: 'CORS test successful',
+    timestamp: new Date().toISOString(),
+    origin: req.headers.origin,
+    userAgent: req.headers['user-agent']
+  });
+});
+
 // Routes
 app.use('/api', require('./routes/auth'));
 app.use('/api/user', require('./routes/user'));
@@ -119,5 +177,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log('Subscription renewal jobs started');
-
 });

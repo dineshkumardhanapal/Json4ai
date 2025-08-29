@@ -18,7 +18,7 @@ router.post('/register', validateRegistration, async (req, res) => {
 
     await User.create({ firstName, lastName, email, password: hash, verified: false, verifyToken: token });
 
-    const verifyLink = `https://json4ai.onrender.com/api/verify/${token}`;
+    const verifyLink = `${process.env.BACKEND_URL || 'https://json4ai.onrender.com'}/api/verify/${token}`;
     await transporter.sendMail({
       from: '"JSON4AI" <json4ai@gmail.com>',
       to: email,
@@ -187,8 +187,8 @@ router.get('/verify/:token', async (req, res) => {
           </div>
           <h1>Email Verified!</h1>
           <p>Your account has been successfully verified. You can now log in to access your dashboard.</p>
-          <a href="https://json4ai.onrender.com/login.html" class="btn btn-primary">Continue to Login</a>
-          <a href="https://json4ai.onrender.com/index.html" class="btn btn-secondary">Back to Home</a>
+          <a href="https://json4ai.netlify.app/login.html" class="btn btn-primary">Continue to Login</a>
+          <a href="https://json4ai.netlify.app/index.html" class="btn btn-secondary">Back to Home</a>
         </div>
       </body>
       </html>
@@ -217,7 +217,7 @@ router.post('/resend-verification', async (req, res) => {
     user.verifyToken = token;
     await user.save();
     
-    const verifyLink = `https://json4ai.onrender.com/api/verify/${token}`;
+    const verifyLink = `${process.env.BACKEND_URL || 'https://json4ai.onrender.com'}/api/verify/${token}`;
     await transporter.sendMail({
       from: '"JSON4AI" <json4ai@gmail.com>',
       to: email,

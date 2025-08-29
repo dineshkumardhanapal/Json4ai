@@ -180,7 +180,10 @@ router.post('/create-order', auth, async (req, res) => {
 // POST /api/payment/webhook - Cashfree webhook handler
 router.post('/webhook', async (req, res) => {
   try {
+    // Log webhook with IP for security monitoring
+    const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     console.log('Cashfree webhook received:', {
+      clientIP: clientIP,
       headers: req.headers,
       body: req.body,
       timestamp: new Date().toISOString()
@@ -195,6 +198,21 @@ router.post('/webhook', async (req, res) => {
       if (!verifyWebhookSignature(req.body, signature, timestamp)) {
         console.error('Invalid webhook signature');
         return res.status(401).json({ error: 'Invalid signature' });
+      }
+    } else {
+      console.log('⚠️ Webhook signature verification disabled - add CASHFREE_WEBHOOK_SECRET for production');
+      
+      // Basic timestamp validation (prevent very old webhooks)
+      if (timestamp) {
+        const webhookTime = parseInt(timestamp);
+        const currentTime = Math.floor(Date.now() / 1000);
+        const timeDiff = currentTime - webhookTime;
+        
+        // Reject webhooks older than 5 minutes (300 seconds)
+        if (timeDiff > 300) {
+          console.error('Webhook too old, rejecting:', timeDiff, 'seconds');
+          return res.status(400).json({ error: 'Webhook too old' });
+        }
       }
     }
     

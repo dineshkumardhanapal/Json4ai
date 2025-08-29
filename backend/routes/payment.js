@@ -162,14 +162,53 @@ router.post('/create-order', auth, async (req, res) => {
 
         // Generate payment URL - Use Cashfree's provided URL or construct manually
         let paymentUrl;
+        
+        // Clean the payment session ID (remove any malformed suffixes)
+        let cleanSessionId = responseData.payment_session_id;
+        
+        // Remove common malformed suffixes
+        if (cleanSessionId.endsWith('payment')) {
+          cleanSessionId = cleanSessionId.replace(/payment$/, '');
+          console.log('⚠️ Removed malformed "payment" suffix');
+        }
+        
+        // Remove any other common malformed endings
+        if (cleanSessionId.includes('payment')) {
+          cleanSessionId = cleanSessionId.split('payment')[0];
+          console.log('⚠️ Removed malformed "payment" from session ID');
+        }
+        
+        console.log('Original session ID:', responseData.payment_session_id);
+        console.log('Cleaned session ID:', cleanSessionId);
+        console.log('Session ID length:', cleanSessionId.length);
+        
+        // Validate session ID format
+        if (!cleanSessionId.startsWith('session_')) {
+          console.warn('⚠️ Session ID does not start with "session_"');
+        }
+        
+        if (cleanSessionId.length < 20) {
+          console.warn('⚠️ Session ID seems too short');
+        }
+        
+        // Check if Cashfree provides a direct payment URL
+        console.log('Available Cashfree response fields:', Object.keys(responseData.data || {}));
+        if (responseData.data && responseData.data.payment_url) {
+          console.log('Found direct payment URL:', responseData.data.payment_url);
+        }
+        
         if (responseData.payment_links && responseData.payment_links.web) {
           paymentUrl = responseData.payment_links.web;
           console.log('Using Cashfree provided payment URL:', paymentUrl);
+        } else if (responseData.data && responseData.data.payment_url) {
+          paymentUrl = responseData.data.payment_url;
+          console.log('Using Cashfree direct payment URL:', paymentUrl);
         } else {
-          // Fallback to manual construction - Production domain
+          // Use the official Cashfree payment gateway format
+          // Based on Cashfree documentation: https://payments.cashfree.com/pay/{session_id}
           const domain = 'payments.cashfree.com';
-          paymentUrl = `https://${domain}/pay/session/${responseData.payment_session_id}`;
-          console.log('Using manually constructed payment URL (PRODUCTION):', paymentUrl);
+          paymentUrl = `https://${domain}/pay/${cleanSessionId}`;
+          console.log('Using official Cashfree payment URL format:', paymentUrl);
         }
 
         res.json({

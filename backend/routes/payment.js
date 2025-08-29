@@ -6,10 +6,8 @@ const { validatePaymentSubscription } = require('../middleware/validation');
 const fetch = require('node-fetch');
 const crypto = require('crypto');
 
-// Cashfree configuration
-const CASHFREE_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://api.cashfree.com/pg' 
-  : 'https://sandbox.cashfree.com/pg';
+// Cashfree configuration - Force production URLs since using live credentials
+const CASHFREE_BASE_URL = 'https://api.cashfree.com/pg';
 
 // Helper function to create Cashfree headers
 function getCashfreeHeaders() {
@@ -131,6 +129,14 @@ router.post('/create-order', auth, async (req, res) => {
     };
 
     try {
+      console.log('Creating Cashfree order:', {
+        url: `${CASHFREE_BASE_URL}/orders`,
+        orderId: orderId,
+        amount: plan.price,
+        currency: plan.currency,
+        environment: process.env.NODE_ENV
+      });
+
       // Create order using Cashfree API
       const response = await fetch(`${CASHFREE_BASE_URL}/orders`, {
         method: 'POST',
@@ -140,6 +146,12 @@ router.post('/create-order', auth, async (req, res) => {
 
       const responseData = await response.json();
       
+      console.log('Cashfree API Response:', {
+        status: response.status,
+        ok: response.ok,
+        data: responseData
+      });
+      
       if (response.ok && responseData.payment_session_id) {
         // Store order details in user record for webhook processing
         await User.findByIdAndUpdate(user._id, {
@@ -148,8 +160,17 @@ router.post('/create-order', auth, async (req, res) => {
           orderCreatedAt: new Date()
         });
 
-        // Generate payment URL - Cashfree provides this directly
-        const paymentUrl = `https://payments${process.env.NODE_ENV === 'production' ? '' : '-test'}.cashfree.com/pay/order/${responseData.payment_session_id}`;
+        // Generate payment URL - Use Cashfree's provided URL or construct manually
+        let paymentUrl;
+        if (responseData.payment_links && responseData.payment_links.web) {
+          paymentUrl = responseData.payment_links.web;
+          console.log('Using Cashfree provided payment URL:', paymentUrl);
+        } else {
+          // Fallback to manual construction - Production domain
+          const domain = 'payments.cashfree.com';
+          paymentUrl = `https://${domain}/pay/session/${responseData.payment_session_id}`;
+          console.log('Using manually constructed payment URL (PRODUCTION):', paymentUrl);
+        }
 
         res.json({
           success: true,

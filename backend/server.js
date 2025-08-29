@@ -16,6 +16,9 @@ try {
 
 const app = express();
 
+// Trust proxy for Render deployment (fixes rate limiter X-Forwarded-For issue)
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: {
@@ -123,8 +126,6 @@ app.use('/api/paypal/webhook', express.raw({ type: 'application/json' }));
 
 // MongoDB connection with security options
 mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
   maxPoolSize: 10,
   serverSelectionTimeoutMS: 5000,
   socketTimeoutMS: 45000,

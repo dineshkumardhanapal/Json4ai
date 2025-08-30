@@ -36,22 +36,26 @@
 <main>
   <div class="container">
     <div class="pricing-header text-center">
-      <h1>Choose Your Plan</h1>
-      <p>Select the perfect plan for your prompt generation needs</p>
+      <h1>Choose Your Quality Tier</h1>
+      <p>Select the perfect plan based on your JSON output quality requirements</p>
     </div>
     
     <div class="pricing-grid">
       <div class="plan-card">
         <div class="plan-header">
           <h3>Free</h3>
-          <p class="plan-description">Perfect for beginners and small projects</p>
+          <p class="plan-description">Basic JSON structure with essential information</p>
         </div>
         <div class="price">₹0<span>/always free</span></div>
         <ul class="plan-features">
           <li>3 prompts per day</li>
           <li>Basic prompt templates</li>
           <li>Community support</li>
-          <li>Standard accuracy</li>
+          <li>Simple JSON structure</li>
+          <li class="quality-feature">
+            <span class="quality-badge quality-free">📝 Basic Quality</span>
+            <span class="quality-desc">Simple structure with essential information only. Perfect for beginners and basic use cases.</span>
+          </li>
         </ul>
         <button class="btn-primary" data-plan="free" disabled>Current Plan</button>
       </div>
@@ -60,7 +64,7 @@
         <div class="plan-badge">Recommended</div>
         <div class="plan-header">
           <h3>Starter</h3>
-          <p class="plan-description">Ideal for teams and growing businesses</p>
+          <p class="plan-description">Enhanced JSON structure with moderate NLP sophistication</p>
         </div>
         <div class="price">₹299<span>/month</span></div>
         <ul class="plan-features">
@@ -70,6 +74,10 @@
           <li>Priority support</li>
           <li>Enhanced accuracy</li>
           <li>Export functionality</li>
+          <li class="quality-feature">
+            <span class="quality-badge quality-standard">✨ Standard Quality</span>
+            <span class="quality-desc">Clear structure with moderate detail and NLP. Ideal for professional use and growing businesses.</span>
+          </li>
         </ul>
         <button class="btn-primary" data-plan="starter">Buy Now</button>
       </div>
@@ -77,7 +85,7 @@
       <div class="plan-card">
         <div class="plan-header">
           <h3>Premium</h3>
-          <p class="plan-description">For large organizations and high-volume usage</p>
+          <p class="plan-description">Maximum JSON detail with advanced NLP and comprehensive content</p>
         </div>
         <div class="price">₹999<span>/month</span></div>
         <ul class="plan-features">
@@ -88,14 +96,61 @@
           <li>API access</li>
           <li>White-label options</li>
           <li>24/7 priority support</li>
+          <li class="quality-feature">
+            <span class="quality-badge quality-premium">⭐ Premium Quality</span>
+            <span class="quality-desc">Maximum detail with advanced NLP and comprehensive content. Perfect for enterprise and high-stakes applications.</span>
+          </li>
         </ul>
         <button class="btn-primary" data-plan="premium">Buy Now</button>
+      </div>
+    </div>
+    
+    <div class="quality-comparison text-center">
+      <h2>Quality Tier Comparison</h2>
+      <div class="quality-grid">
+        <div class="quality-card">
+          <h3>Free Tier</h3>
+          <div class="quality-badge quality-free">Basic Quality</div>
+          <ul>
+            <li>Simple JSON structure</li>
+            <li>Essential information only</li>
+            <li>Basic NLP processing</li>
+            <li>100-150 word output</li>
+            <li>Standard accuracy</li>
+          </ul>
+        </div>
+        <div class="quality-card">
+          <h3>Starter Tier</h3>
+          <div class="quality-badge quality-standard">Standard Quality</div>
+          <ul>
+            <li>Enhanced JSON structure</li>
+            <li>Moderate detail and depth</li>
+            <li>Improved NLP sophistication</li>
+            <li>150-200 word output</li>
+            <li>Enhanced accuracy</li>
+          </ul>
+        </div>
+        <div class="quality-card">
+          <h3>Premium Tier</h3>
+          <div class="quality-badge quality-premium">Premium Quality</div>
+          <ul>
+            <li>Maximum JSON detail</li>
+            <li>Advanced NLP techniques</li>
+            <li>Comprehensive content</li>
+            <li>200+ word output</li>
+            <li>Maximum accuracy</li>
+          </ul>
+        </div>
       </div>
     </div>
     
     <div class="pricing-faq text-center">
       <h2>Frequently Asked Questions</h2>
       <div class="faq-grid">
+        <div class="faq-item">
+          <h4>What's the difference between quality tiers?</h4>
+          <p>Free tier provides basic JSON structure, Starter offers enhanced detail with moderate NLP, and Premium delivers maximum detail with advanced NLP techniques for comprehensive content generation.</p>
+        </div>
         <div class="faq-item">
           <h4>How long do paid plans last?</h4>
           <p>Each paid plan (Starter/Premium) lasts for exactly 1 month from the date of purchase. After expiry, you'll return to the free plan.</p>
@@ -110,7 +165,11 @@
         </div>
         <div class="faq-item">
           <h4>How does payment work?</h4>
-          <p>All plans are one-time payments processed securely through Cashfree. No recurring charges - you only pay when you want to extend your access.</p>
+          <p>All plans are one-time payments processed securely through Razorpay. No recurring charges - you only pay when you want to extend your access.</p>
+        </div>
+        <div class="faq-item">
+          <h4>Can I upgrade my plan later?</h4>
+          <p>Yes, you can upgrade to a higher tier at any time. The new plan will start immediately and last for 1 month from the purchase date.</p>
         </div>
       </div>
     </div>

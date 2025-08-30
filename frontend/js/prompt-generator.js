@@ -210,7 +210,7 @@ const generatePrompt = async (comment) => {
     const result = await res.json();
     
     // Display the result
-    displayResult(comment, result.prompt);
+    displayResult(comment, result.prompt, result.qualityTier);
     
     // Refresh usage status
     loadUsageStatus();
@@ -232,7 +232,7 @@ const generatePrompt = async (comment) => {
 };
 
 // Display generated result
-const displayResult = (input, promptJson) => {
+const displayResult = (input, promptJson, qualityTier = null) => {
   const originalInputText = document.getElementById('original-input-text');
   const jsonOutput = document.getElementById('json-output');
   
@@ -247,6 +247,32 @@ const displayResult = (input, promptJson) => {
     // If it's not valid JSON, display as-is
     jsonOutput.textContent = promptJson;
     jsonOutput.className = 'json-invalid';
+  }
+  
+  // Display quality tier information if available
+  if (qualityTier) {
+    const qualityInfo = document.getElementById('quality-info');
+    if (qualityInfo) {
+      const tierLabels = {
+        'free': 'Basic Quality',
+        'standard': 'Standard Quality',
+        'premium': 'Premium Quality'
+      };
+      const tierDescriptions = {
+        'free': 'Basic structure with essential information',
+        'standard': 'Clear structure with moderate detail and NLP',
+        'premium': 'Maximum detail with advanced NLP and comprehensive content'
+      };
+      
+      qualityInfo.innerHTML = `
+        <div class="quality-badge quality-${qualityTier}">
+          <span class="quality-icon">${qualityTier === 'premium' ? '⭐' : qualityTier === 'standard' ? '✨' : '📝'}</span>
+          <span class="quality-label">${tierLabels[qualityTier]}</span>
+        </div>
+        <p class="quality-description">${tierDescriptions[qualityTier]}</p>
+      `;
+      qualityInfo.style.display = 'block';
+    }
   }
   
   resultCard.style.display = 'block';

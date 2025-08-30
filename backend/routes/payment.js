@@ -90,15 +90,17 @@ router.post('/create-order', auth, async (req, res) => {
       });
     }
 
-    // Generate unique order ID
+    // Generate unique order ID (shortened for Razorpay receipt limit)
     const orderId = `order_${user._id}_${Date.now()}`;
+    const shortReceipt = `json4ai_${Date.now()}`; // Shorter receipt for Razorpay
     
     // Create Razorpay order
     const orderOptions = {
       amount: plan.price * 100, // Razorpay expects amount in paise (smallest currency unit)
       currency: plan.currency,
-      receipt: orderId,
+      receipt: shortReceipt, // Use shorter receipt (max 40 chars)
       notes: {
+        order_id: orderId, // Store full order ID in notes
         plan_type: planType,
         user_id: user._id.toString(),
         plan_name: plan.name,
@@ -126,7 +128,7 @@ router.post('/create-order', auth, async (req, res) => {
       
       // Store order details in user record for webhook processing
       await User.findByIdAndUpdate(user._id, {
-        pendingOrderId: order.id, // Use Razorpay's order ID
+        pendingOrderId: orderId, // Use our full order ID for tracking
         pendingPlanType: planType,
         orderCreatedAt: new Date()
       });
@@ -134,7 +136,8 @@ router.post('/create-order', auth, async (req, res) => {
       // Return order details for frontend
       res.json({
         success: true,
-        orderId: order.id,
+        orderId: order.id, // Razorpay's order ID for payment
+        fullOrderId: orderId, // Our full order ID for tracking
         amount: order.amount,
         currency: order.currency,
         key: process.env.RAZORPAY_KEY_ID, // Frontend needs this for payment
@@ -233,13 +236,16 @@ router.post('/webhook', async (req, res) => {
 // Handle successful payment
 async function handlePaymentSuccess(order, payment) {
   try {
-    const { order_id, order_amount, order_currency } = order;
+    const { id: order_id, amount: order_amount, currency: order_currency, notes } = order;
     console.log(`✅ Payment successful for order: ${order_id}, amount: ${order_amount} ${order_currency}`);
     
+    // Get the full order ID from notes (since receipt is shortened)
+    const fullOrderId = notes?.order_id || order_id;
+    
     // Find user by pending order ID
-    const user = await User.findOne({ pendingOrderId: order_id });
+    const user = await User.findOne({ pendingOrderId: fullOrderId });
     if (!user) {
-      console.error(`User not found for order: ${order_id}`);
+      console.error(`User not found for order: ${fullOrderId}`);
       return;
     }
 
@@ -285,11 +291,14 @@ async function handlePaymentSuccess(order, payment) {
 // Handle failed payment
 async function handlePaymentFailed(order, payment) {
   try {
-    const { order_id } = order;
+    const { id: order_id, notes } = order;
     console.log(`❌ Payment failed for order: ${order_id}`);
     
+    // Get the full order ID from notes (since receipt is shortened)
+    const fullOrderId = notes?.order_id || order_id;
+    
     // Find user by pending order ID and clear pending data
-    const user = await User.findOne({ pendingOrderId: order_id });
+    const user = await User.findOne({ pendingOrderId: fullOrderId });
     if (user) {
       await User.findByIdAndUpdate(user._id, {
         pendingOrderId: null,
@@ -308,11 +317,14 @@ async function handlePaymentFailed(order, payment) {
 // Handle payment dropped (user abandoned payment)
 async function handlePaymentDropped(order, payment) {
   try {
-    const { order_id } = order;
+    const { id: order_id, notes } = order;
     console.log(`🚫 Payment dropped for order: ${order_id}`);
     
+    // Get the full order ID from notes (since receipt is shortened)
+    const fullOrderId = notes?.order_id || order_id;
+    
     // Find user by pending order ID and clear pending data
-    const user = await User.findOne({ pendingOrderId: order_id });
+    const user = await User.findOne({ pendingOrderId: fullOrderId });
     if (user) {
       await User.findByIdAndUpdate(user._id, {
         pendingOrderId: null,
@@ -381,7 +393,12 @@ router.post('/verify-payment', auth, async (req, res) => {
       
       if (payment.status === 'captured') {
         // Payment confirmed - activate plan
-        await handlePaymentSuccess({ id: razorpay_order_id }, payment);
+        // Create a mock order object with the structure expected by handlePaymentSuccess
+        const mockOrder = { 
+          id: razorpay_order_id, 
+          notes: { order_id: razorpay_order_id } 
+        };
+        await handlePaymentSuccess(mockOrder, payment);
         res.json({ success: true, message: 'Payment verified and plan activated' });
       } else {
         res.json({ success: false, message: `Payment status: ${payment.status}` });

@@ -2117,6 +2117,103 @@ footer {
   margin-top: 0.5rem;
 }
 
+/* Enhanced Quality Badge Styles for Pricing Page */
+.plan-header .quality-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  border-radius: var(--radius-xl);
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 1rem 0;
+  box-shadow: var(--shadow-lg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.plan-header .quality-badge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.plan-header .quality-badge:hover::before {
+  left: 100%;
+}
+
+.plan-header .quality-badge.quality-free {
+  background: linear-gradient(135deg, #4b5563, #6b7280, #9ca3af);
+  color: white;
+  border: 2px solid rgba(156, 163, 175, 0.3);
+}
+
+.plan-header .quality-badge.quality-free:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl), 0 0 20px rgba(156, 163, 175, 0.4);
+}
+
+.plan-header .quality-badge.quality-standard {
+  background: linear-gradient(135deg, #7c3aed, #8b5cf6, #a78bfa);
+  color: white;
+  border: 2px solid rgba(139, 92, 246, 0.3);
+}
+
+.plan-header .quality-badge.quality-standard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl), 0 0 25px rgba(139, 92, 246, 0.5);
+}
+
+.plan-header .quality-badge.quality-premium {
+  background: linear-gradient(135deg, #d97706, #f59e0b, #fbbf24);
+  color: white;
+  border: 2px solid rgba(245, 158, 11, 0.3);
+  animation: premium-glow 3s ease-in-out infinite alternate;
+}
+
+.plan-header .quality-badge.quality-premium:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-xl), 0 0 30px rgba(245, 158, 11, 0.6);
+}
+
+.plan-header .quality-badge .quality-icon {
+  font-size: 1.25rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  animation: icon-float 2s ease-in-out infinite alternate;
+}
+
+.plan-header .quality-badge .quality-text {
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Icon floating animation */
+@keyframes icon-float {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Enhanced premium glow animation */
+@keyframes premium-glow {
+  0% {
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(245, 158, 11, 0.4);
+  }
+  100% {
+    box-shadow: var(--shadow-xl), 0 0 35px rgba(245, 158, 11, 0.8);
+  }
+}
+
 /* Quality Comparison Section */
 .quality-comparison {
   margin-top: 4rem;

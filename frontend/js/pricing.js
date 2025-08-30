@@ -253,6 +253,13 @@ async function verifyPayment(response) {
       showSuccess('Payment successful! Your plan has been activated.');
       // Clear pending order
       localStorage.removeItem('pendingOrder');
+      
+      // Force refresh user plan data
+      await refreshUserPlan();
+      
+      // Update UI to show new plan
+      updateUIForNewPlan();
+      
       // Redirect to dashboard after a short delay
       setTimeout(() => {
         location.href = 'dashboard.html';
@@ -309,6 +316,63 @@ if (window.location.search.includes('success') ||
     window.location.search.includes('order_id')) {
   handlePaymentReturn();
 }
+
+// Plan refresh and UI update functions
+const refreshUserPlan = async () => {
+  try {
+    const sessionManager = window.sessionManager;
+    if (!sessionManager || !sessionManager.isLoggedIn()) return;
+    
+    // Force refresh user plan data
+    const res = await fetch(API('/api/user/profile'), {
+      headers: {
+        'Authorization': `Bearer ${sessionManager.getAccessToken()}`,
+        'Cache-Control': 'no-cache'
+      }
+    });
+    
+    if (res.ok) {
+      const user = await res.json();
+      // Store updated plan info
+      localStorage.setItem('userPlan', JSON.stringify({
+        plan: user.plan,
+        planEndDate: user.planEndDate,
+        timestamp: Date.now()
+      }));
+      return user;
+    }
+  } catch (error) {
+    console.error('Error refreshing user plan:', error);
+  }
+};
+
+const updateUIForNewPlan = () => {
+  // Update plan buttons to show current plan
+  const userPlan = JSON.parse(localStorage.getItem('userPlan') || '{}');
+  if (userPlan.plan) {
+    updatePlanButtons(userPlan.plan);
+  }
+  
+  // Show success notification
+  showSuccess(`Plan updated successfully! You now have ${userPlan.plan} access.`);
+};
+
+// Auto-refresh plan data every 30 seconds if user is on pricing page
+let planRefreshInterval;
+const startPlanRefresh = () => {
+  if (planRefreshInterval) clearInterval(planRefreshInterval);
+  
+  planRefreshInterval = setInterval(async () => {
+    if (window.sessionManager && window.sessionManager.isLoggedIn()) {
+      await refreshUserPlan();
+    }
+  }, 30000); // 30 seconds
+};
+
+// Start plan refresh when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  startPlanRefresh();
+});
 
 // Notification functions
 function showError(message) {

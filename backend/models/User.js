@@ -43,8 +43,9 @@ const userSchema = new mongoose.Schema({
   billingEmail: String,
   lastPaymentDate: Date,
   nextBillingDate: Date,
-  // Pending order tracking for Cashfree
+  // Pending order tracking for Razorpay
   pendingOrderId: String,
+  razorpayOrderId: String, // Store Razorpay's order ID for verification
   pendingPlanType: String,
   orderCreatedAt: Date
 }, { timestamps: true });

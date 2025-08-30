@@ -129,6 +129,7 @@ router.post('/create-order', auth, async (req, res) => {
       // Store order details in user record for webhook processing
       await User.findByIdAndUpdate(user._id, {
         pendingOrderId: orderId, // Use our full order ID for tracking
+        razorpayOrderId: order.id, // Store Razorpay's order ID for verification
         pendingPlanType: planType,
         orderCreatedAt: new Date()
       });
@@ -272,6 +273,7 @@ async function handlePaymentSuccess(order, payment) {
       lastDailyReset: new Date(),
       // Clear pending order data
       pendingOrderId: null,
+      razorpayOrderId: null,
       pendingPlanType: null,
       orderCreatedAt: null,
       // Update activity
@@ -302,6 +304,7 @@ async function handlePaymentFailed(order, payment) {
     if (user) {
       await User.findByIdAndUpdate(user._id, {
         pendingOrderId: null,
+        razorpayOrderId: null,
         pendingPlanType: null,
         orderCreatedAt: null
       });
@@ -328,6 +331,7 @@ async function handlePaymentDropped(order, payment) {
     if (user) {
       await User.findByIdAndUpdate(user._id, {
         pendingOrderId: null,
+        razorpayOrderId: null,
         pendingPlanType: null,
         orderCreatedAt: null
       });
@@ -371,9 +375,30 @@ router.post('/verify-payment', auth, async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
     const user = req.user;
     
-    // Check if user has pending order
-    if (user.pendingOrderId !== razorpay_order_id) {
-      return res.status(400).json({ error: 'Invalid order ID' });
+    console.log('Payment verification request:', {
+      razorpay_order_id,
+      razorpay_payment_id,
+      user_pending_order: user.pendingOrderId,
+      user_id: user._id
+    });
+    
+    // Check if user has pending order with matching Razorpay order ID
+    console.log('Order ID comparison:', {
+      user_razorpay_order_id: user.razorpayOrderId,
+      received_razorpay_order_id: razorpay_order_id,
+      user_pending_order_id: user.pendingOrderId,
+      match: user.razorpayOrderId === razorpay_order_id
+    });
+    
+    if (user.razorpayOrderId !== razorpay_order_id) {
+      return res.status(400).json({ 
+        error: 'Invalid order ID',
+        details: `Expected: ${user.razorpayOrderId}, Received: ${razorpay_order_id}`
+      });
+    }
+    
+    if (!user.pendingOrderId) {
+      return res.status(400).json({ error: 'No pending order found' });
     }
     
     // Verify payment signature
@@ -396,7 +421,7 @@ router.post('/verify-payment', auth, async (req, res) => {
         // Create a mock order object with the structure expected by handlePaymentSuccess
         const mockOrder = { 
           id: razorpay_order_id, 
-          notes: { order_id: razorpay_order_id } 
+          notes: { order_id: user.pendingOrderId } // Use the stored full order ID
         };
         await handlePaymentSuccess(mockOrder, payment);
         res.json({ success: true, message: 'Payment verified and plan activated' });

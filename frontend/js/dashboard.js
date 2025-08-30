@@ -2,14 +2,23 @@ const accessToken = localStorage.getItem('accessToken');
 const refreshToken = localStorage.getItem('refreshToken');
 if (!accessToken || !refreshToken) location.href = 'login.html';
 
-const logoutBtn = document.getElementById('logout');
-logoutBtn && logoutBtn.addEventListener('click', async () => {
-  if (window.sessionManager) {
-    await window.sessionManager.logout();
-  } else {
-    localStorage.clear();
-    location.href = 'index.html';
-  }
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+  const logoutBtn = document.getElementById('logout');
+  logoutBtn && logoutBtn.addEventListener('click', async () => {
+    if (window.sessionManager) {
+      await window.sessionManager.logout();
+    } else {
+      localStorage.clear();
+      location.href = 'index.html';
+    }
+  });
+
+  // Initialize loading spinner
+  addLoadingSpinner();
+  
+  // Load profile data
+  loadProfile();
 });
 
 // Populate profile
@@ -18,16 +27,26 @@ const loadProfile = async () => {
   const errorMessage = document.getElementById('error-message');
   if (errorMessage) errorMessage.style.display = 'none';
   
+  // Show loading state
+  showLoadingState();
+  
   try {
-    // Load both profile and usage information
+    // Load both profile and usage information in parallel with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    
     const [profileRes, usageRes] = await Promise.all([
       fetch('https://json4ai.onrender.com/api/user/profile', {
-        headers: { 'Authorization': `Bearer ${accessToken}` }
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+        signal: controller.signal
       }),
       fetch('https://json4ai.onrender.com/api/user/usage', {
-        headers: { 'Authorization': `Bearer ${accessToken}` }
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+        signal: controller.signal
       })
     ]);
+    
+    clearTimeout(timeoutId);
     
     if (!profileRes.ok || !usageRes.ok) {
       if (profileRes.status === 401 || usageRes.status === 401) {
@@ -165,8 +184,14 @@ const loadProfile = async () => {
     // Load recent activity
     loadRecentActivity();
     
+    // Hide loading state
+    hideLoadingState();
+    
   } catch (error) {
     console.error('Error loading profile:', error);
+    
+    // Hide loading state
+    hideLoadingState();
     
     // Show error message
     const errorMessage = document.getElementById('error-message');
@@ -241,6 +266,116 @@ const formatTimeAgo = (date) => {
   if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
   if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} days ago`;
   return date.toLocaleDateString();
+};
+
+// Loading state management
+const showLoadingState = () => {
+  // Show loading spinner
+  const loadingSpinner = document.getElementById('loading-spinner');
+  if (loadingSpinner) loadingSpinner.style.display = 'block';
+  
+  // Disable form inputs
+  const inputs = document.querySelectorAll('input, button');
+  inputs.forEach(input => input.disabled = true);
+  
+  // Show loading message
+  const dashboardSubtitle = document.getElementById('dashboard-subtitle');
+  if (dashboardSubtitle) {
+    dashboardSubtitle.textContent = 'Loading your dashboard...';
+    dashboardSubtitle.style.opacity = '0.7';
+  }
+};
+
+const hideLoadingState = () => {
+  // Hide loading spinner
+  const loadingSpinner = document.getElementById('loading-spinner');
+  if (loadingSpinner) loadingSpinner.style.display = 'none';
+  
+  // Enable form inputs
+  const inputs = document.querySelectorAll('input, button');
+  inputs.forEach(input => input.disabled = false);
+  
+  // Restore dashboard subtitle
+  const dashboardSubtitle = document.getElementById('dashboard-subtitle');
+  if (dashboardSubtitle) {
+    dashboardSubtitle.style.opacity = '1';
+  }
+};
+
+// Add loading spinner to dashboard if it doesn't exist
+const addLoadingSpinner = () => {
+  if (!document.getElementById('loading-spinner')) {
+    const spinner = document.createElement('div');
+    spinner.id = 'loading-spinner';
+    spinner.innerHTML = `
+      <div style="display: none; text-align: center; padding: 2rem;">
+        <div class="spinner" style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #8b5cf6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+        <p style="color: #6b7280;">Loading your dashboard...</p>
+      </div>
+    `;
+    
+    const dashboardHeader = document.querySelector('.dashboard-header');
+    if (dashboardHeader) {
+      dashboardHeader.appendChild(spinner);
+    }
+  }
+};
+
+// Notification functions
+const showSuccess = (message) => {
+  if (window.showNotification) {
+    window.showNotification(message, 'success');
+  } else {
+    // Fallback notification
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem 1.5rem;
+      background: #10b981;
+      color: white;
+      border-radius: 8px;
+      font-weight: 600;
+      z-index: 10001;
+      max-width: 300px;
+      word-wrap: break-word;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, 5000);
+  }
+};
+
+const showError = (message) => {
+  if (window.showNotification) {
+    window.showNotification(message, 'error');
+  } else {
+    // Fallback notification
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem 1.5rem;
+      background: #ef4444;
+      color: white;
+      border-radius: 8px;
+      font-weight: 600;
+      z-index: 10001;
+      max-width: 300px;
+      word-wrap: break-word;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, 5000);
+  }
 };
 
 // Load profile when page loads

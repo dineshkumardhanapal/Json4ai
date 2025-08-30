@@ -310,6 +310,47 @@ class SessionManager {
       localStorage.setItem('lastActivity', Date.now().toString());
     }
   }
+  
+  // Refresh user plan data
+  async refreshUserPlan() {
+    try {
+      if (!this.accessToken) return null;
+      
+      const res = await fetch('https://json4ai.onrender.com/api/user/profile', {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Cache-Control': 'no-cache'
+        }
+      });
+      
+      if (res.ok) {
+        const user = await res.json();
+        // Store updated plan info
+        localStorage.setItem('userPlan', JSON.stringify({
+          plan: user.plan,
+          planEndDate: user.planEndDate,
+          timestamp: Date.now()
+        }));
+        return user;
+      }
+    } catch (error) {
+      console.error('Error refreshing user plan:', error);
+    }
+    return null;
+  }
+  
+  // Get current user plan
+  getCurrentPlan() {
+    const userPlan = localStorage.getItem('userPlan');
+    if (userPlan) {
+      try {
+          return JSON.parse(userPlan);
+      } catch (e) {
+        console.error('Error parsing user plan:', e);
+      }
+    }
+    return null;
+  }
 
   // Show notification
   showNotification(message, type = 'info') {

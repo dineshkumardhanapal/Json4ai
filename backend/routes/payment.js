@@ -103,9 +103,7 @@ router.post('/create-order', auth, async (req, res) => {
         user_id: user._id.toString(),
         plan_name: plan.name,
         source: 'json4ai'
-      },
-      callback_url: `${process.env.FRONTEND_URL}/payment-success`,
-      callback_method: 'get'
+      }
     };
 
     try {

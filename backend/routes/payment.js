@@ -259,8 +259,13 @@ router.post('/webhook', async (req, res) => {
         console.error('Invalid webhook signature');
         return res.status(401).json({ error: 'Invalid signature' });
       }
+      console.log('✅ Webhook signature verified successfully');
     } else {
-      console.log('⚠️ Webhook signature verification disabled - add CASHFREE_WEBHOOK_SECRET for production');
+      if (process.env.NODE_ENV === 'production') {
+        console.warn('⚠️ Webhook signature verification disabled - add CASHFREE_WEBHOOK_SECRET for production security');
+      } else {
+        console.log('ℹ️ Webhook signature verification disabled in development mode');
+      }
       
       // Basic timestamp validation (prevent very old webhooks)
       if (timestamp) {
@@ -273,6 +278,7 @@ router.post('/webhook', async (req, res) => {
           console.error('Webhook too old, rejecting:', timeDiff, 'seconds');
           return res.status(400).json({ error: 'Webhook too old' });
         }
+        console.log(`✅ Webhook timestamp validated (${timeDiff}s old)`);
       }
     }
     
@@ -297,8 +303,14 @@ router.post('/webhook', async (req, res) => {
       case 'PAYMENT_USER_DROPPED_WEBHOOK':
         await handlePaymentDropped(order, payment);
         break;
+      case 'WEBHOOK':
+        // Handle test webhooks from Cashfree dashboard
+        console.log('✅ Test webhook received from Cashfree dashboard');
+        break;
       default:
         console.log(`Unhandled webhook event: ${type}`);
+        // Log the full webhook data for debugging
+        console.log('Webhook data:', JSON.stringify(req.body, null, 2));
     }
     
     res.json({ received: true });

@@ -156,16 +156,53 @@ async function handleUpgrade(e) {
     });
 
     const data = await res.json();
-    if (res.ok && data.success && data.paymentUrl) {
+    if (res.ok && data.success) {
       // Store order details for tracking
       localStorage.setItem('pendingOrder', JSON.stringify({
         orderId: data.orderId,
+        fullOrderId: data.fullOrderId,
         planType: plan,
         timestamp: Date.now()
       }));
       
-      // Redirect to Cashfree payment page
-      location.href = data.paymentUrl;
+      // Initialize Razorpay checkout
+      const options = {
+        key: data.key,
+        amount: data.amount,
+        currency: data.currency,
+        name: data.name,
+        description: data.description,
+        order_id: data.orderId,
+        prefill: data.prefill,
+        notes: data.notes,
+        handler: function (response) {
+          // Payment successful - verify with backend
+          verifyPayment(response);
+        },
+        modal: {
+          ondismiss: function() {
+            // Payment modal dismissed
+            e.target.disabled = false;
+            e.target.textContent = 'Buy Now';
+          }
+        },
+        onClose: function() {
+          // Payment modal closed
+          e.target.disabled = false;
+          e.target.textContent = 'Buy Now';
+        }
+      };
+      
+      if (typeof Razorpay === 'undefined') {
+        showError('Payment gateway not available. Please refresh the page and try again.');
+        e.target.disabled = false;
+        e.target.textContent = 'Buy Now';
+        return;
+      }
+      
+      const rzp = new Razorpay(options);
+      rzp.open();
+      
     } else {
       // Show appropriate error messages
       if (data.error && data.error.includes('You already have an active plan')) {
@@ -176,16 +213,60 @@ async function handleUpgrade(e) {
         showError(data.error || 'Unable to create payment order.');
       }
     }
-  } catch (err) {
-    console.error(err);
-    showError('Network error. Please try again later.');
-  } finally {
-    e.target.disabled = false;
-    e.target.textContent = 'Buy Now';
+      } catch (err) {
+      console.error('Payment order creation error:', err);
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        showError('Network error. Please check your internet connection and try again.');
+      } else {
+        showError('Unable to create payment order. Please try again later.');
+      }
+    } finally {
+      e.target.disabled = false;
+      e.target.textContent = 'Buy Now';
+    }
+}
+
+// Verify payment with backend
+async function verifyPayment(response) {
+  try {
+    const sessionManager = window.sessionManager;
+    if (!sessionManager || !sessionManager.isLoggedIn()) {
+      showError('Session expired. Please log in again.');
+      return;
+    }
+
+    const res = await fetch(API('/api/payment/verify-payment'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionManager.getAccessToken()}`
+      },
+      body: JSON.stringify({
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_signature: response.razorpay_signature
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showSuccess('Payment successful! Your plan has been activated.');
+      // Clear pending order
+      localStorage.removeItem('pendingOrder');
+      // Redirect to dashboard after a short delay
+      setTimeout(() => {
+        location.href = 'dashboard.html';
+      }, 2000);
+    } else {
+      showError(data.error || 'Payment verification failed. Please contact support.');
+    }
+  } catch (error) {
+    console.error('Payment verification error:', error);
+    showError('Payment verification failed. Please contact support.');
   }
 }
 
-// Handle return from payment gateway (Cashfree)
+// Handle return from payment gateway (Razorpay)
 function handlePaymentReturn() {
   const urlParams = new URLSearchParams(window.location.search);
   const success = urlParams.get('success');

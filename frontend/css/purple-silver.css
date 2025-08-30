@@ -3320,22 +3320,7 @@ body {
   color: var(--text-primary) !important;
 }
 
-/* Ensure the animated background is visible */
-body::before {
-  content: '' !important;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: 
-    radial-gradient(circle at 20% 80%, rgba(99, 179, 237, 0.1) 0%, transparent 50%) !important,
-    radial-gradient(circle at 80% 20%, rgba(167, 139, 250, 0.1) 0%, transparent 50%) !important,
-    radial-gradient(circle at 40% 40%, rgba(104, 211, 145, 0.1) 0%, transparent 50%) !important;
-  pointer-events: none !important;
-  z-index: -1 !important;
-  animation: float 20s ease-in-out infinite !important;
-}
+/* Ensure the animated background is visible - using existing body::before from earlier in file */
 
 /* Force all buttons to use the new theme */
 button,
@@ -3483,4 +3468,316 @@ html body * {
   color: var(--text-primary) !important;
   border-color: var(--glass-border) !important;
   box-shadow: var(--glass-shadow) !important;
+}
+
+/* Ensure all containers have proper glass borders and backgrounds */
+.navbar,
+.card,
+.feature-card,
+.plan-card,
+.dashboard-header,
+.usage-status-card,
+.generator-card,
+.result-card,
+.activity-item,
+.history-item,
+footer,
+.notification,
+.success-message,
+.error-message,
+.content-header,
+.quality-info,
+.quality-card,
+.auth-container .card,
+.hero,
+.features,
+.pricing-header,
+.pricing-grid,
+.pricing-faq,
+.dashboard-grid,
+.quick-actions,
+.plan-features,
+.plan-description,
+.plan-header,
+.plan-badge,
+.quality-badge,
+.quality-indicator,
+.credit-status-card,
+.credit-badge,
+.usage-stats,
+.usage-bar,
+.usage-progress,
+.usage-text,
+.credit-details,
+.credit-actions,
+.activity-list,
+.activity-content,
+.activity-meta,
+.activity-time,
+.history-list,
+.history-content,
+.history-icon,
+.original-input,
+.json-display,
+.json-display pre,
+.form,
+.form-group,
+.form input,
+.form label,
+.form small,
+.prompt-form,
+.prompt-form textarea,
+.prompt-form label,
+.prompt-form small,
+.form-actions,
+.btn-primary,
+.btn-secondary,
+.btn-large,
+.btn,
+.button,
+.checkbox-group,
+.checkbox-label,
+.auth-actions,
+.auth-header,
+.auth-footer,
+.content-body,
+.quality-comparison,
+.quality-grid,
+.quality-feature,
+.quality-desc,
+.quality-icon,
+.quality-label,
+.status-icon,
+.feature-icon,
+.history-icon {
+  background: var(--glass-bg) !important;
+  background-color: var(--glass-bg) !important;
+  background-image: none !important;
+  color: var(--text-primary) !important;
+  border: 2px solid var(--glass-border) !important;
+  border-color: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  transition: var(--glass-transition) !important;
+  border-radius: 12px !important;
+}
+
+/* Ensure plan cards have stronger borders and backgrounds */
+.plan-card {
+  background: var(--glass-bg) !important;
+  background-color: var(--glass-bg) !important;
+  background-image: none !important;
+  color: var(--text-primary) !important;
+  border: 3px solid var(--glass-border) !important;
+  border-color: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow-lg) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  transition: var(--glass-transition) !important;
+  border-radius: 16px !important;
+  padding: 2rem !important;
+}
+
+/* Ensure feature cards have proper glass effect */
+.feature-card {
+  background: var(--glass-bg) !important;
+  background-color: var(--glass-bg) !important;
+  background-image: none !important;
+  color: var(--text-primary) !important;
+  border: 2px solid var(--glass-border) !important;
+  border-color: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  transition: var(--glass-transition) !important;
+  border-radius: 12px !important;
+  padding: 1.5rem !important;
+}
+
+/* Ensure dashboard elements have proper glass effect */
+.dashboard-header,
+.usage-status-card,
+.generator-card,
+.result-card {
+  background: var(--glass-bg) !important;
+  background-color: var(--glass-bg) !important;
+  background-image: none !important;
+  color: var(--text-primary) !important;
+  border: 2px solid var(--glass-border) !important;
+  border-color: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  transition: var(--glass-transition) !important;
+  border-radius: 12px !important;
+  padding: 1.5rem !important;
+}
+
+/* Ensure form elements have proper glass effect */
+.form input,
+.prompt-form textarea,
+select {
+  background: var(--glass-bg) !important;
+  background-color: var(--glass-bg) !important;
+  background-image: none !important;
+  color: var(--text-primary) !important;
+  border: 2px solid var(--glass-border) !important;
+  border-color: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow-sm) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  transition: var(--glass-transition) !important;
+  border-radius: 8px !important;
+  padding: 0.75rem 1rem !important;
+}
+
+/* Ensure buttons have proper glass effect */
+.btn-primary,
+.btn-secondary,
+.btn-large,
+.btn,
+.button,
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  background: var(--accent-gradient) !important;
+  background-color: var(--accent-primary) !important;
+  background-image: var(--accent-gradient) !important;
+  color: white !important;
+  border: 2px solid var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+  box-shadow: var(--glass-shadow) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  transition: var(--glass-transition) !important;
+  border-radius: 8px !important;
+  padding: 0.75rem 1.5rem !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  display: inline-block !important;
+  cursor: pointer !important;
+}
+
+/* Ensure quality badges have proper glass effect */
+.quality-badge,
+.plan-badge {
+  background: var(--accent-gradient) !important;
+  background-color: var(--accent-primary) !important;
+  background-image: var(--accent-gradient) !important;
+  color: white !important;
+  border: 2px solid var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+  box-shadow: var(--glass-shadow) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  transition: var(--glass-transition) !important;
+  border-radius: 20px !important;
+  padding: 0.5rem 1rem !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Ensure the navbar has proper glass effect */
+.navbar {
+  background: var(--glass-bg) !important;
+  background-color: var(--glass-bg) !important;
+  background-image: none !important;
+  color: var(--text-primary) !important;
+  border-bottom: 2px solid var(--glass-border) !important;
+  border-color: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  transition: var(--glass-transition) !important;
+  padding: 1rem 0 !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+}
+
+/* Ensure the hero section has proper glass effect */
+.hero {
+  background: var(--glass-bg) !important;
+  background-color: var(--glass-bg) !important;
+  background-image: none !important;
+  color: var(--text-primary) !important;
+  border: 2px solid var(--glass-border) !important;
+  border-color: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  transition: var(--glass-transition) !important;
+  border-radius: 16px !important;
+  padding: 3rem 2rem !important;
+  margin: 2rem 0 !important;
+}
+
+/* Ensure footer has proper glass effect */
+footer {
+  background: var(--glass-bg) !important;
+  background-color: var(--glass-bg) !important;
+  background-image: none !important;
+  color: var(--text-primary) !important;
+  border-top: 2px solid var(--glass-border) !important;
+  border-color: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  transition: var(--glass-transition) !important;
+  padding: 2rem 0 !important;
+  margin-top: 3rem !important;
+}
+
+/* Ensure all text is visible against the glass background */
+h1, h2, h3, h4, h5, h6,
+p, span, div, li, a, label, small {
+  color: var(--text-primary) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Ensure links are visible */
+a {
+  color: var(--accent-primary) !important;
+  text-decoration: none !important;
+  transition: var(--glass-transition) !important;
+}
+
+a:hover {
+  color: var(--accent-secondary) !important;
+  text-decoration: underline !important;
+}
+
+/* Ensure the logo is visible */
+.logo {
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
+  font-size: 1.5rem !important;
+  text-decoration: none !important;
+}
+
+.logo span {
+  background: var(--accent-gradient) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-weight: 800 !important;
+}
+
+/* Ensure navigation links are visible */
+.nav-links a {
+  color: var(--text-secondary) !important;
+  text-decoration: none !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 6px !important;
+  transition: var(--glass-transition) !important;
+}
+
+.nav-links a:hover {
+  color: var(--accent-primary) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
 }

@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>JSON4AI – Accurate AI Prompt Generator</title>
+  <meta name="description" content="Generate accurate prompts with JSON4AI. AI-ready JSON schema to prompt translator in seconds."/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="canonical" href="https://json4ai.com"/>
+  <meta property="og:title" content="JSON4AI – Accurate AI Prompt Generator"/>
+  <meta property="og:description" content="Generate accurate prompts with JSON4AI. AI-ready JSON schema to prompt translator in seconds."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://json4ai.com"/>
+  <meta property="og:image" content="https://json4ai.com/assets/og-image.png"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css"/>
+  <link rel="stylesheet" href="css/purple-silver.css"/>
+  <link rel="stylesheet" href="css/responsive.css"/>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js" defer></script>
+  <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
+  <script src="js/notifications.js" defer></script>
+  <script src="js/utils.js" defer></script>
+  <script src="js/migration.js" defer></script>
+  <script src="js/session-manager.js" defer></script>
+</head>
+<body>
+<header class="navbar">
+  <div class="container flex-between">
+    <a href="index.html" class="logo">JSON4<span>AI</span></a>
+    <nav id="nav-links" class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="login.html" id="login-link">Login</a>
+      <a href="dashboard.html" id="dashboard-link" class="hidden">Dashboard</a>
+    </nav>
+    <button id="hamburger" class="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-links">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- Notification Container -->
+<div id="notification-container" class="notification-container"></div>
+
+<main>
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1>Generate your accurate prompt with <span class="highlight">Json4Ai</span></h1>
+        <p>Turn any Search Query into a precise Json AI prompt in seconds. Our advanced AI-powered system ensures accuracy and consistency in every generated prompt.</p>
+        <a href="register.html" class="btn-primary">Get Started Free</a>
+      </div>
+      <div class="hero-visual">
+        <lottie-player 
+          src="https://lottie.host/de53e67b-4e74-4757-a9e3-aeb6c59f2856/PJXYiUEymi.json" 
+          background="transparent" 
+          speed="1" 
+          style="width: 400px; height: 400px;" 
+          loop 
+          autoplay 
+          role="img" 
+          aria-label="AI prompt generation animation">
+        </lottie-player>
+      </div>
+    </div>
+  </section>
+  
+  <section class="features">
+    <div class="container">
+      <div class="features-header text-center">
+        <h2>Why Choose Json4Ai?</h2>
+        <p>Powerful features that make prompt generation effortless</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <h3>Lightning Fast</h3>
+          <p>Generate prompts in seconds, not minutes. Our optimized AI engine delivers results instantly.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3>Pinpoint Accuracy</h3>
+          <p>Advanced algorithms ensure your prompts are precise and contextually relevant every time.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.623 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"></path>
+            </svg>
+          </div>
+          <h3>Enterprise Ready</h3>
+          <p>Built with security and scalability in mind. Perfect for teams and large-scale operations.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- AI Platform Compatibility Section -->
+  <section class="compatibility">
+    <div class="container">
+      <div class="compatibility-header text-center">
+        <h2>Json4AI works well with</h2>
+        <p>Seamlessly integrate with all major AI platforms and models</p>
+      </div>
+      
+                    <div class="logo-slider">
+        <div class="logo-track">
+           <div class="logo-slide">
+             <div class="ai-logo">
+               <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" alt="ChatGPT" class="w-16 h-16">
+               <span>ChatGPT</span>
+             </div>
+           </div>
+          
+          <div class="logo-slide">
+            <div class="ai-logo">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg" alt="Gemini" class="w-16 h-16">
+              <span>Gemini</span>
+            </div>
+          </div>
+          
+          <div class="logo-slide">
+            <div class="ai-logo">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Grok-feb-2025-logo.svg" alt="Grok" class="w-16 h-16" style="filter: brightness(0) invert(1);">
+              <span>Grok</span>
+            </div>
+          </div>
+          
+          <div class="logo-slide">
+            <div class="ai-logo">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/DeepSeek_logo.svg" alt="DeepSeek" class="w-16 h-16">
+              <span>DeepSeek</span>
+            </div>
+          </div>
+          
+                     <div class="logo-slide">
+             <div class="ai-logo">
+               <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Google_ai_studio_logo.png" alt="Google AI Studio" class="w-16 h-16">
+               <span>Google AI Studio</span>
+             </div>
+           </div>
+           
+           <div class="logo-slide">
+             <div class="ai-logo">
+               <img src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Meta-Logo.png" alt="Meta Llama" class="w-16 h-16" style="filter: brightness(0) invert(1);">
+               <span>Meta Llama</span>
+             </div>
+           </div>
+           
+                       <div class="logo-slide">
+              <div class="ai-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/69/Qwen_logo.svg" alt="QWen" class="w-16 h-16">
+                <span>QWen</span>
+              </div>
+            </div>
+            
+            <div class="logo-slide">
+              <div class="ai-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e6/Mistral_AI_logo_%282025%E2%80%93%29.svg" alt="Mistral AI" class="w-16 h-16">
+                <span>Mistral AI</span>
+              </div>
+            </div>
+            
+            <!-- Duplicate logos for seamless loop -->
+                     <div class="logo-slide">
+             <div class="ai-logo">
+               <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" alt="ChatGPT" class="w-16 h-16">
+               <span>ChatGPT</span>
+             </div>
+           </div>
+          
+          <div class="logo-slide">
+            <div class="ai-logo">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg" alt="Gemini" class="w-16 h-16">
+              <span>Gemini</span>
+            </div>
+          </div>
+          
+          <div class="logo-slide">
+            <div class="ai-logo">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Grok-feb-2025-logo.svg" alt="Grok" class="w-16 h-16" style="filter: brightness(0) invert(1);">
+              <span>Grok</span>
+            </div>
+          </div>
+          
+          <div class="logo-slide">
+            <div class="ai-logo">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/DeepSeek_logo.svg" alt="DeepSeek" class="w-16 h-16">
+              <span>DeepSeek</span>
+            </div>
+          </div>
+          
+                     <div class="logo-slide">
+             <div class="ai-logo">
+               <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Google_ai_studio_logo.png" alt="Google AI Studio" class="w-16 h-16">
+               <span>Google AI Studio</span>
+             </div>
+           </div>
+           
+           <div class="logo-slide">
+             <div class="ai-logo">
+               <img src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Meta-Logo.png" alt="Meta Llama" class="w-16 h-16" style="filter: brightness(0) invert(1);">
+               <span>Meta Llama</span>
+             </div>
+           </div>
+           
+                       <div class="logo-slide">
+              <div class="ai-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/69/Qwen_logo.svg" alt="QWen" class="w-16 h-16">
+                <span>QWen</span>
+              </div>
+            </div>
+            
+            <div class="logo-slide">
+              <div class="ai-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e6/Mistral_AI_logo_%282025%E2%80%93%29.svg" alt="Mistral AI" class="w-16 h-16">
+                <span>Mistral AI</span>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="grid-4">
+      <div>
+        <h4>Json4Ai</h4>
+        <p>Generate your accurate prompt with our advanced AI-powered system.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="pricing.html">Pricing</a>
+        <a href="dashboard.html">Dashboard</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms</a>
+        <a href="gdpr.html">GDPR</a>
+        <a href="cookies.html">Cookie Policy</a>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="mailto:hello@json4ai.com">Contact</a>
+      </div>
+    </div>
+    <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+  </div>
+</footer>
+</body>
+</html>

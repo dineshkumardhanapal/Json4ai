@@ -23,6 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Populate profile
 const loadProfile = async () => {
+  console.log('🔄 Starting to load profile...');
+  
   // Hide any existing error messages
   const errorMessage = document.getElementById('error-message');
   if (errorMessage) errorMessage.style.display = 'none';
@@ -31,6 +33,8 @@ const loadProfile = async () => {
   showLoadingState();
   
   try {
+    console.log('📡 Fetching profile and usage data...');
+    
     // Load both profile and usage information in parallel with timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
@@ -48,18 +52,28 @@ const loadProfile = async () => {
     
     clearTimeout(timeoutId);
     
+    console.log('📊 API responses received:', {
+      profileStatus: profileRes.status,
+      usageStatus: usageRes.status,
+      profileOk: profileRes.ok,
+      usageOk: usageRes.ok
+    });
+    
     if (!profileRes.ok || !usageRes.ok) {
       if (profileRes.status === 401 || usageRes.status === 401) {
+        console.log('🔒 Token expired or invalid, redirecting to login...');
         // Token expired or invalid
         localStorage.clear();
         location.href = 'login.html';
         return;
       }
-      throw new Error('Failed to load profile or usage information');
+      throw new Error(`Failed to load profile or usage information. Status: ${profileRes.status}, ${usageRes.status}`);
     }
     
     const user = await profileRes.json();
     const usage = await usageRes.json();
+    
+    console.log('✅ Profile and usage data loaded successfully:', { user, usage });
     
     const first = document.getElementById('firstName');
     const last  = document.getElementById('lastName');
@@ -179,7 +193,7 @@ const loadProfile = async () => {
     const subtitle = document.getElementById('dashboard-subtitle');
     if (subtitle) subtitle.textContent = `Welcome back, ${user.firstName || 'User'}! Manage your profile, view usage, and upgrade your plan`;
     
-    console.log('Profile loaded successfully:', user);
+    console.log('✅ Profile loaded successfully:', user);
     
     // Load recent activity
     loadRecentActivity();
@@ -188,7 +202,7 @@ const loadProfile = async () => {
     hideLoadingState();
     
   } catch (error) {
-    console.error('Error loading profile:', error);
+    console.error('❌ Error loading profile:', error);
     
     // Hide loading state
     hideLoadingState();
@@ -289,9 +303,16 @@ const formatTimeAgo = (date) => {
 
 // Loading state management
 const showLoadingState = () => {
+  console.log('🔄 Showing loading state...');
+  
   // Show loading spinner
   const loadingSpinner = document.getElementById('loading-spinner');
-  if (loadingSpinner) loadingSpinner.style.display = 'block';
+  if (loadingSpinner) {
+    loadingSpinner.style.display = 'block';
+    console.log('✅ Loading spinner shown');
+  } else {
+    console.warn('⚠️ Loading spinner element not found');
+  }
   
   // Disable form inputs
   const inputs = document.querySelectorAll('input, button');
@@ -306,9 +327,16 @@ const showLoadingState = () => {
 };
 
 const hideLoadingState = () => {
+  console.log('✅ Hiding loading state...');
+  
   // Hide loading spinner
   const loadingSpinner = document.getElementById('loading-spinner');
-  if (loadingSpinner) loadingSpinner.style.display = 'none';
+  if (loadingSpinner) {
+    loadingSpinner.style.display = 'none';
+    console.log('✅ Loading spinner hidden');
+  } else {
+    console.warn('⚠️ Loading spinner element not found');
+  }
   
   // Enable form inputs
   const inputs = document.querySelectorAll('input, button');
@@ -398,7 +426,7 @@ const showError = (message) => {
 };
 
 // Load profile when page loads
-loadProfile();
+// loadProfile(); // Removed duplicate call - already called in DOMContentLoaded
 
 // Update profile
 document.getElementById('profile-form')?.addEventListener('submit', async e => {

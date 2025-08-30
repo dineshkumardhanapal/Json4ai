@@ -20,20 +20,15 @@
   --accent-tertiary: #68d391;      /* Saturated mint green */
   --accent-gradient: linear-gradient(135deg, #63b3ed, #a78bfa, #68d391);
   
-  /* Legacy accent colors for compatibility */
-  --accent-purple: #a78bfa;
-  --accent-purple-light: #c4b5fd;
-  --accent-purple-dark: #8b5cf6;
-  
   /* Glass effect variables */
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-  --glass-shadow-sm: 0 4px 16px rgba(31, 38, 135, 0.1);
-  --glass-shadow-md: 0 8px 32px rgba(31, 38, 135, 0.15);
-  --glass-shadow-lg: 0 16px 64px rgba(31, 38, 135, 0.2);
-  --glass-highlight: rgba(255, 255, 255, 0.3);
-  --glass-glow: rgba(99, 179, 237, 0.3);
+  --glass-bg: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.25);
+  --glass-shadow: 0 8px 32px rgba(99, 179, 237, 0.15);
+  --glass-shadow-sm: 0 4px 16px rgba(99, 179, 237, 0.1);
+  --glass-shadow-md: 0 8px 32px rgba(99, 179, 237, 0.2);
+  --glass-shadow-lg: 0 16px 64px rgba(99, 179, 237, 0.25);
+  --glass-highlight: rgba(255, 255, 255, 0.4);
+  --glass-glow: rgba(99, 179, 237, 0.4);
   --glass-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   
   /* Border radius and spacing */
@@ -43,12 +38,11 @@
   --radius-xl: 32px;
   
   /* Shadows for depth */
-  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-soft: 0 2px 8px rgba(99, 179, 237, 0.1);
+  --shadow-medium: 0 4px 16px rgba(99, 179, 237, 0.15);
+  --shadow-strong: 0 8px 32px rgba(99, 179, 237, 0.2);
   
-  /* Legacy variables for compatibility */
-  --border-color: rgba(255, 255, 255, 0.2);
+  /* Transition */
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -356,14 +350,17 @@ body::before {
 }
 
 .feature-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
   padding: 2.5rem 2rem;
   text-align: center;
-  transition: var(--transition);
+  transition: var(--glass-transition);
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--glass-shadow);
 }
 
 .feature-card::before {
@@ -373,15 +370,16 @@ body::before {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--accent-purple), var(--accent-purple-light));
+  background: var(--accent-gradient);
   opacity: 0;
-  transition: var(--transition);
+  transition: var(--glass-transition);
 }
 
 .feature-card:hover {
   transform: translateY(-8px);
-  border-color: var(--accent-purple);
-  box-shadow: var(--shadow-xl);
+  border-color: var(--accent-primary);
+  box-shadow: var(--glass-shadow-lg);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .feature-card:hover::before {
@@ -409,12 +407,20 @@ body::before {
 
 /* Cards */
 .card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
   padding: 2rem;
-  box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(10px);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: var(--glass-transition);
+}
+
+.card:hover {
+  box-shadow: var(--glass-shadow-md);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .form {
@@ -424,13 +430,22 @@ body::before {
 }
 
 .form input {
-  background: var(--bg-secondary);
-  border: 2px solid var(--border-color);
+  background: var(--glass-bg);
+  border: 2px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: 1rem;
   color: var(--text-primary);
   font-size: 1rem;
-  transition: var(--transition);
+  transition: var(--glass-transition);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.form input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--glass-glow);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .form input:focus {
@@ -488,15 +503,16 @@ body::before {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--accent-purple), var(--accent-purple-light));
+  background: var(--accent-gradient);
   opacity: 0;
-  transition: var(--transition);
+  transition: var(--glass-transition);
 }
 
 .plan-card:hover {
   transform: translateY(-8px);
-  border-color: var(--accent-purple);
-  box-shadow: var(--shadow-xl);
+  border-color: var(--accent-primary);
+  box-shadow: var(--glass-shadow-lg);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .plan-card:hover::before {
@@ -536,14 +552,17 @@ body::before {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-light));
-  color: var(--text-primary);
+  background: var(--accent-gradient);
+  color: white;
   padding: 0.5rem 1rem;
   border-radius: var(--radius-lg);
   font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--glass-shadow-sm);
 }
 
 .plan-header {
@@ -566,7 +585,10 @@ body::before {
 .price {
   font-size: 3rem;
   font-weight: 800;
-  color: var(--accent-purple);
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 1.5rem;
   line-height: 1;
 }
@@ -2840,4 +2862,195 @@ footer,
 .plan-badge.plan-premium:hover {
   box-shadow: var(--glass-shadow-lg), 0 0 40px rgba(167, 139, 250, 0.7) !important;
   transform: scale(1.1) !important;
+}
+
+/* Complete Soft Pastel Liquid Glass Theme Override */
+/* Remove all dark theme elements and apply the new ethereal design */
+
+/* Global text color overrides */
+* {
+  color: var(--text-primary);
+}
+
+/* Remove any dark backgrounds */
+.navbar,
+.card,
+.feature-card,
+.plan-card,
+.dashboard-header,
+.usage-status-card,
+.generator-card,
+.result-card,
+.activity-item,
+.history-item,
+footer,
+.notification,
+.success-message,
+.error-message,
+.content-header,
+.quality-info,
+.quality-card,
+.auth-container .card {
+  background: var(--glass-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Ensure all borders use the new glass border */
+.navbar,
+.card,
+.feature-card,
+.plan-card,
+.dashboard-header,
+.usage-status-card,
+.generator-card,
+.result-card,
+.activity-item,
+.history-item,
+footer,
+.notification,
+.success-message,
+.error-message,
+.content-header,
+.quality-info,
+.quality-card,
+.auth-container .card,
+.form input,
+.prompt-form textarea {
+  border-color: var(--glass-border) !important;
+}
+
+/* Apply glass shadows everywhere */
+.navbar,
+.card,
+.feature-card,
+.plan-card,
+.dashboard-header,
+.usage-status-card,
+.generator-card,
+.result-card,
+.activity-item,
+.history-item,
+footer,
+.notification,
+.success-message,
+.error-message,
+.content-header,
+.quality-info,
+.quality-card,
+.auth-container .card {
+  box-shadow: var(--glass-shadow) !important;
+}
+
+/* Ensure backdrop filters are applied */
+.navbar,
+.card,
+.feature-card,
+.plan-card,
+.dashboard-header,
+.usage-status-card,
+.generator-card,
+.result-card,
+.activity-item,
+.history-item,
+footer,
+.notification,
+.success-message,
+.error-message,
+.content-header,
+.quality-info,
+.quality-card,
+.auth-container .card,
+.form input,
+.prompt-form textarea {
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+/* Remove any remaining dark theme colors */
+.plan-badge.plan-free,
+.plan-badge.plan-starter,
+.plan-badge.plan-premium {
+  background: var(--accent-gradient) !important;
+  color: white !important;
+}
+
+/* Ensure all buttons use the new theme */
+.btn-primary {
+  background: var(--accent-gradient) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: var(--glass-shadow-sm) !important;
+}
+
+.btn-secondary {
+  background: var(--glass-bg) !important;
+  color: var(--text-primary) !important;
+  border: 2px solid var(--accent-primary) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Remove any dark shadows */
+.shadow-sm,
+.shadow-md,
+.shadow-lg,
+.shadow-xl {
+  box-shadow: var(--glass-shadow) !important;
+}
+
+/* Ensure all form elements use the new theme */
+input,
+textarea,
+select {
+  background: var(--glass-bg) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text-primary) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Focus states for all form elements */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 3px var(--glass-glow) !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Remove any remaining dark backgrounds */
+.bg-dark,
+.bg-black,
+.bg-gray-900,
+.bg-gray-800 {
+  background: var(--glass-bg) !important;
+}
+
+/* Ensure all text uses the new color scheme */
+.text-white,
+.text-light {
+  color: var(--text-primary) !important;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+/* Remove any dark borders */
+.border-dark,
+.border-gray-800 {
+  border-color: var(--glass-border) !important;
+}
+
+/* Premium glow effects */
+.quality-badge.quality-premium,
+.plan-badge.plan-premium {
+  background: var(--accent-gradient) !important;
+  box-shadow: var(--glass-shadow-md), 0 0 30px rgba(167, 139, 250, 0.5) !important;
+  animation: premium-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes premium-glow {
+  0% { box-shadow: var(--glass-shadow-md), 0 0 20px rgba(167, 139, 250, 0.3); }
+  100% { box-shadow: var(--glass-shadow-lg), 0 0 40px rgba(167, 139, 250, 0.7); }
 }

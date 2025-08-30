@@ -6,8 +6,8 @@ const requiredEnvVars = [
   'EMAIL_USER',
   'EMAIL_PASS',
   'FRONTEND_URL',
-  'CASHFREE_APP_ID',
-  'CASHFREE_SECRET_KEY'
+  'RAZORPAY_KEY_ID',
+  'RAZORPAY_KEY_SECRET'
 ];
 
 const validateEnvironment = () => {
@@ -44,13 +44,13 @@ const validateEnvironment = () => {
     throw new Error('Invalid EMAIL_USER format');
   }
   
-  // Validate Cashfree configuration
-  if (process.env.CASHFREE_APP_ID && process.env.CASHFREE_APP_ID.length < 10) {
-    throw new Error('CASHFREE_APP_ID appears to be invalid');
+  // Validate Razorpay configuration
+  if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_ID.length < 10) {
+    throw new Error('RAZORPAY_KEY_ID appears to be invalid');
   }
   
-  if (process.env.CASHFREE_SECRET_KEY && process.env.CASHFREE_SECRET_KEY.length < 20) {
-    throw new Error('CASHFREE_SECRET_KEY appears to be invalid');
+  if (process.env.RAZORPAY_KEY_SECRET && process.env.RAZORPAY_KEY_SECRET.length < 20) {
+    throw new Error('RAZORPAY_KEY_SECRET appears to be invalid');
   }
   
   console.log('✅ Environment variables validated successfully');

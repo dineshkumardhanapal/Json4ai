@@ -3,50 +3,39 @@ const router = express.Router();
 const User = require('../models/User');
 const auth = require('../middleware/auth');
 const { validatePaymentSubscription } = require('../middleware/validation');
-const fetch = require('node-fetch');
 const crypto = require('crypto');
 
-// Cashfree configuration - Force production URLs since using live credentials
-const CASHFREE_BASE_URL = 'https://api.cashfree.com/pg';
+// Razorpay configuration
+const Razorpay = require('razorpay');
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
-// Helper function to create Cashfree headers
-function getCashfreeHeaders() {
-  return {
-    'Content-Type': 'application/json',
-    'x-client-id': process.env.CASHFREE_APP_ID,
-    'x-client-secret': process.env.CASHFREE_SECRET_KEY,
-    'x-api-version': '2022-09-01'
-  };
-}
-
-// Webhook signature verification (for production security)
-function verifyWebhookSignature(payload, signature, timestamp) {
+// Webhook signature verification for Razorpay
+function verifyRazorpayWebhookSignature(payload, signature) {
   try {
-    if (!process.env.CASHFREE_WEBHOOK_SECRET) {
-      console.warn('CASHFREE_WEBHOOK_SECRET not set, skipping signature verification');
+    if (!process.env.RAZORPAY_WEBHOOK_SECRET) {
+      console.warn('RAZORPAY_WEBHOOK_SECRET not set, skipping signature verification');
       return true;
     }
     
-    // Create expected signature
-    const payloadString = JSON.stringify(payload);
-    const signaturePayload = timestamp + payloadString;
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.CASHFREE_WEBHOOK_SECRET)
-      .update(signaturePayload)
+      .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET)
+      .update(payload, 'utf8')
       .digest('hex');
     
-    // Compare signatures
     return crypto.timingSafeEqual(
       Buffer.from(signature, 'hex'),
       Buffer.from(expectedSignature, 'hex')
     );
   } catch (error) {
-    console.error('Webhook signature verification error:', error);
+    console.error('Razorpay webhook signature verification error:', error);
     return false;
   }
 }
 
-// Plan configuration for Cashfree one-time payments
+// Plan configuration for Razorpay one-time payments
 const PLANS = {
   'starter': {
     name: 'Starter',
@@ -80,7 +69,7 @@ const PLANS = {
   }
 };
 
-// POST /api/payment/create-order - Create Cashfree one-time payment
+// POST /api/payment/create-order - Create Razorpay order
 router.post('/create-order', auth, async (req, res) => {
   try {
     const { planType } = req.body;
@@ -104,128 +93,71 @@ router.post('/create-order', auth, async (req, res) => {
     // Generate unique order ID
     const orderId = `order_${user._id}_${Date.now()}`;
     
-    // Create Cashfree payment order
-    const orderRequest = {
-      order_amount: plan.price,
-      order_currency: plan.currency,
-      order_id: orderId,
-      customer_details: {
-        customer_id: user._id.toString(),
-        customer_name: `${user.firstName} ${user.lastName}`,
-        customer_email: user.email,
-        customer_phone: user.phone || '9999999999' // Default phone if not provided
-      },
-      order_meta: {
+    // Create Razorpay order
+    const orderOptions = {
+      amount: plan.price * 100, // Razorpay expects amount in paise (smallest currency unit)
+      currency: plan.currency,
+      receipt: orderId,
+      notes: {
         plan_type: planType,
         user_id: user._id.toString(),
-        plan_name: plan.name
+        plan_name: plan.name,
+        source: 'json4ai'
       },
-      order_note: `${plan.name} Plan - 1 Month Access`,
-      order_tags: {
-        source: 'json4ai',
-        plan: planType
-      },
-      order_splits: []
+      callback_url: `${process.env.FRONTEND_URL}/payment-success`,
+      callback_method: 'get'
     };
 
     try {
-      console.log('Creating Cashfree order:', {
-        url: `${CASHFREE_BASE_URL}/orders`,
+      console.log('Creating Razorpay order:', {
         orderId: orderId,
         amount: plan.price,
         currency: plan.currency,
         environment: process.env.NODE_ENV
       });
 
-      // Create order using Cashfree API
-      const response = await fetch(`${CASHFREE_BASE_URL}/orders`, {
-        method: 'POST',
-        headers: getCashfreeHeaders(),
-        body: JSON.stringify(orderRequest)
-      });
-
-      const responseData = await response.json();
+      // Create order using Razorpay API
+      const order = await razorpay.orders.create(orderOptions);
       
-      console.log('Cashfree API Response:', {
-        status: response.status,
-        ok: response.ok,
-        data: responseData
+      console.log('Razorpay order created:', {
+        orderId: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        status: order.status
       });
       
-      if (response.ok && responseData.payment_session_id) {
-        // Store order details in user record for webhook processing
-        await User.findByIdAndUpdate(user._id, {
-          pendingOrderId: orderId,
-          pendingPlanType: planType,
-          orderCreatedAt: new Date()
-        });
+      // Store order details in user record for webhook processing
+      await User.findByIdAndUpdate(user._id, {
+        pendingOrderId: order.id, // Use Razorpay's order ID
+        pendingPlanType: planType,
+        orderCreatedAt: new Date()
+      });
 
-        // Generate payment URL - Use Cashfree's provided URL or construct manually
-        let paymentUrl;
-        
-        // Clean the payment session ID (remove any malformed suffixes)
-        let cleanSessionId = responseData.payment_session_id;
-        
-        // Remove common malformed suffixes
-        if (cleanSessionId.endsWith('payment')) {
-          cleanSessionId = cleanSessionId.replace(/payment$/, '');
-          console.log('⚠️ Removed malformed "payment" suffix');
+      // Return order details for frontend
+      res.json({
+        success: true,
+        orderId: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        key: process.env.RAZORPAY_KEY_ID, // Frontend needs this for payment
+        name: 'JSON4AI',
+        description: `${plan.name} Plan - 1 Month Access`,
+        prefill: {
+          name: `${user.firstName} ${user.lastName}`,
+          email: user.email,
+          contact: user.phone || '9999999999'
+        },
+        notes: {
+          plan_type: planType,
+          user_id: user._id.toString()
         }
-        
-        // Remove any other common malformed endings
-        if (cleanSessionId.includes('payment')) {
-          cleanSessionId = cleanSessionId.split('payment')[0];
-          console.log('⚠️ Removed malformed "payment" from session ID');
-        }
-        
-        console.log('Original session ID:', responseData.payment_session_id);
-        console.log('Cleaned session ID:', cleanSessionId);
-        console.log('Session ID length:', cleanSessionId.length);
-        
-        // Validate session ID format
-        if (!cleanSessionId.startsWith('session_')) {
-          console.warn('⚠️ Session ID does not start with "session_"');
-        }
-        
-        if (cleanSessionId.length < 20) {
-          console.warn('⚠️ Session ID seems too short');
-        }
-        
-        // Check if Cashfree provides a direct payment URL
-        console.log('Available Cashfree response fields:', Object.keys(responseData.data || {}));
-        if (responseData.data && responseData.data.payment_url) {
-          console.log('Found direct payment URL:', responseData.data.payment_url);
-        }
-        
-        if (responseData.payment_links && responseData.payment_links.web) {
-          paymentUrl = responseData.payment_links.web;
-          console.log('Using Cashfree provided payment URL:', paymentUrl);
-        } else if (responseData.data && responseData.data.payment_url) {
-          paymentUrl = responseData.data.payment_url;
-          console.log('Using Cashfree direct payment URL:', paymentUrl);
-        } else {
-          // Use the official Cashfree payment gateway format
-          // Based on Cashfree documentation: https://payments.cashfree.com/pay/{session_id}
-          const domain = 'payments.cashfree.com';
-          paymentUrl = `https://${domain}/pay/${cleanSessionId}`;
-          console.log('Using official Cashfree payment URL format:', paymentUrl);
-        }
-
-        res.json({
-          success: true,
-          orderId: orderId,
-          paymentUrl: paymentUrl,
-          paymentSessionId: responseData.payment_session_id
-        });
-      } else {
-        console.error('Cashfree API Error:', responseData);
-        throw new Error(responseData.message || 'Invalid response from Cashfree');
-      }
-    } catch (cashfreeError) {
-      console.error('Cashfree API Error:', cashfreeError);
+      });
+      
+    } catch (razorpayError) {
+      console.error('Razorpay API Error:', razorpayError);
       return res.status(500).json({
         error: 'Failed to create payment order',
-        details: cashfreeError.message || 'Please try again later or contact support if the issue persists.'
+        details: razorpayError.message || 'Please try again later or contact support if the issue persists.'
       });
     }
 
@@ -237,85 +169,65 @@ router.post('/create-order', auth, async (req, res) => {
   }
 });
 
-// POST /api/payment/webhook - Cashfree webhook handler
+// POST /api/payment/webhook - Razorpay webhook handler
 router.post('/webhook', async (req, res) => {
   try {
     // Log webhook with IP for security monitoring
     const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    console.log('Cashfree webhook received:', {
+    console.log('Razorpay webhook received:', {
       clientIP: clientIP,
       headers: req.headers,
       body: req.body,
       timestamp: new Date().toISOString()
     });
     
-    // Verify webhook signature (optional but recommended for production)
-    const signature = req.headers['x-webhook-signature'];
-    const timestamp = req.headers['x-webhook-timestamp'];
+    // Verify webhook signature
+    const signature = req.headers['x-razorpay-signature'];
     
-    // For production, verify the webhook signature
-    if (process.env.NODE_ENV === 'production' && process.env.CASHFREE_WEBHOOK_SECRET) {
-      if (!verifyWebhookSignature(req.body, signature, timestamp)) {
-        console.error('Invalid webhook signature');
+    if (process.env.NODE_ENV === 'production' && process.env.RAZORPAY_WEBHOOK_SECRET) {
+      if (!verifyRazorpayWebhookSignature(JSON.stringify(req.body), signature)) {
+        console.error('Invalid Razorpay webhook signature');
         return res.status(401).json({ error: 'Invalid signature' });
       }
-      console.log('✅ Webhook signature verified successfully');
+      console.log('✅ Razorpay webhook signature verified successfully');
     } else {
       if (process.env.NODE_ENV === 'production') {
-        console.warn('⚠️ Webhook signature verification disabled - add CASHFREE_WEBHOOK_SECRET for production security');
+        console.warn('⚠️ Webhook signature verification disabled - add RAZORPAY_WEBHOOK_SECRET for production security');
       } else {
         console.log('ℹ️ Webhook signature verification disabled in development mode');
-      }
-      
-      // Basic timestamp validation (prevent very old webhooks)
-      if (timestamp) {
-        const webhookTime = parseInt(timestamp);
-        const currentTime = Math.floor(Date.now() / 1000);
-        const timeDiff = currentTime - webhookTime;
-        
-        // Reject webhooks older than 5 minutes (300 seconds)
-        if (timeDiff > 300) {
-          console.error('Webhook too old, rejecting:', timeDiff, 'seconds');
-          return res.status(400).json({ error: 'Webhook too old' });
-        }
-        console.log(`✅ Webhook timestamp validated (${timeDiff}s old)`);
       }
     }
     
     const { 
-      type, 
-      data: {
+      event,
+      payload: {
         order = {},
         payment = {}
       } = {}
     } = req.body;
 
-    console.log(`Processing webhook event: ${type}`);
+    console.log(`Processing Razorpay webhook event: ${event}`);
 
     // Handle different webhook events
-    switch (type) {
-      case 'PAYMENT_SUCCESS_WEBHOOK':
+    switch (event) {
+      case 'order.paid':
         await handlePaymentSuccess(order, payment);
         break;
-      case 'PAYMENT_FAILED_WEBHOOK':
+      case 'payment.failed':
         await handlePaymentFailed(order, payment);
         break;
-      case 'PAYMENT_USER_DROPPED_WEBHOOK':
-        await handlePaymentDropped(order, payment);
-        break;
-      case 'WEBHOOK':
-        // Handle test webhooks from Cashfree dashboard
-        console.log('✅ Test webhook received from Cashfree dashboard');
+      case 'order.payment_failed':
+        await handlePaymentFailed(order, payment);
         break;
       default:
-        console.log(`Unhandled webhook event: ${type}`);
+        console.log(`Unhandled Razorpay webhook event: ${event}`);
         // Log the full webhook data for debugging
         console.log('Webhook data:', JSON.stringify(req.body, null, 2));
     }
     
     res.json({ received: true });
   } catch (error) {
-    console.error('Webhook handler error:', error);
+    console.error('Razorpay webhook handler error:', error);
     res.status(500).json({ error: 'Webhook handler failed' });
   }
 });
@@ -440,6 +352,51 @@ router.get('/plan', auth, async (req, res) => {
   } catch (error) {
     console.error('Get plan error:', error);
     res.status(500).json({ error: 'Failed to retrieve plan information' });
+  }
+});
+
+// POST /api/payment/verify-payment - Verify Razorpay payment
+router.post('/verify-payment', auth, async (req, res) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    const user = req.user;
+    
+    // Check if user has pending order
+    if (user.pendingOrderId !== razorpay_order_id) {
+      return res.status(400).json({ error: 'Invalid order ID' });
+    }
+    
+    // Verify payment signature
+    const text = `${razorpay_order_id}|${razorpay_payment_id}`;
+    const signature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(text)
+      .digest('hex');
+    
+    if (signature !== razorpay_signature) {
+      return res.status(400).json({ error: 'Invalid payment signature' });
+    }
+    
+    // Query Razorpay API to confirm payment status
+    try {
+      const payment = await razorpay.payments.fetch(razorpay_payment_id);
+      
+      if (payment.status === 'captured') {
+        // Payment confirmed - activate plan
+        await handlePaymentSuccess({ id: razorpay_order_id }, payment);
+        res.json({ success: true, message: 'Payment verified and plan activated' });
+      } else {
+        res.json({ success: false, message: `Payment status: ${payment.status}` });
+      }
+      
+    } catch (razorpayError) {
+      console.error('Error fetching payment from Razorpay:', razorpayError);
+      res.status(500).json({ error: 'Failed to verify payment with Razorpay' });
+    }
+    
+  } catch (error) {
+    console.error('Payment verification error:', error);
+    res.status(500).json({ error: 'Failed to verify payment' });
   }
 });
 

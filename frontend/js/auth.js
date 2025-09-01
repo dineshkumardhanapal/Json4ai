@@ -77,7 +77,7 @@ if (loginForm) {
   if (resendBtn) {
     resendBtn.addEventListener('click', async () => {
       if (!currentEmail) {
-        alert('Please enter your email first');
+        showNotification('Please enter your email first', 'warning');
         return;
       }
       

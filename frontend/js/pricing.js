@@ -381,7 +381,7 @@ function showError(message) {
     window.showError(message);
   } else {
     // Use a simple alert as fallback to prevent infinite loops
-    alert('Error: ' + message);
+    showNotification(message, 'error');
   }
 }
 
@@ -389,7 +389,7 @@ function showSuccess(message) {
   if (window.showSuccess) {
     window.showSuccess(message);
   } else {
-    alert('Success: ' + message);
+    showNotification(message, 'success');
   }
 }
 
@@ -397,6 +397,6 @@ function showInfo(message) {
   if (window.showInfo) {
     window.showInfo(message);
   } else {
-    alert('Info: ' + message);
+    showNotification(message, 'info');
   }
 }

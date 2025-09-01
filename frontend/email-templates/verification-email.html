@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - JSON4AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0b1220 0%, #0d1b2a 50%, #0b132b 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 18px;
+            backdrop-filter: blur(16px);
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(34, 211, 238, 0.18);
+        }
+        
+        .email-header {
+            background: linear-gradient(135deg, #60a5fa 0%, #22d3ee 25%, #22c55e 50%, #059669 75%, #047857 100%);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .email-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(34,211,238,0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(34,197,94,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo span {
+            background: linear-gradient(45deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .email-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .email-content {
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .welcome-text {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            margin-bottom: 30px;
+            line-height: 1.7;
+        }
+        
+        .verification-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #60a5fa, #22d3ee, #22c55e);
+            color: #0b1220;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(34, 211, 238, 0.25);
+            transition: all 0.3s ease;
+        }
+        
+        .verification-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(34, 211, 238, 0.35);
+        }
+        
+        .alternative-text {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .verification-link {
+            color: #22d3ee;
+            word-break: break-all;
+            text-decoration: underline;
+        }
+        
+        .email-footer {
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links {
+            margin: 15px 0;
+        }
+        
+        .footer-links a {
+            color: #22d3ee;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 10px;
+            }
+            
+            .email-header,
+            .email-content,
+            .email-footer {
+                padding: 25px 20px;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .email-title {
+                font-size: 1.3rem;
+            }
+            
+            .verification-btn {
+                padding: 14px 24px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <div class="logo">JSON4<span>AI</span></div>
+            <div class="email-title">Verify Your Email Address</div>
+        </div>
+        
+        <div class="email-content">
+            <p class="welcome-text">
+                Welcome to JSON4AI! We're excited to have you on board. 
+                To complete your registration and start generating accurate AI prompts, 
+                please verify your email address by clicking the button below.
+            </p>
+            
+            <a href="{{VERIFICATION_URL}}" class="verification-btn">
+                Verify Email Address
+            </a>
+            
+            <div class="alternative-text">
+                <p><strong>Button not working?</strong></p>
+                <p>Copy and paste this link into your browser:</p>
+                <p><a href="{{VERIFICATION_URL}}" class="verification-link">{{VERIFICATION_URL}}</a></p>
+            </div>
+            
+            <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 25px;">
+                This verification link will expire in 24 hours for security reasons.
+            </p>
+        </div>
+        
+        <div class="email-footer">
+            <p>If you didn't create an account with JSON4AI, you can safely ignore this email.</p>
+            
+            <div class="footer-links">
+                <a href="https://json4ai.com">Visit Website</a>
+                <a href="https://json4ai.com/privacy.html">Privacy Policy</a>
+                <a href="https://json4ai.com/terms.html">Terms of Service</a>
+            </div>
+            
+            <p>&copy; 2025 JSON4AI. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

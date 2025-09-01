@@ -8,19 +8,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css"/>
-  <link rel="stylesheet" href="css/purple-silver.css"/>
+  <link rel="stylesheet" href="css/aurora-glass.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
   <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
+  <script src="js/mobile-nav.js" defer></script>
 </head>
 <body>
 <header class="navbar">
   <div class="container flex-between">
     <a href="index.html" class="logo">JSON4<span>AI</span></a>
-    <nav>
+    <nav class="nav-links" id="nav-links">
       <a href="index.html">Home</a>
       <a href="pricing.html">Pricing</a>
       <a href="login.html">Login</a>
     </nav>
+    <button id="hamburger" class="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-links">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
 
@@ -36,7 +40,32 @@
 
 <footer>
   <div class="container">
-    <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+    <div class="grid-4">
+      <div>
+        <h4>JSON4AI</h4>
+        <p>Advanced AI prompt generation with JSON structure validation</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="pricing.html">Pricing</a>
+        <a href="prompt-generator.html">Prompt Generator</a>
+        <a href="dashboard.html">Dashboard</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="gdpr.html">GDPR</a>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="cookies.html">Cookie Policy</a>
+        <a href="mailto:support@json4ai.com">Contact Us</a>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>&copy; 2025 JSON4AI. All rights reserved.</p>
+    </div>
   </div>
 </footer>
 </body>

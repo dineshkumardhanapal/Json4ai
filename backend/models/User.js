@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
   password:  { type: String, required: true, minlength: 6 },
   verified:  { type: Boolean, default: false },
   verifyToken: String,
+  resetToken: String,
+  resetTokenExpiry: Date,
   credits:   { type: Number, default: 3 }, // Only used for free plan
   plan:      { 
     type: String, 

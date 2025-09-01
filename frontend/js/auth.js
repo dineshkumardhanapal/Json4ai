@@ -4,6 +4,43 @@ const registerForm = document.getElementById('register-form');
 
 const API = path => `https://json4ai.onrender.com/api${path}`;
 
+// Google OAuth Configuration
+const GOOGLE_CLIENT_ID = 'your-google-client-id.googleusercontent.com'; // Replace with actual client ID
+
+// Initialize Google Sign-In
+function initializeGoogleAuth() {
+  if (typeof google !== 'undefined' && google.accounts) {
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleSignIn
+    });
+  }
+}
+
+// Handle Google Sign-In response
+async function handleGoogleSignIn(response) {
+  try {
+    const res = await fetch(API('/auth/google'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: response.credential })
+    });
+    
+    const data = await res.json();
+    
+    if (res.ok) {
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+      location.href = 'dashboard.html';
+    } else {
+      showError(data.message || 'Google authentication failed');
+    }
+  } catch (error) {
+    console.error('Google auth error:', error);
+    showError('Network error during Google authentication');
+  }
+}
+
 // Auth.js loaded
 
 if (loginForm) {
@@ -148,3 +185,33 @@ if (registerForm) {
     }
   });
 }
+
+// Initialize Google Auth when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize Google Auth
+  setTimeout(initializeGoogleAuth, 1000); // Delay to ensure Google SDK is loaded
+  
+  // Handle Google Sign-In button clicks
+  const googleSignInBtn = document.getElementById('google-signin');
+  const googleSignUpBtn = document.getElementById('google-signup');
+  
+  if (googleSignInBtn) {
+    googleSignInBtn.addEventListener('click', function() {
+      if (typeof google !== 'undefined' && google.accounts) {
+        google.accounts.id.prompt();
+      } else {
+        showError('Google Sign-In is not available. Please try again later.');
+      }
+    });
+  }
+  
+  if (googleSignUpBtn) {
+    googleSignUpBtn.addEventListener('click', function() {
+      if (typeof google !== 'undefined' && google.accounts) {
+        google.accounts.id.prompt();
+      } else {
+        showError('Google Sign-Up is not available. Please try again later.');
+      }
+    });
+  }
+});

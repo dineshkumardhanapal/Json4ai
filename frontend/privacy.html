@@ -9,18 +9,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css"/>
-  <link rel="stylesheet" href="css/purple-silver.css"/>
+  <link rel="stylesheet" href="css/aurora-glass.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
+  <script src="js/mobile-nav.js" defer></script>
 </head>
 <body>
 <header class="navbar">
   <div class="container flex-between">
     <a href="index.html" class="logo">JSON4<span>AI</span></a>
-    <nav>
+    <nav class="nav-links" id="nav-links">
       <a href="index.html">Home</a>
       <a href="pricing.html">Pricing</a>
       <a href="login.html">Login</a>
     </nav>
+    <button id="hamburger" class="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-links">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
 
@@ -32,32 +36,111 @@
     </div>
     
     <div class="content-body">
-      <p>We collect the minimum data required to provide and improve JSON4AI ... (add full GDPR-compliant text).</p>
+      <p>At JSON4AI, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our AI prompt generation services.</p>
       
       <h2>Information We Collect</h2>
-      <p>We collect information you provide directly to us, such as when you create an account, use our services, or contact us for support.</p>
+      <p>We collect information you provide directly to us, such as when you create an account, use our services, or contact us for support. This may include:</p>
+      <ul>
+        <li><strong>Account Information:</strong> Name, email address, password, and account preferences</li>
+        <li><strong>Usage Data:</strong> Information about how you use our services, including prompt generation history and feature usage</li>
+        <li><strong>Technical Information:</strong> IP address, browser type, device information, and usage analytics</li>
+        <li><strong>Communication Data:</strong> Messages, feedback, and support requests you send to us</li>
+      </ul>
       
       <h2>How We Use Your Information</h2>
-      <p>We use the information we collect to provide, maintain, and improve our services, communicate with you, and ensure security.</p>
+      <p>We use the information we collect to provide, maintain, and improve our services, communicate with you, and ensure security. Specifically, we use your information to:</p>
+      <ul>
+        <li>Provide and personalize our AI prompt generation services</li>
+        <li>Process transactions and manage your account</li>
+        <li>Send important updates about our services</li>
+        <li>Improve our platform and develop new features</li>
+        <li>Ensure security and prevent fraud</li>
+        <li>Comply with legal obligations</li>
+      </ul>
       
-      <h2>Information Sharing</h2>
-      <p>We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described in this policy.</p>
+      <h2>Information Sharing and Disclosure</h2>
+      <p>We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described in this policy. We may share your information in the following circumstances:</p>
+      <ul>
+        <li><strong>Service Providers:</strong> With trusted third-party service providers who assist us in operating our platform</li>
+        <li><strong>Legal Requirements:</strong> When required by law or to protect our rights and safety</li>
+        <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets</li>
+        <li><strong>Consent:</strong> With your explicit consent for specific purposes</li>
+      </ul>
       
       <h2>Data Security</h2>
-      <p>We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p>
+      <p>We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. These measures include:</p>
+      <ul>
+        <li>Encryption of data in transit and at rest</li>
+        <li>Regular security assessments and updates</li>
+        <li>Access controls and authentication measures</li>
+        <li>Employee training on data protection</li>
+        <li>Incident response procedures</li>
+      </ul>
       
-      <h2>Your Rights</h2>
-      <p>You have the right to access, correct, or delete your personal information. You can also object to or restrict certain processing of your data.</p>
+      <h2>Data Retention</h2>
+      <p>We retain your personal information only for as long as necessary to fulfill the purposes outlined in this policy, unless a longer retention period is required or permitted by law. We will delete or anonymize your information when it is no longer needed.</p>
+      
+      <h2>Your Rights and Choices</h2>
+      <p>Depending on your location, you may have certain rights regarding your personal information, including:</p>
+      <ul>
+        <li><strong>Access:</strong> Request access to your personal information</li>
+        <li><strong>Correction:</strong> Request correction of inaccurate information</li>
+        <li><strong>Deletion:</strong> Request deletion of your personal information</li>
+        <li><strong>Portability:</strong> Request a copy of your data in a portable format</li>
+        <li><strong>Objection:</strong> Object to certain processing of your data</li>
+        <li><strong>Withdrawal:</strong> Withdraw consent where processing is based on consent</li>
+      </ul>
+      
+      <h2>Cookies and Tracking Technologies</h2>
+      <p>We use cookies and similar tracking technologies to enhance your experience on our platform. These technologies help us remember your preferences, analyze usage patterns, and provide personalized content. You can control cookie settings through your browser preferences.</p>
+      
+      <h2>International Data Transfers</h2>
+      <p>Your information may be transferred to and processed in countries other than your own. We ensure that such transfers comply with applicable data protection laws and implement appropriate safeguards to protect your information.</p>
+      
+      <h2>Children's Privacy</h2>
+      <p>Our services are not intended for children under the age of 16. We do not knowingly collect personal information from children under 16. If you believe we have collected such information, please contact us immediately.</p>
+      
+      <h2>Changes to This Policy</h2>
+      <p>We may update this Privacy Policy from time to time to reflect changes in our practices or applicable laws. We will notify you of any material changes by posting the updated policy on our platform and, where appropriate, sending you an email notification.</p>
       
       <h2>Contact Us</h2>
-      <p>If you have any questions about this Privacy Policy, please contact us at <a href="mailto:privacy@json4ai.com">privacy@json4ai.com</a>.</p>
+      <p>If you have any questions about this Privacy Policy or our data practices, please contact us at <a href="mailto:privacy@json4ai.com">privacy@json4ai.com</a>. We will respond to your inquiry within 48 hours during business days.</p>
+      
+      <blockquote>
+        <strong>Data Protection Officer:</strong> For GDPR-related inquiries, you may also contact our Data Protection Officer at <a href="mailto:dpo@json4ai.com">dpo@json4ai.com</a>.
+      </blockquote>
     </div>
   </div>
 </main>
 
 <footer>
   <div class="container">
-    <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+    <div class="grid-4">
+      <div>
+        <h4>JSON4AI</h4>
+        <p>Advanced AI prompt generation with JSON structure validation</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="pricing.html">Pricing</a>
+        <a href="prompt-generator.html">Prompt Generator</a>
+        <a href="dashboard.html">Dashboard</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="gdpr.html">GDPR</a>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="cookies.html">Cookie Policy</a>
+        <a href="mailto:support@json4ai.com">Contact Us</a>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>&copy; 2025 JSON4AI. All rights reserved.</p>
+    </div>
   </div>
 </footer>
 </body>

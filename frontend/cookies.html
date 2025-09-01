@@ -9,18 +9,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css"/>
-  <link rel="stylesheet" href="css/purple-silver.css"/>
+  <link rel="stylesheet" href="css/aurora-glass.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
+  <script src="js/mobile-nav.js" defer></script>
 </head>
 <body>
 <header class="navbar">
   <div class="container flex-between">
     <a href="index.html" class="logo">JSON4<span>AI</span></a>
-    <nav>
+    <nav class="nav-links" id="nav-links">
       <a href="index.html">Home</a>
       <a href="pricing.html">Pricing</a>
       <a href="login.html">Login</a>
     </nav>
+    <button id="hamburger" class="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-links">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
 
@@ -32,41 +36,194 @@
     </div>
     
     <div class="content-body">
-      <p>This Cookie Policy explains how JSON4AI uses cookies and similar technologies to recognize you when you visit our website.</p>
+      <p>This Cookie Policy explains how JSON4AI uses cookies and similar technologies to recognize you when you visit our website. It provides detailed information about the types of cookies we use, their purposes, and how you can manage them.</p>
       
-      <h2>What Are Cookies</h2>
-      <p>Cookies are small text files that are placed on your device when you visit our website. They help us provide you with a better experience and understand how you use our site.</p>
+      <h2>What Are Cookies?</h2>
+      <p>Cookies are small text files that are placed on your device (computer, tablet, or mobile phone) when you visit our website. They help us provide you with a better experience by:</p>
+      <ul>
+        <li>Remembering your preferences and settings</li>
+        <li>Understanding how you use our website</li>
+        <li>Providing personalized content and features</li>
+        <li>Improving our services and user experience</li>
+        <li>Ensuring security and preventing fraud</li>
+      </ul>
       
       <h2>Types of Cookies We Use</h2>
-      <p>We use several types of cookies, including essential cookies for website functionality, analytics cookies to understand usage patterns, and preference cookies to remember your settings.</p>
+      <p>We use several categories of cookies, each serving different purposes to enhance your experience on our platform:</p>
       
-      <h2>Essential Cookies</h2>
-      <p>These cookies are necessary for the website to function properly. They enable basic functions like page navigation and access to secure areas of the website.</p>
+      <h3>Essential Cookies (Strictly Necessary)</h3>
+      <p>These cookies are absolutely necessary for the website to function properly. They enable basic functions like page navigation, access to secure areas, and form submissions. These cookies do not store any personally identifiable information.</p>
+      <ul>
+        <li><strong>Authentication Cookies:</strong> Remember your login status and session information</li>
+        <li><strong>Security Cookies:</strong> Protect against fraud and ensure secure connections</li>
+        <li><strong>Functionality Cookies:</strong> Enable core website features and navigation</li>
+      </ul>
       
-      <h2>Analytics Cookies</h2>
-      <p>We use analytics cookies to understand how visitors interact with our website. This helps us improve our services and user experience.</p>
+      <h3>Analytics Cookies (Performance)</h3>
+      <p>We use analytics cookies to understand how visitors interact with our website. This information helps us improve our services, identify popular features, and optimize user experience.</p>
+      <ul>
+        <li><strong>Google Analytics:</strong> Track page views, user behavior, and traffic sources</li>
+        <li><strong>Heatmap Analysis:</strong> Understand how users navigate our pages</li>
+        <li><strong>Performance Monitoring:</strong> Identify and fix technical issues</li>
+        <li><strong>User Journey Tracking:</strong> Analyze user paths and conversion rates</li>
+      </ul>
       
-      <h2>Preference Cookies</h2>
-      <p>These cookies allow the website to remember choices you make and provide enhanced, more personal features.</p>
+      <h3>Preference Cookies (Functionality)</h3>
+      <p>These cookies allow the website to remember choices you make and provide enhanced, more personal features. They may also be used to provide services you have requested.</p>
+      <ul>
+        <li><strong>Language Preferences:</strong> Remember your preferred language</li>
+        <li><strong>Theme Settings:</strong> Store your UI theme preferences</li>
+        <li><strong>Feature Preferences:</strong> Remember your tool and feature settings</li>
+        <li><strong>Form Data:</strong> Temporarily store form information</li>
+      </ul>
       
-      <h2>Managing Cookies</h2>
-      <p>You can control and manage cookies through your browser settings. You can delete existing cookies and prevent new ones from being set.</p>
+      <h3>Marketing Cookies (Targeting)</h3>
+      <p>These cookies are used to deliver relevant advertisements and track the effectiveness of our marketing campaigns. They may be set by our advertising partners.</p>
+      <ul>
+        <li><strong>Retargeting:</strong> Show relevant ads based on your interests</li>
+        <li><strong>Campaign Tracking:</strong> Measure marketing campaign effectiveness</li>
+        <li><strong>Social Media Integration:</strong> Enable social sharing and engagement</li>
+        <li><strong>Affiliate Tracking:</strong> Track referral sources and conversions</li>
+      </ul>
+      
+      <h2>Specific Cookies We Use</h2>
+      <p>Below is a detailed list of the specific cookies we use on our website:</p>
+      
+      <h3>Essential Cookies</h3>
+      <ul>
+        <li><strong>session_id:</strong> Maintains your login session (expires when browser closes)</li>
+        <li><strong>csrf_token:</strong> Protects against cross-site request forgery attacks</li>
+        <li><strong>preferences:</strong> Stores essential user preferences (expires in 1 year)</li>
+      </ul>
+      
+      <h3>Analytics Cookies</h3>
+      <ul>
+        <li><strong>_ga:</strong> Google Analytics identifier (expires in 2 years)</li>
+        <li><strong>_gid:</strong> Google Analytics session identifier (expires in 1 day)</li>
+        <li><strong>_gat:</strong> Google Analytics throttle request rate (expires in 1 minute)</li>
+      </ul>
+      
+      <h3>Preference Cookies</h3>
+      <ul>
+        <li><strong>theme:</strong> Stores your UI theme preference (expires in 1 year)</li>
+        <li><strong>language:</strong> Remembers your language choice (expires in 1 year)</li>
+        <li><strong>notifications:</strong> Stores notification preferences (expires in 1 year)</li>
+      </ul>
       
       <h2>Third-Party Cookies</h2>
-      <p>Some cookies on our website are set by third-party services that we use to enhance functionality and analyze usage.</p>
+      <p>Some cookies on our website are set by third-party services that we use to enhance functionality and analyze usage. These services include:</p>
+      <ul>
+        <li><strong>Google Analytics:</strong> Website analytics and performance monitoring</li>
+        <li><strong>Stripe:</strong> Payment processing and security</li>
+        <li><strong>Intercom:</strong> Customer support and chat functionality</li>
+        <li><strong>Hotjar:</strong> User behavior analysis and heatmaps</li>
+      </ul>
+      
+      <h2>Cookie Duration</h2>
+      <p>Cookies have different lifespans depending on their purpose:</p>
+      <ul>
+        <li><strong>Session Cookies:</strong> Temporary cookies that expire when you close your browser</li>
+        <li><strong>Persistent Cookies:</strong> Long-term cookies that remain on your device for a specified period</li>
+        <li><strong>First-Party Cookies:</strong> Set directly by our website</li>
+        <li><strong>Third-Party Cookies:</strong> Set by external services we use</li>
+      </ul>
+      
+      <h2>Managing Your Cookie Preferences</h2>
+      <p>You have several options for managing cookies on our website:</p>
+      
+      <h3>Browser Settings</h3>
+      <p>Most web browsers allow you to control cookies through their settings. You can:</p>
+      <ul>
+        <li>View and delete existing cookies</li>
+        <li>Block cookies from specific websites</li>
+        <li>Set preferences for different types of cookies</li>
+        <li>Enable "Do Not Track" signals</li>
+      </ul>
+      
+      <h3>Cookie Consent Management</h3>
+      <p>When you first visit our website, you'll see a cookie consent banner that allows you to:</p>
+      <ul>
+        <li>Accept all cookies</li>
+        <li>Customize your cookie preferences</li>
+        <li>Reject non-essential cookies</li>
+        <li>Learn more about our cookie usage</li>
+      </ul>
+      
+      <h3>Opt-Out Options</h3>
+      <p>For specific third-party services, you can opt out directly:</p>
+      <ul>
+        <li><strong>Google Analytics:</strong> <a href="https://tools.google.com/dlpage/gaoptout" target="_blank">Google Analytics Opt-out Browser Add-on</a></li>
+        <li><strong>Advertising Networks:</strong> <a href="http://www.youronlinechoices.com/" target="_blank">Your Online Choices</a></li>
+        <li><strong>Social Media:</strong> Manage preferences in your social media account settings</li>
+      </ul>
+      
+      <h2>Impact of Disabling Cookies</h2>
+      <p>While you can disable cookies, please note that doing so may affect your experience on our website:</p>
+      <ul>
+        <li><strong>Essential Functions:</strong> Some features may not work properly</li>
+        <li><strong>Personalization:</strong> We won't be able to remember your preferences</li>
+        <li><strong>Analytics:</strong> We can't improve our services based on usage data</li>
+        <li><strong>Security:</strong> Some security features may be compromised</li>
+      </ul>
       
       <h2>Updates to This Policy</h2>
-      <p>We may update this Cookie Policy from time to time. We will notify you of any changes by posting the new policy on this page.</p>
+      <p>We may update this Cookie Policy from time to time to reflect changes in our practices, technology, or legal requirements. We will notify you of any material changes by:</p>
+      <ul>
+        <li>Posting the updated policy on this page</li>
+        <li>Sending email notifications to registered users</li>
+        <li>Displaying prominent notices on our website</li>
+        <li>Updating the "Last updated" date at the top of this policy</li>
+      </ul>
       
       <h2>Contact Us</h2>
-      <p>If you have any questions about our use of cookies, please contact us at <a href="mailto:cookies@json4ai.com">cookies@json4ai.com</a>.</p>
+      <p>If you have any questions about our use of cookies, this Cookie Policy, or would like to exercise your cookie preferences, please contact us:</p>
+      
+      <blockquote>
+        <strong>Cookie Policy Inquiries</strong><br>
+        Email: <a href="mailto:cookies@json4ai.com">cookies@json4ai.com</a><br>
+        Response Time: Within 24 hours during business days<br>
+        Subject: Cookie Policy Question
+      </blockquote>
+      
+      <h2>Additional Resources</h2>
+      <p>For more information about cookies and online privacy, you may find these resources helpful:</p>
+      <ul>
+        <li><a href="https://www.allaboutcookies.org/" target="_blank">All About Cookies</a> - Comprehensive guide to cookies</li>
+        <li><a href="https://ico.org.uk/for-the-public/online/cookies/" target="_blank">ICO Cookie Guidance</a> - UK Information Commissioner's Office</li>
+        <li><a href="https://www.aboutcookies.org/" target="_blank">About Cookies</a> - Cookie management tools and information</li>
+      </ul>
     </div>
   </div>
 </main>
 
 <footer>
   <div class="container">
-    <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+    <div class="grid-4">
+      <div>
+        <h4>JSON4AI</h4>
+        <p>Advanced AI prompt generation with JSON structure validation</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="pricing.html">Pricing</a>
+        <a href="prompt-generator.html">Prompt Generator</a>
+        <a href="dashboard.html">Dashboard</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="gdpr.html">GDPR</a>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="cookies.html">Cookie Policy</a>
+        <a href="mailto:support@json4ai.com">Contact Us</a>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>&copy; 2025 JSON4AI. All rights reserved.</p>
+    </div>
   </div>
 </footer>
 </body>

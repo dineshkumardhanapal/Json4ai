@@ -278,53 +278,155 @@ router.post('/login', validateLogin, async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
-    if (!user.verified) return res.status(401).json({ message: 'Please verify your email' });
-
-    const ok = await bcrypt.compare(password, user.password);
-    if (!ok) return res.status(400).json({ message: 'Invalid credentials' });
-
-    // Create access token with 15 minutes expiration (for security)
-    const accessToken = jwt.sign(
-      { 
-        id: user._id, 
-        type: 'access',
-        iat: Math.floor(Date.now() / 1000)
-      }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: '15m' }
-    );
-
-    // Create refresh token with 7 days expiration
-    const refreshToken = jwt.sign(
-      { 
-        id: user._id, 
-        type: 'refresh',
-        iat: Math.floor(Date.now() / 1000)
-      }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: '7d' }
-    );
-
-    // Store refresh token hash in user document
-    const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
-    user.refreshToken = refreshTokenHash;
-    user.lastLogin = new Date();
-    await user.save();
-
+    
+    if (!user) return res.status(400).json({ message: 'Invalid email or password' });
+    if (!user.verified) return res.status(400).json({ message: 'Please verify your email before logging in' });
+    
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) return res.status(400).json({ message: 'Invalid email or password' });
+    
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    
     res.json({ 
-      accessToken, 
-      refreshToken,
-      expiresIn: 15 * 60, // 15 minutes in seconds
-      user: {
-        id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email
-      }
+      message: 'Login successful!', 
+      token, 
+      user: { 
+        id: user._id, 
+        firstName: user.firstName, 
+        lastName: user.lastName, 
+        email: user.email,
+        plan: user.plan,
+        dailyUsage: user.dailyUsage,
+        credits: user.credits
+      } 
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+
+// POST /api/auth/forgot-password
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    // Validate email
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ message: 'Please provide a valid email address' });
+    }
+    
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      // Don't reveal if user exists or not for security
+      return res.json({ message: 'If an account with that email exists, a password reset link has been sent.' });
+    }
+    
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    
+    // Save reset token to user
+    user.resetToken = resetToken;
+    user.resetTokenExpiry = resetTokenExpiry;
+    await user.save();
+    
+    // Send reset email
+    const resetLink = `${process.env.FRONTEND_URL || 'https://json4ai.com'}/reset-password.html?token=${resetToken}`;
+    
+    await transporter.sendMail({
+      from: '"JSON4AI" <json4ai@gmail.com>',
+      to: email,
+      subject: 'Reset your JSON4AI password',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #8b5cf6; margin: 0; font-size: 28px;">JSON4AI</h1>
+            <p style="color: #6b7280; margin: 10px 0 0 0;">Password Reset Request</p>
+          </div>
+          
+          <div style="background-color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Reset Your Password</h2>
+            
+            <p style="color: #4b5563; line-height: 1.6; margin-bottom: 25px;">
+              We received a request to reset your password. Click the button below to create a new password.
+              If you didn't request this, you can safely ignore this email.
+            </p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${resetLink}" 
+                 style="background-color: #8b5cf6; color: white; padding: 14px 28px; text-decoration: none; 
+                        border-radius: 8px; font-weight: 600; font-size: 16px; display: inline-block;">
+                Reset Password
+              </a>
+            </div>
+            
+            <p style="color: #6b7280; font-size: 14px; margin: 25px 0 0 0; text-align: center;">
+              If the button doesn't work, you can also copy and paste this link into your browser:<br>
+              <a href="${resetLink}" style="color: #8b5cf6; word-break: break-all;">${resetLink}</a>
+            </p>
+            
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 25px 0;">
+            
+            <p style="color: #6b7280; font-size: 12px; margin: 0; text-align: center;">
+              This reset link will expire in 1 hour for security reasons. 
+              If you need a new link, please request another password reset.
+            </p>
+          </div>
+          
+          <div style="text-align: center; margin-top: 20px;">
+            <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+              © 2025 JSON4AI. All rights reserved.
+            </p>
+          </div>
+        </div>
+      `
+    });
+    
+    res.json({ message: 'Password reset email sent successfully!' });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    res.status(500).json({ message: 'Failed to send reset email. Please try again.' });
+  }
+});
+
+// POST /api/auth/reset-password
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    
+    // Validate input
+    if (!token || !password) {
+      return res.status(400).json({ message: 'Token and password are required' });
+    }
+    
+    if (password.length < 8) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters long' });
+    }
+    
+    // Find user with valid reset token
+    const user = await User.findOne({ 
+      resetToken: token, 
+      resetTokenExpiry: { $gt: Date.now() } 
+    });
+    
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired reset token. Please request a new password reset.' });
+    }
+    
+    // Hash new password
+    const hash = await bcrypt.hash(password, 10);
+    
+    // Update user password and clear reset token
+    user.password = hash;
+    user.resetToken = undefined;
+    user.resetTokenExpiry = undefined;
+    await user.save();
+    
+    res.json({ message: 'Password reset successfully!' });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    res.status(500).json({ message: 'Failed to reset password. Please try again.' });
   }
 });
 

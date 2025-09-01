@@ -9,65 +9,289 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css"/>
-  <link rel="stylesheet" href="css/purple-silver.css"/>
+  <link rel="stylesheet" href="css/aurora-glass.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
   <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="js/notifications.js" defer></script>
   <script src="js/auth.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
 </head>
-<body>
+<body class="login-body">
+<!-- Header -->
 <header class="navbar">
   <div class="container flex-between">
     <a href="index.html" class="logo">JSON4<span>AI</span></a>
-    <nav class="nav-links">
+    <nav class="nav-links" id="nav-links">
       <a href="index.html">Home</a>
       <a href="pricing.html">Pricing</a>
+      <a href="register.html">Sign Up</a>
     </nav>
+    <button id="hamburger" class="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-links">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
 
 <!-- Notification Container -->
 <div id="notification-container" class="notification-container"></div>
 
-<main class="center">
-  <div class="auth-container">
-    <div class="auth-header">
-      <h1>Welcome Back</h1>
-      <p>Sign in to your JSON4AI account to continue</p>
-    </div>
-    
-    <form id="login-form" class="form card">
-      <div class="form-group">
-        <label for="email" class="visually-hidden">Email</label>
-        <input id="email" name="email" type="email" placeholder="Enter your email" required/>
+<div class="login-split">
+  <!-- Left Panel - Aurora Gradient with Lottie -->
+  <div class="login-left">
+    <div class="login-brand">
+      <div class="brand-logo">
+        <div class="logo-icon">JSON4<span>AI</span></div>
       </div>
-      <div class="form-group">
-        <label for="password" class="visually-hidden">Password</label>
-        <input id="password" name="password" type="password" placeholder="Enter your password" required minlength="6"/>
-      </div>
-      <button type="submit" class="btn-primary">Sign In</button>
+      <h2>Welcome Back</h2>
+      <p>Sign in to access your AI prompt generator dashboard</p>
       
-      <!-- Resend verification section -->
-      <div class="verification-section" style="display: none;">
-        <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; text-align: center;">
-          Didn't receive a verification email?
-        </p>
-        <button type="button" id="resend-verification" class="btn-secondary" style="width: 100%;">
-          Resend Verification Email
+             <!-- Lottie Animation Container -->
+       <div class="lottie-container">
+         <lottie-player 
+           src="https://lottie.host/653955d6-57e3-4ac8-8a40-59a24381402b/nPXEKn3sXi.lottie" 
+           background="transparent" 
+           speed="1" 
+           style="width: 300px; height: 300px;" 
+           loop 
+           autoplay>
+         </lottie-player>
+       </div>
+      
+      <!-- Alternative: Static 3D Cube if Lottie fails -->
+      <div class="fallback-cube" style="display: none;">
+        <div class="cube">
+          <div class="cube-face front">
+            <div class="cube-button"></div>
+            <div class="cube-indicators">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+          <div class="cube-face top">
+            <div class="cube-slot"></div>
+            <div class="cube-button-yellow"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Right Panel - Login Form -->
+  <div class="login-right">
+    <div class="login-form-container">
+      <div class="login-header">
+        <div class="logo-small">
+          <div class="logo-icon-small">JSON4<span>AI</span></div>
+        </div>
+        <h1>Log In</h1>
+        <p>Enter your email and password to login to our dashboard.</p>
+      </div>
+      
+      <!-- OAuth Buttons -->
+      <div class="oauth-buttons">
+        <button type="button" class="oauth-btn google-btn" id="google-signin">
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Continue with Google
         </button>
       </div>
       
-      <div class="auth-footer">
-        <p>Don't have an account? <a href="register.html">Create one</a></p>
+      <div class="divider">
+        <span>or</span>
       </div>
-    </form>
-  </div>
-</main>
 
+      <!-- Login Form -->
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="Enter your email address" required/>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-input">
+            <input id="password" name="password" type="password" placeholder="Enter your password" required/>
+            <button type="button" class="password-toggle" onclick="togglePassword()">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <button type="submit" class="submit-btn">Sign In</button>
+        
+        <!-- Resend verification section -->
+        <div class="verification-section" style="display: none;">
+          <hr class="divider-line">
+          <p>Didn't receive a verification email?</p>
+          <button type="button" id="resend-verification" class="btn-secondary">
+            Resend Verification Email
+          </button>
+        </div>
+        
+        <div class="login-links">
+          <p>Don't have an account? <a href="register.html">Sign Up</a></p>
+          <a href="forgot-password.html" class="forgot-password">Forget Password?</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Cookie Consent Banner -->
+<div id="cookie-consent" class="cookie-consent">
+  <div class="cookie-content">
+    <div class="cookie-text">
+      <h4>🍪 We use cookies to enhance your experience</h4>
+      <p>We use cookies and similar technologies to provide, protect, and improve our services. By clicking "Accept All", you consent to our use of cookies for analytics and personalized content. You can customize your preferences or learn more in our <a href="cookies.html" target="_blank">Cookie Policy</a>.</p>
+    </div>
+    <div class="cookie-actions">
+      <button id="cookie-preferences" class="btn-secondary">Customize</button>
+      <button id="cookie-accept-all" class="btn-primary">Accept All</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cookie Preferences Modal -->
+<div id="cookie-modal" class="cookie-modal">
+  <div class="cookie-modal-content">
+    <div class="cookie-modal-header">
+      <h3>🍪 Cookie Preferences</h3>
+      <button id="cookie-modal-close" class="cookie-modal-close">&times;</button>
+    </div>
+    <div class="cookie-modal-body">
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="essential-cookies" checked disabled>
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Essential Cookies</h4>
+            <p>Required for the website to function properly. Cannot be disabled.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="analytics-cookies">
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Analytics Cookies</h4>
+            <p>Help us understand how visitors interact with our website to improve performance.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="preference-cookies">
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Preference Cookies</h4>
+            <p>Remember your settings and preferences for a personalized experience.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="marketing-cookies">
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Marketing Cookies</h4>
+            <p>Used to deliver relevant advertisements and track marketing campaign effectiveness.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cookie-modal-footer">
+      <button id="cookie-save-preferences" class="btn-primary">Save Preferences</button>
+      <button id="cookie-reject-all" class="btn-secondary">Reject All</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function togglePassword() {
+  const passwordInput = document.getElementById('password');
+  const toggleBtn = passwordInput.nextElementSibling;
+  
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    toggleBtn.innerHTML = `
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+      </svg>
+    `;
+  } else {
+    passwordInput.type = 'password';
+    toggleBtn.innerHTML = `
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+      </svg>
+    `;
+  }
+}
+
+// Fallback to static cube if Lottie fails to load
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(() => {
+    const lottieContainer = document.querySelector('.lottie-container');
+    const fallbackCube = document.querySelector('.fallback-cube');
+    
+    if (lottieContainer && lottieContainer.children.length === 0) {
+      lottieContainer.style.display = 'none';
+      fallbackCube.style.display = 'block';
+    }
+  }, 3000);
+  });
+</script>
+
+<!-- Footer -->
 <footer>
   <div class="container">
-    <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+    <div class="grid-4">
+      <div>
+        <h4>JSON4AI</h4>
+        <p>Advanced AI prompt generation with JSON structure validation</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="pricing.html">Pricing</a>
+        <a href="prompt-generator.html">Prompt Generator</a>
+        <a href="dashboard.html">Dashboard</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="gdpr.html">GDPR</a>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="cookies.html">Cookie Policy</a>
+        <a href="mailto:support@json4ai.com">Contact Us</a>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>&copy; 2025 JSON4AI. All rights reserved.</p>
+    </div>
   </div>
 </footer>
 </body>

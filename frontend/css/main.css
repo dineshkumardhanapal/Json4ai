@@ -106,19 +106,12 @@ svg {
   align-items: center;
   gap: 0.5rem;
   padding: 1rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
   min-width: 120px;
 }
 
 .ai-logo:hover {
   transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(139, 92, 246, 0.3);
-  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
 }
 
 .ai-logo svg {
@@ -135,6 +128,7 @@ svg {
   font-weight: 600;
   color: var(--text-primary);
   text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .ai-logo img {

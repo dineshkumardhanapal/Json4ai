@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css"/>
-  <link rel="stylesheet" href="css/purple-silver.css"/>
+  <link rel="stylesheet" href="css/aurora-glass.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js" defer></script>
   <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
@@ -24,6 +24,7 @@
   <script src="js/utils.js" defer></script>
   <script src="js/migration.js" defer></script>
   <script src="js/session-manager.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
 </head>
 <body>
 <header class="navbar">
@@ -48,9 +49,11 @@
   <section class="hero">
     <div class="container">
       <div class="hero-content">
-        <h1>Generate your accurate prompt with <span class="highlight">Json4Ai</span></h1>
+        <h1 class="text-gradient">Generate your accurate prompt with <span class="highlight">JSON4AI</span></h1>
         <p>Turn any Search Query into a precise Json AI prompt in seconds. Our advanced AI-powered system ensures accuracy and consistency in every generated prompt.</p>
-        <a href="register.html" class="btn-primary">Get Started Free</a>
+        <div class="hero-buttons">
+          <a href="register.html" class="btn-primary">Get Started Free</a>
+        </div>
       </div>
       <div class="hero-visual">
         <lottie-player 
@@ -65,12 +68,13 @@
         </lottie-player>
       </div>
     </div>
+    
   </section>
   
   <section class="features">
     <div class="container">
       <div class="features-header text-center">
-        <h2>Why Choose Json4Ai?</h2>
+        <h2>Why Choose JSON4AI?</h2>
         <p>Powerful features that make prompt generation effortless</p>
       </div>
       <div class="features-grid">
@@ -109,7 +113,7 @@
   <section class="compatibility">
     <div class="container">
       <div class="compatibility-header text-center">
-        <h2>Json4AI works well with</h2>
+        <h2>JSON4AI works well with</h2>
         <p>Seamlessly integrate with all major AI platforms and models</p>
       </div>
       
@@ -237,7 +241,7 @@
   <div class="container">
     <div class="grid-4">
       <div>
-        <h4>Json4Ai</h4>
+        <h4>JSON4AI</h4>
         <p>Generate your accurate prompt with our advanced AI-powered system.</p>
       </div>
       <div>
@@ -260,5 +264,88 @@
     <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
   </div>
 </footer>
+
+<!-- Cookie Consent Banner -->
+<div id="cookie-consent" class="cookie-consent">
+  <div class="cookie-content">
+    <div class="cookie-text">
+      <h4>🍪 We use cookies to enhance your experience</h4>
+      <p>We use cookies and similar technologies to provide, protect, and improve our services. By clicking "Accept All", you consent to our use of cookies for analytics and personalized content. You can customize your preferences or learn more in our <a href="cookies.html" target="_blank">Cookie Policy</a>.</p>
+    </div>
+    <div class="cookie-actions">
+      <button id="cookie-preferences" class="btn-secondary">Customize</button>
+      <button id="cookie-accept-all" class="btn-primary">Accept All</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cookie Preferences Modal -->
+<div id="cookie-modal" class="cookie-modal">
+  <div class="cookie-modal-content">
+    <div class="cookie-modal-header">
+      <h3>🍪 Cookie Preferences</h3>
+      <button id="cookie-modal-close" class="cookie-modal-close">&times;</button>
+    </div>
+    <div class="cookie-modal-body">
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="essential-cookies" checked disabled>
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Essential Cookies</h4>
+            <p>Required for the website to function properly. Cannot be disabled.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="analytics-cookies">
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Analytics Cookies</h4>
+            <p>Help us understand how visitors interact with our website to improve performance.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="preference-cookies">
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Preference Cookies</h4>
+            <p>Remember your settings and preferences for a personalized experience.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="marketing-cookies">
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Marketing Cookies</h4>
+            <p>Used to deliver relevant advertisements and track marketing campaign effectiveness.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cookie-modal-footer">
+      <button id="cookie-save-preferences" class="btn-primary">Save Preferences</button>
+      <button id="cookie-reject-all" class="btn-secondary">Reject All</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/cookie-consent.js"></script>
 </body>
 </html>

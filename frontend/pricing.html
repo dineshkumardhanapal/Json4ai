@@ -8,25 +8,29 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css"/>
-  <link rel="stylesheet" href="css/purple-silver.css"/>
+  <link rel="stylesheet" href="css/aurora-glass.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
   <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="js/notifications.js" defer></script>
   <script src="js/session-manager.js" defer></script>
   <script src="js/pricing.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
 
 </head>
 <body>
 <header class="navbar">
   <div class="container flex-between">
-    <a href="index.html" class="logo">Json4<span>Ai</span></a>
+    <a href="index.html" class="logo">JSON4<span>AI</span></a>
     <nav class="nav-links" id="nav-links">
       <a href="index.html">Home</a>
       <a href="login.html" id="login-link">Login</a>
       <a href="dashboard.html" id="dashboard-link" style="display: none;">Dashboard</a>
       <a href="#" id="logout-link" style="display: none;">Logout</a>
     </nav>
+    <button id="hamburger" class="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-links">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
 
@@ -109,6 +113,7 @@
     <div class="pricing-faq text-center">
       <h2>Frequently Asked Questions</h2>
       <div class="faq-grid">
+        <!-- Row 1 -->
         <div class="faq-item">
           <h4>What's the difference between quality tiers?</h4>
           <p>Free tier provides basic JSON structure, Starter offers enhanced detail with moderate NLP, and Premium delivers maximum detail with advanced NLP techniques for comprehensive content generation.</p>
@@ -117,6 +122,8 @@
           <h4>How long do paid plans last?</h4>
           <p>Each paid plan (Starter/Premium) lasts for exactly 1 month from the date of purchase. After expiry, you'll return to the free plan.</p>
         </div>
+        
+        <!-- Row 2 -->
         <div class="faq-item">
           <h4>What happens if I exceed my daily limit?</h4>
           <p>You'll need to wait until the next day for your limit to reset, or purchase a plan with higher daily limits.</p>
@@ -125,6 +132,8 @@
           <h4>Is there a free plan?</h4>
           <p>Yes, the Free plan comes with 3 prompts per day, forever. No credit card required to start.</p>
         </div>
+        
+        <!-- Row 3 -->
         <div class="faq-item">
           <h4>How does payment work?</h4>
           <p>All plans are one-time payments processed securely through Razorpay. No recurring charges - you only pay when you want to extend your access.</p>
@@ -133,14 +142,211 @@
           <h4>Can I upgrade my plan later?</h4>
           <p>Yes, you can upgrade to a higher tier at any time. The new plan will start immediately and last for 1 month from the purchase date.</p>
         </div>
+        
+        <!-- Row 4 -->
+        <div class="faq-item">
+          <h4>What AI models do you support?</h4>
+          <p>We support all major AI platforms including ChatGPT, Gemini, Grok, DeepSeek, Mistral AI, and more. Our prompts are designed to work universally.</p>
+        </div>
+        <div class="faq-item">
+          <h4>Is my data secure?</h4>
+          <p>Absolutely! We use industry-standard encryption and never store your generated prompts. Your data privacy and security are our top priorities.</p>
+        </div>
       </div>
     </div>
   </div>
 </main>
 
+<script>
+// Plan selection functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const planCards = document.querySelectorAll('.plan-card');
+  
+  planCards.forEach(card => {
+    card.addEventListener('click', function() {
+      // Remove selected class from all cards
+      planCards.forEach(c => c.classList.remove('selected'));
+      
+      // Add selected class to clicked card
+      this.classList.add('selected');
+      
+      // Update button text based on selection
+      updateButtonText(this);
+      
+      // Add subtle animation
+      this.style.animation = 'none';
+      this.offsetHeight; // Trigger reflow
+      this.style.animation = 'planGlow 2s ease-in-out infinite alternate';
+    });
+    
+    // Add hover effects
+    card.addEventListener('mouseenter', function() {
+      if (!this.classList.contains('selected')) {
+        this.style.transform = 'translateY(-4px)';
+        this.style.boxShadow = 'var(--shadow-strong)';
+        this.style.borderColor = 'var(--aurora-cyan)';
+      }
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      if (!this.classList.contains('selected')) {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = 'var(--shadow-medium)';
+        this.style.borderColor = 'var(--glass-border)';
+      }
+    });
+  });
+  
+  function updateButtonText(selectedCard) {
+    const planName = selectedCard.querySelector('h3').textContent;
+    const buttons = selectedCard.querySelectorAll('.btn-primary');
+    
+    buttons.forEach(button => {
+      if (button.textContent.includes('Current Plan')) {
+        button.textContent = 'Current Plan';
+        button.style.background = 'var(--aurora-green)';
+        button.style.cursor = 'default';
+      } else {
+        button.textContent = `Select ${planName} Plan`;
+        button.style.background = 'var(--accent-gradient)';
+        button.style.cursor = 'pointer';
+      }
+    });
+  }
+  
+  // Initialize with first plan selected (optional)
+  // planCards[0].classList.add('selected');
+  // updateButtonText(planCards[0]);
+});
+
+// Enhanced button interactions
+document.querySelectorAll('.btn-primary').forEach(button => {
+  button.addEventListener('click', function(e) {
+    if (this.textContent.includes('Current Plan')) {
+      e.preventDefault();
+      return;
+    }
+    
+    // Add click animation
+    this.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      this.style.transform = 'translateY(-2px)';
+    }, 150);
+  });
+});
+</script>
+
+<!-- Cookie Consent Banner -->
+<div id="cookie-consent" class="cookie-consent">
+  <div class="cookie-content">
+    <div class="cookie-text">
+      <h4>🍪 We use cookies to enhance your experience</h4>
+      <p>We use cookies and similar technologies to provide, protect, and improve our services. By clicking "Accept All", you consent to our use of cookies for analytics and personalized content. You can customize your preferences or learn more in our <a href="cookies.html" target="_blank">Cookie Policy</a>.</p>
+    </div>
+    <div class="cookie-actions">
+      <button id="cookie-preferences" class="btn-secondary">Customize</button>
+      <button id="cookie-accept-all" class="btn-primary">Accept All</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cookie Preferences Modal -->
+<div id="cookie-modal" class="cookie-modal">
+  <div class="cookie-modal-content">
+    <div class="cookie-modal-header">
+      <h3>🍪 Cookie Preferences</h3>
+      <button id="cookie-modal-close" class="cookie-modal-close">&times;</button>
+    </div>
+    <div class="cookie-modal-body">
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="essential-cookies" checked disabled>
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Essential Cookies</h4>
+            <p>Required for the website to function properly. Cannot be disabled.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="analytics-cookies">
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Analytics Cookies</h4>
+            <p>Help us understand how visitors interact with our website to improve performance.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="preference-cookies">
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Preference Cookies</h4>
+            <p>Remember your settings and preferences for a personalized experience.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="marketing-cookies">
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Marketing Cookies</h4>
+            <p>Used to deliver relevant advertisements and track marketing campaign effectiveness.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cookie-modal-footer">
+      <button id="cookie-save-preferences" class="btn-primary">Save Preferences</button>
+      <button id="cookie-reject-all" class="btn-secondary">Reject All</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/cookie-consent.js"></script>
+
 <footer>
   <div class="container">
-    <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+    <div class="grid-4">
+      <div>
+        <h4>JSON4AI</h4>
+        <p>Advanced AI prompt generation with JSON structure validation</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="pricing.html">Pricing</a>
+        <a href="prompt-generator.html">Prompt Generator</a>
+        <a href="dashboard.html">Dashboard</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="gdpr.html">GDPR</a>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="cookies.html">Cookie Policy</a>
+        <a href="mailto:support@json4ai.com">Contact Us</a>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>&copy; 2025 JSON4AI. All rights reserved.</p>
+    </div>
   </div>
 </footer>
 </body>

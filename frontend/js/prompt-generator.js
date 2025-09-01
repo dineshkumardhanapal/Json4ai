@@ -178,6 +178,9 @@ const generatePrompt = async (comment) => {
     btnLoading.style.display = 'flex';
     generateBtn.disabled = true;
     
+    // Show progress indicator
+    showGenerationProgress();
+    
     const res = await fetch('https://json4ai.onrender.com/api/prompt/generate', {
       method: 'POST',
       headers: {
@@ -200,6 +203,7 @@ const generatePrompt = async (comment) => {
       if (res.status === 402) {
         // Credit limit reached
         showError(errorData.message);
+        hideGenerationProgress();
         loadUsageStatus(); // Refresh usage status
         return;
       }
@@ -209,8 +213,11 @@ const generatePrompt = async (comment) => {
     
     const result = await res.json();
     
-    // Display the result
-    displayResult(comment, result.prompt, result.qualityTier);
+    // Complete progress animation
+    completeGenerationProgress();
+    
+    // Display the result with typing effect
+    displayResultWithTyping(comment, result.prompt, result.qualityTier);
     
     // Refresh usage status
     loadUsageStatus();
@@ -223,6 +230,7 @@ const generatePrompt = async (comment) => {
   } catch (error) {
     console.error('Error generating prompt:', error);
     showError(error.message || 'Failed to generate prompt. Please try again.');
+    hideGenerationProgress();
   } finally {
     // Reset button state
     btnText.style.display = 'inline';
@@ -231,52 +239,198 @@ const generatePrompt = async (comment) => {
   }
 };
 
-// Display generated result
-const displayResult = (input, promptJson, qualityTier = null) => {
+// Show generation progress with animations
+const showGenerationProgress = () => {
+  const progressCard = document.getElementById('generation-progress');
+  const resultCard = document.getElementById('result-card');
+  
+  // Hide result card if visible
+  resultCard.style.display = 'none';
+  
+  // Show progress card
+  progressCard.style.display = 'block';
+  progressCard.scrollIntoView({ behavior: 'smooth' });
+  
+  // Start progress animation
+  startProgressAnimation();
+};
+
+// Start progress animation
+const startProgressAnimation = () => {
+  const steps = ['step-1', 'step-2', 'step-3', 'step-4'];
+  const progressFill = document.getElementById('progress-fill');
+  const progressText = document.getElementById('progress-text');
+  const statusMessage = document.getElementById('status-message');
+  
+  let currentStep = 0;
+  let progress = 0;
+  
+  // Step 1: Analyzing Input
+  setTimeout(() => {
+    updateStep(steps[0], 'active');
+    progressText.textContent = 'Analyzing your input...';
+    statusMessage.textContent = 'Understanding your requirements and preparing the AI model...';
+    progress = 25;
+    progressFill.style.width = `${progress}%`;
+  }, 500);
+  
+  // Step 2: Processing Request
+  setTimeout(() => {
+    updateStep(steps[0], 'completed');
+    updateStep(steps[1], 'active');
+    progressText.textContent = 'Processing your request...';
+    statusMessage.textContent = 'Sending your request to our advanced AI system...';
+    progress = 50;
+    progressFill.style.width = `${progress}%`;
+  }, 2000);
+  
+  // Step 3: Generating JSON
+  setTimeout(() => {
+    updateStep(steps[1], 'completed');
+    updateStep(steps[2], 'active');
+    progressText.textContent = 'Generating JSON structure...';
+    statusMessage.textContent = 'Creating a well-structured JSON prompt based on your input...';
+    progress = 75;
+    progressFill.style.width = `${progress}%`;
+  }, 3500);
+  
+  // Step 4: Finalizing
+  setTimeout(() => {
+    updateStep(steps[2], 'completed');
+    updateStep(steps[3], 'active');
+    progressText.textContent = 'Finalizing your prompt...';
+    statusMessage.textContent = 'Adding final touches and validating the JSON structure...';
+    progress = 90;
+    progressFill.style.width = `${progress}%`;
+  }, 5000);
+};
+
+// Update step status
+const updateStep = (stepId, status) => {
+  const step = document.getElementById(stepId);
+  step.className = `step ${status}`;
+};
+
+// Complete generation progress
+const completeGenerationProgress = () => {
+  const progressCard = document.getElementById('generation-progress');
+  const progressFill = document.getElementById('progress-fill');
+  const progressText = document.getElementById('progress-text');
+  const statusMessage = document.getElementById('status-message');
+  
+  // Complete final step
+  updateStep('step-4', 'completed');
+  
+  // Complete progress bar
+  progressFill.style.width = '100%';
+  progressText.textContent = 'Generation complete!';
+  statusMessage.textContent = 'Your AI-generated prompt is ready!';
+  
+  // Hide progress after a short delay
+  setTimeout(() => {
+    hideGenerationProgress();
+  }, 1500);
+};
+
+// Hide generation progress
+const hideGenerationProgress = () => {
+  const progressCard = document.getElementById('generation-progress');
+  progressCard.style.display = 'none';
+  
+  // Reset progress
+  const progressFill = document.getElementById('progress-fill');
+  const steps = ['step-1', 'step-2', 'step-3', 'step-4'];
+  
+  progressFill.style.width = '0%';
+  steps.forEach(stepId => {
+    const step = document.getElementById(stepId);
+    step.className = 'step';
+  });
+};
+
+// Display result with typing effect
+const displayResultWithTyping = (input, promptJson, qualityTier = null) => {
   const originalInputText = document.getElementById('original-input-text');
   const jsonOutput = document.getElementById('json-output');
   
   originalInputText.textContent = input;
   
-  try {
-    // Try to parse and format the JSON
-    const parsed = JSON.parse(promptJson);
-    jsonOutput.textContent = JSON.stringify(parsed, null, 2);
-    jsonOutput.className = 'json-valid';
-  } catch (e) {
-    // If it's not valid JSON, display as-is
-    jsonOutput.textContent = promptJson;
-    jsonOutput.className = 'json-invalid';
-  }
+  // Show result card
+  const resultCard = document.getElementById('result-card');
+  resultCard.style.display = 'block';
+  resultCard.scrollIntoView({ behavior: 'smooth' });
   
   // Display quality tier information if available
   if (qualityTier) {
-    const qualityInfo = document.getElementById('quality-info');
-    if (qualityInfo) {
-      const tierLabels = {
-        'free': 'Basic Quality',
-        'standard': 'Standard Quality',
-        'premium': 'Premium Quality'
-      };
-      const tierDescriptions = {
-        'free': 'Basic structure with essential information',
-        'standard': 'Clear structure with moderate detail and NLP',
-        'premium': 'Maximum detail with advanced NLP and comprehensive content'
-      };
-      
-      qualityInfo.innerHTML = `
-        <div class="quality-badge quality-${qualityTier}">
-          <span class="quality-icon">${qualityTier === 'premium' ? '⭐' : qualityTier === 'standard' ? '✨' : '📝'}</span>
-          <span class="quality-label">${tierLabels[qualityTier]}</span>
-        </div>
-        <p class="quality-description">${tierDescriptions[qualityTier]}</p>
-      `;
-      qualityInfo.style.display = 'block';
-    }
+    displayQualityTier(qualityTier);
   }
   
-  resultCard.style.display = 'block';
-  resultCard.scrollIntoView({ behavior: 'smooth' });
+  // Start typing effect for JSON
+  startTypingEffect(promptJson, jsonOutput);
+};
+
+// Start typing effect for JSON output
+const startTypingEffect = (text, outputElement) => {
+  let index = 0;
+  const speed = 30; // Characters per second
+  
+  // Clear output
+  outputElement.textContent = '';
+  outputElement.classList.add('typing');
+  
+  // Function to type next character
+  const typeNextChar = () => {
+    if (index < text.length) {
+      // Add next character
+      outputElement.textContent += text[index];
+      index++;
+      
+      // Continue typing
+      setTimeout(typeNextChar, speed);
+    } else {
+      // Typing complete
+      outputElement.classList.remove('typing');
+      
+      // Try to format as JSON
+      try {
+        const parsed = JSON.parse(text);
+        outputElement.textContent = JSON.stringify(parsed, null, 2);
+        outputElement.className = 'json-valid';
+      } catch (e) {
+        // If it's not valid JSON, keep as-is
+        outputElement.className = 'json-invalid';
+      }
+    }
+  };
+  
+  // Start typing
+  typeNextChar();
+};
+
+// Display quality tier information
+const displayQualityTier = (qualityTier) => {
+  const qualityInfo = document.getElementById('quality-info');
+  if (qualityInfo) {
+    const tierLabels = {
+      'free': 'Basic Quality',
+      'standard': 'Standard Quality',
+      'premium': 'Premium Quality'
+    };
+    const tierDescriptions = {
+      'free': 'Basic structure with essential information',
+      'standard': 'Clear structure with moderate detail and NLP',
+      'premium': 'Maximum detail with advanced NLP and comprehensive content'
+    };
+    
+    qualityInfo.innerHTML = `
+      <div class="quality-badge quality-${qualityTier}">
+        <span class="quality-icon">${qualityTier === 'premium' ? '⭐' : qualityTier === 'standard' ? '✨' : '📝'}</span>
+        <span class="quality-label">${tierLabels[qualityTier]}</span>
+      </div>
+      <p class="quality-description">${tierDescriptions[qualityTier]}</p>
+    `;
+    qualityInfo.style.display = 'block';
+  }
 };
 
 // Copy JSON to clipboard
@@ -399,7 +553,7 @@ const initializePage = async () => {
   await new Promise(resolve => setTimeout(resolve, 100));
   
   // Check if we have a token
-  if (!token) {
+  if (!accessToken) { // Changed from token to accessToken
     location.href = 'login.html';
     return;
   }
@@ -424,7 +578,7 @@ const initializePage = async () => {
 
 // Listen for storage changes (in case token is cleared from another tab/window)
 window.addEventListener('storage', (e) => {
-  if (e.key === 'token' && !e.newValue) {
+  if (e.key === 'accessToken' && !e.newValue) { // Changed from token to accessToken
     location.href = 'login.html';
   }
 });

@@ -9,24 +9,27 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css"/>
-  <link rel="stylesheet" href="css/purple-silver.css"/>
+  <link rel="stylesheet" href="css/aurora-glass.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
   <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
   <script src="js/notifications.js" defer></script>
   <script src="js/prompt-generator.js" defer></script>
   <script src="js/migration.js" defer></script>
   <script src="js/session-manager.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
 </head>
 <body>
 <header class="navbar">
   <div class="container flex-between">
     <a href="index.html" class="logo">JSON4<span>AI</span></a>
-    <nav class="nav-links">
+    <nav class="nav-links" id="nav-links">
       <a href="dashboard.html">Dashboard</a>
       <a href="pricing.html">Pricing</a>
       <button id="logout" class="btn-secondary">Logout</button>
     </nav>
-  </nav>
+    <button id="hamburger" class="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-links">
+      <span></span><span></span><span></span>
+    </button>
 </header>
 
 <!-- Notification Container -->
@@ -125,6 +128,47 @@
       </div>
     </div>
 
+    <!-- Real-time Generation Progress -->
+    <div class="generation-progress" id="generation-progress" style="display: none;">
+      <div class="progress-header">
+        <h3>🚀 Generating Your Prompt...</h3>
+        <div class="progress-steps">
+          <div class="step active" id="step-1">
+            <div class="step-icon">1</div>
+            <span>Analyzing Input</span>
+          </div>
+          <div class="step" id="step-2">
+            <div class="step-icon">2</div>
+            <span>Processing Request</span>
+          </div>
+          <div class="step" id="step-3">
+            <div class="step-icon">3</div>
+            <span>Generating JSON</span>
+          </div>
+          <div class="step" id="step-4">
+            <div class="step-icon">4</div>
+            <span>Finalizing</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="progress-content">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-text" id="progress-text">Initializing...</div>
+      </div>
+      
+      <div class="generation-status" id="generation-status">
+        <div class="status-message" id="status-message">Preparing to analyze your request...</div>
+        <div class="typing-indicator">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+
     <!-- Recent Generations -->
     <div class="history-card">
       <div class="card-header">
@@ -142,9 +186,117 @@
   </div>
 </main>
 
+<!-- Cookie Consent Banner -->
+<div id="cookie-consent" class="cookie-consent">
+  <div class="cookie-content">
+    <div class="cookie-text">
+      <h4>🍪 We use cookies to enhance your experience</h4>
+      <p>We use cookies and similar technologies to provide, protect, and improve our services. By clicking "Accept All", you consent to our use of cookies for analytics and personalized content. You can customize your preferences or learn more in our <a href="cookies.html" target="_blank">Cookie Policy</a>.</p>
+    </div>
+    <div class="cookie-actions">
+      <button id="cookie-preferences" class="btn-secondary">Customize</button>
+      <button id="cookie-accept-all" class="btn-primary">Accept All</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cookie Preferences Modal -->
+<div id="cookie-modal" class="cookie-modal">
+  <div class="cookie-modal-content">
+    <div class="cookie-modal-header">
+      <h3>🍪 Cookie Preferences</h3>
+      <button id="cookie-modal-close" class="cookie-modal-close">&times;</button>
+    </div>
+    <div class="cookie-modal-body">
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="essential-cookies" checked disabled>
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Essential Cookies</h4>
+            <p>Required for the website to function properly. Cannot be disabled.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="analytics-cookies">
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Analytics Cookies</h4>
+            <p>Help us understand how visitors interact with our website to improve performance.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="preference-cookies">
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Preference Cookies</h4>
+            <p>Remember your settings and preferences for a personalized experience.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <label class="cookie-toggle">
+            <input type="checkbox" id="marketing-cookies">
+            <span class="cookie-slider"></span>
+          </label>
+          <div class="cookie-category-info">
+            <h4>Marketing Cookies</h4>
+            <p>Used to deliver relevant advertisements and track marketing campaign effectiveness.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cookie-modal-footer">
+      <button id="cookie-save-preferences" class="btn-primary">Save Preferences</button>
+      <button id="cookie-reject-all" class="btn-secondary">Reject All</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/cookie-consent.js"></script>
+
 <footer>
   <div class="container">
-    <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+    <div class="grid-4">
+      <div>
+        <h4>JSON4AI</h4>
+        <p>Advanced AI prompt generation with JSON structure validation</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="pricing.html">Pricing</a>
+        <a href="prompt-generator.html">Prompt Generator</a>
+        <a href="dashboard.html">Dashboard</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="gdpr.html">GDPR</a>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="cookies.html">Cookie Policy</a>
+        <a href="mailto:support@json4ai.com">Contact Us</a>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>&copy; 2025 JSON4AI. All rights reserved.</p>
+    </div>
   </div>
 </footer>
 </body>

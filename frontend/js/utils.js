@@ -6,15 +6,36 @@ if (hamburger) {
     navLinks.classList.toggle('open');
   });
 }
-// Show Dashboard link if JWT exists
-const accessToken = localStorage.getItem('accessToken');
-const refreshToken = localStorage.getItem('refreshToken');
-if (accessToken && refreshToken) {
+// Update navigation UI based on login status
+function updateNavigationUI() {
   const loginLink = document.getElementById('login-link');
-  const dashLink  = document.getElementById('dashboard-link');
-  if (loginLink) loginLink.classList.add('hidden');
-  if (dashLink)  dashLink.classList.remove('hidden');
+  const dashLink = document.getElementById('dashboard-link');
+  
+  // Check if user is logged in using session manager
+  if (window.sessionManager && window.sessionManager.isLoggedIn()) {
+    if (loginLink) loginLink.classList.add('hidden');
+    if (dashLink) dashLink.classList.remove('hidden');
+  } else {
+    if (loginLink) loginLink.classList.remove('hidden');
+    if (dashLink) dashLink.classList.add('hidden');
+  }
 }
+
+// Initialize navigation UI when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  // Wait for session manager to be available
+  setTimeout(updateNavigationUI, 100);
+  
+  // Update navigation UI when session status changes
+  if (window.sessionManager) {
+    // Listen for storage changes (when tokens are cleared)
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'accessToken' || e.key === 'refreshToken') {
+        updateNavigationUI();
+      }
+    });
+  }
+});
 
 // Logo Slider Enhancement
 document.addEventListener('DOMContentLoaded', function() {

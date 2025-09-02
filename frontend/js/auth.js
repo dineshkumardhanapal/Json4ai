@@ -31,6 +31,12 @@ async function handleGoogleSignIn(response) {
     if (res.ok) {
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
+      
+      // Update navigation UI if available
+      if (window.sessionManager) {
+        window.sessionManager.updateNavigationUI();
+      }
+      
       location.href = 'dashboard.html';
     } else {
       showError(data.message || 'Google authentication failed');
@@ -60,6 +66,12 @@ if (loginForm) {
               if (res.ok) {
           localStorage.setItem('accessToken', data.accessToken);
           localStorage.setItem('refreshToken', data.refreshToken);
+          
+          // Update navigation UI if available
+          if (window.sessionManager) {
+            window.sessionManager.updateNavigationUI();
+          }
+          
           location.href = 'dashboard.html';
         } else {
           if (data.message === 'Please verify your email') {

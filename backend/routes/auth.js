@@ -285,11 +285,29 @@ router.post('/login', validateLogin, async (req, res) => {
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) return res.status(400).json({ message: 'Invalid email or password' });
     
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    // Create access token
+    const accessToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    
+    // Create refresh token
+    const refreshToken = jwt.sign(
+      { 
+        id: user._id, 
+        type: 'refresh',
+        iat: Math.floor(Date.now() / 1000)
+      }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '30d' }
+    );
+    
+    // Hash and store refresh token
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    user.refreshToken = hashedRefreshToken;
+    await user.save();
     
     res.json({ 
       message: 'Login successful!', 
-      token, 
+      accessToken, 
+      refreshToken,
       user: { 
         id: user._id, 
         firstName: user.firstName, 
@@ -460,17 +478,17 @@ router.post('/refresh', async (req, res) => {
     // Generate new access token
     const newAccessToken = jwt.sign(
       { 
-        id: user._id, 
+        userId: user._id, 
         type: 'access',
         iat: Math.floor(Date.now() / 1000)
       }, 
       process.env.JWT_SECRET, 
-      { expiresIn: '15m' }
+      { expiresIn: '7d' }
     );
 
     res.json({ 
       accessToken: newAccessToken,
-      expiresIn: 15 * 60 // 15 minutes in seconds
+      expiresIn: 7 * 24 * 60 * 60 // 7 days in seconds
     });
   } catch (error) {
     if (error.name === 'TokenExpiredError') {

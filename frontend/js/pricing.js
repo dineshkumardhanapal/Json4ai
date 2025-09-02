@@ -73,7 +73,12 @@ function updateUIForGuestUser() {
 // Load user's current plan and update UI
 async function loadUserPlan() {
   try {
-    const token = localStorage.getItem('accessToken');
+    const sessionManager = window.sessionManager;
+    if (!sessionManager || !sessionManager.isLoggedIn()) {
+      return;
+    }
+    
+    const token = sessionManager.getAccessToken();
     if (!token) return;
     
     const response = await fetch(API('/api/user/profile'), {

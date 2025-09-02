@@ -1,6 +1,7 @@
-const accessToken = localStorage.getItem('accessToken');
-const refreshToken = localStorage.getItem('refreshToken');
-if (!accessToken || !refreshToken) location.href = 'login.html';
+// Check authentication using session manager
+if (!window.sessionManager || !window.sessionManager.isLoggedIn()) {
+  location.href = 'login.html';
+}
 
 const logoutBtn = document.getElementById('logout');
 logoutBtn && logoutBtn.addEventListener('click', async () => {
@@ -15,16 +16,19 @@ logoutBtn && logoutBtn.addEventListener('click', async () => {
 // Validate token before making API calls
 const validateToken = async () => {
   try {
+    const accessToken = window.sessionManager.getAccessToken();
+    if (!accessToken) {
+      window.sessionManager.forceLogout('No access token available');
+      return false;
+    }
+    
     const res = await fetch('https://json4ai.onrender.com/api/user/profile', {
       headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
     if (res.status === 401) {
-      // Token is invalid or expired - redirect to login
-      setTimeout(() => {
-        localStorage.clear();
-        location.href = 'login.html';
-      }, 1000);
+      // Token is invalid or expired - let session manager handle this
+      window.sessionManager.forceLogout('Token expired during validation');
       return false;
     }
     
@@ -49,16 +53,19 @@ const historyList = document.getElementById('history-list');
 // Load usage status and check if user can generate prompts
 const loadUsageStatus = async () => {
   try {
+    const accessToken = window.sessionManager.getAccessToken();
+    if (!accessToken) {
+      window.sessionManager.forceLogout('No access token available');
+      return;
+    }
+    
     const res = await fetch('https://json4ai.onrender.com/api/prompt/usage', {
       headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
     if (!res.ok) {
       if (res.status === 401) {
-        setTimeout(() => {
-          localStorage.clear();
-          location.href = 'login.html';
-        }, 1000);
+        window.sessionManager.forceLogout('Token expired during usage check');
         return;
       }
       
@@ -181,6 +188,12 @@ const generatePrompt = async (comment) => {
     // Show progress indicator
     showGenerationProgress();
     
+    const accessToken = window.sessionManager.getAccessToken();
+    if (!accessToken) {
+      showError('No access token available. Please log in again.');
+      return;
+    }
+    
     const res = await fetch('https://json4ai.onrender.com/api/prompt/generate', {
       method: 'POST',
       headers: {
@@ -194,9 +207,8 @@ const generatePrompt = async (comment) => {
       const errorData = await res.json();
       
       if (res.status === 401) {
-        // Token expired or invalid - redirect to login
-        localStorage.clear();
-        location.href = 'login.html';
+        // Token expired or invalid - let session manager handle this
+        window.sessionManager.forceLogout('Token expired during prompt generation');
         return;
       }
       
@@ -456,17 +468,20 @@ const startNewPrompt = () => {
 // Load recent generation history
 const loadRecentHistory = async () => {
   try {
+    const accessToken = window.sessionManager.getAccessToken();
+    if (!accessToken) {
+      console.log('No access token available for history');
+      return;
+    }
+    
     const res = await fetch('https://json4ai.onrender.com/api/prompt/history', {
       headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
     if (!res.ok) {
       if (res.status === 401) {
-        // Token expired or invalid - redirect to login
-        setTimeout(() => {
-          localStorage.clear();
-          location.href = 'login.html';
-        }, 1000);
+        // Token expired or invalid - let session manager handle this
+        window.sessionManager.forceLogout('Token expired during history load');
         return;
       }
       console.error('Failed to load history');
@@ -553,7 +568,7 @@ const initializePage = async () => {
   await new Promise(resolve => setTimeout(resolve, 100));
   
   // Check if we have a token
-  if (!accessToken) { // Changed from token to accessToken
+  if (!window.sessionManager || !window.sessionManager.isLoggedIn()) {
     location.href = 'login.html';
     return;
   }
@@ -578,8 +593,13 @@ const initializePage = async () => {
 
 // Listen for storage changes (in case token is cleared from another tab/window)
 window.addEventListener('storage', (e) => {
-  if (e.key === 'accessToken' && !e.newValue) { // Changed from token to accessToken
-    location.href = 'login.html';
+  if (e.key === 'accessToken' && !e.newValue) {
+    // Token was cleared from another tab/window
+    if (window.sessionManager) {
+      window.sessionManager.forceLogout('Token cleared from another tab');
+    } else {
+      location.href = 'login.html';
+    }
   }
 });
 

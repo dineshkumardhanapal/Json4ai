@@ -26,7 +26,7 @@ module.exports = async function (req, res, next) {
     }
     
     // Check if user still exists
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.userId || decoded.id);
     if (!user) {
       return res.status(401).json({ 
         message: 'User not found',

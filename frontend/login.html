@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="css/aurora-glass.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
   <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
-  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js" defer></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="js/notifications.js" defer></script>
   <script src="js/auth.js" defer></script>
@@ -49,11 +49,17 @@
       
              <!-- Lottie Animation Container -->
        <div class="lottie-container">
+         <div class="lottie-loading" style="display: flex; align-items: center; justify-content: center; height: 300px; color: var(--text-secondary);">
+           <div style="text-align: center;">
+             <div style="width: 40px; height: 40px; border: 3px solid var(--glass-border); border-top: 3px solid var(--text-light); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+             <p>Loading animation...</p>
+           </div>
+         </div>
          <lottie-player 
-           src="https://lottie.host/653955d6-57e3-4ac8-8a40-59a24381402b/nPXEKn3sXi.lottie" 
+           src="assets/lottie/hero-animation.json" 
            background="transparent" 
            speed="1" 
-           style="width: 300px; height: 300px;" 
+           style="width: 300px; height: 300px; display: none;" 
            loop 
            autoplay>
          </lottie-player>
@@ -79,7 +85,7 @@
   
   <!-- Right Panel - Login Form -->
   <div class="login-right">
-    <div class="login-form-container">
+    <div class="login-form-container mobile-optimized">
       <div class="login-header">
         <div class="logo-small">
           <div class="logo-icon-small">JSON4<span>AI</span></div>
@@ -251,16 +257,56 @@ function togglePassword() {
 
 // Fallback to static cube if Lottie fails to load
 document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(() => {
-    const lottieContainer = document.querySelector('.lottie-container');
-    const fallbackCube = document.querySelector('.fallback-cube');
+  const lottieContainer = document.querySelector('.lottie-container');
+  const fallbackCube = document.querySelector('.fallback-cube');
+  const lottiePlayer = lottieContainer?.querySelector('lottie-player');
+  const lottieLoading = lottieContainer?.querySelector('.lottie-loading');
+  
+  console.log('Lottie container:', lottieContainer);
+  console.log('Lottie player:', lottiePlayer);
+  console.log('Fallback cube:', fallbackCube);
+  console.log('Lottie loading:', lottieLoading);
+  console.log('Lottie player script loaded:', typeof LottiePlayer !== 'undefined');
+  
+  // Check if Lottie player is available
+  if (lottiePlayer && typeof LottiePlayer !== 'undefined') {
+    console.log('Lottie player found, setting up event listeners');
     
-    if (lottieContainer && lottieContainer.children.length === 0) {
-      lottieContainer.style.display = 'none';
+    // Listen for Lottie player events
+    lottiePlayer.addEventListener('error', function(e) {
+      console.log('Lottie animation failed to load:', e);
+      lottieLoading.style.display = 'none';
+      lottiePlayer.style.display = 'none';
       fallbackCube.style.display = 'block';
-    }
-  }, 3000);
-  });
+    });
+    
+    lottiePlayer.addEventListener('ready', function() {
+      console.log('Lottie animation is ready');
+      lottieLoading.style.display = 'none';
+      lottiePlayer.style.display = 'block';
+    });
+    
+    lottiePlayer.addEventListener('complete', function() {
+      console.log('Lottie animation completed');
+    });
+    
+    // Fallback timeout in case the error event doesn't fire
+    setTimeout(() => {
+      if (lottieLoading && lottieLoading.style.display !== 'none') {
+        console.log('Lottie animation timeout, showing fallback');
+        lottieLoading.style.display = 'none';
+        lottiePlayer.style.display = 'none';
+        fallbackCube.style.display = 'block';
+      }
+    }, 5000);
+  } else {
+    // If lottie-player is not available at all, show fallback immediately
+    console.log('Lottie player not available, showing fallback');
+    lottieLoading.style.display = 'none';
+    lottiePlayer.style.display = 'none';
+    fallbackCube.style.display = 'block';
+  }
+});
 </script>
 
 <!-- Footer -->

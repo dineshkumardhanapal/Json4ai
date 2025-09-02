@@ -1,6 +1,7 @@
-const accessToken = localStorage.getItem('accessToken');
-const refreshToken = localStorage.getItem('refreshToken');
-if (!accessToken || !refreshToken) location.href = 'login.html';
+// Check authentication using session manager
+if (!window.sessionManager || !window.sessionManager.isLoggedIn()) {
+  location.href = 'login.html';
+}
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -39,6 +40,14 @@ const loadProfile = async () => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
     
+    // Get current token from session manager
+    const accessToken = window.sessionManager.getAccessToken();
+    if (!accessToken) {
+      console.log('🔒 No access token available, redirecting to login...');
+      location.href = 'login.html';
+      return;
+    }
+    
     const [profileRes, usageRes] = await Promise.all([
       fetch('https://json4ai.onrender.com/api/user/profile', {
         headers: { 'Authorization': `Bearer ${accessToken}` },
@@ -62,9 +71,8 @@ const loadProfile = async () => {
     if (!profileRes.ok || !usageRes.ok) {
       if (profileRes.status === 401 || usageRes.status === 401) {
         console.log('🔒 Token expired or invalid, redirecting to login...');
-        // Token expired or invalid
-        localStorage.clear();
-        location.href = 'login.html';
+        // Token expired or invalid - let session manager handle this
+        window.sessionManager.forceLogout('Token expired');
         return;
       }
       throw new Error(`Failed to load profile or usage information. Status: ${profileRes.status}, ${usageRes.status}`);
@@ -222,6 +230,12 @@ const loadProfile = async () => {
 // Load recent activity
 const loadRecentActivity = async () => {
   try {
+    const accessToken = window.sessionManager.getAccessToken();
+    if (!accessToken) {
+      console.log('🔒 No access token available for activity history');
+      return;
+    }
+    
     const res = await fetch('https://json4ai.onrender.com/api/prompt/history', {
       headers: { 'Authorization': `Bearer ${accessToken}` }
     });
@@ -444,16 +458,21 @@ document.getElementById('profile-form')?.addEventListener('submit', async e => {
       lastName:  document.getElementById('lastName').value
     };
     
+    const accessToken = window.sessionManager.getAccessToken();
+    if (!accessToken) {
+      showError('No access token available. Please log in again.');
+      return;
+    }
+    
     const res = await fetch('https://json4ai.onrender.com/api/user/profile', {
       method: 'PUT',
-              headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${accessToken}` },
+      headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${accessToken}` },
       body: JSON.stringify(body)
     });
     
     if (!res.ok) {
       if (res.status === 401) {
-        localStorage.clear();
-        location.href = 'login.html';
+        window.sessionManager.forceLogout('Token expired during profile update');
         return;
       }
       throw new Error('Failed to update profile');

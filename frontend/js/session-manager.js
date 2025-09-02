@@ -17,6 +17,9 @@ class SessionManager {
   }
 
   init() {
+    // Always update navigation UI on init
+    this.updateNavigationUI();
+    
     if (this.accessToken && this.refreshToken) {
       this.startSessionMonitoring();
       this.setupActivityListeners();
@@ -206,6 +209,9 @@ class SessionManager {
         this.accessToken = data.accessToken;
         localStorage.setItem('accessToken', this.accessToken);
         
+        // Update navigation UI
+        this.updateNavigationUI();
+        
         // Reset session monitoring
         this.resetSessionTimeout();
         
@@ -249,8 +255,13 @@ class SessionManager {
     const loginLink = document.getElementById('login-link');
     const dashLink = document.getElementById('dashboard-link');
     
-    if (loginLink) loginLink.classList.remove('hidden');
-    if (dashLink) dashLink.classList.add('hidden');
+    if (this.isLoggedIn()) {
+      if (loginLink) loginLink.classList.add('hidden');
+      if (dashLink) dashLink.classList.remove('hidden');
+    } else {
+      if (loginLink) loginLink.classList.remove('hidden');
+      if (dashLink) dashLink.classList.add('hidden');
+    }
   }
 
   // Check if token is expired
@@ -290,6 +301,9 @@ class SessionManager {
         const data = await response.json();
         this.accessToken = data.accessToken;
         localStorage.setItem('accessToken', this.accessToken);
+        
+        // Update navigation UI
+        this.updateNavigationUI();
         
         // Reset session monitoring
         this.resetSessionTimeout();

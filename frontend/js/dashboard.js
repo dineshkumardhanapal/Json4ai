@@ -1,10 +1,19 @@
-// Check authentication using session manager
-if (!window.sessionManager || !window.sessionManager.isLoggedIn()) {
-  location.href = 'login.html';
-}
-
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
+  // Check authentication using session manager - wait for session manager to initialize
+  setTimeout(() => {
+    if (!window.sessionManager || !window.sessionManager.isLoggedIn()) {
+      location.href = 'login.html';
+      return;
+    }
+    
+    // Initialize loading spinner
+    addLoadingSpinner();
+    
+    // Load profile data
+    loadProfile();
+  }, 100);
+
   const logoutBtn = document.getElementById('logout');
   logoutBtn && logoutBtn.addEventListener('click', async () => {
     if (window.sessionManager) {
@@ -14,12 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
       location.href = 'index.html';
     }
   });
-
-  // Initialize loading spinner
-  addLoadingSpinner();
-  
-  // Load profile data
-  loadProfile();
 });
 
 // Populate profile

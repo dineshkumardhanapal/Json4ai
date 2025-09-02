@@ -1,16 +1,25 @@
-// Check authentication using session manager
-if (!window.sessionManager || !window.sessionManager.isLoggedIn()) {
-  location.href = 'login.html';
-}
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+  // Check authentication using session manager - wait for session manager to initialize
+  setTimeout(() => {
+    if (!window.sessionManager || !window.sessionManager.isLoggedIn()) {
+      location.href = 'login.html';
+      return;
+    }
+    
+    // Initialize page if authenticated
+    initializePage();
+  }, 100);
 
-const logoutBtn = document.getElementById('logout');
-logoutBtn && logoutBtn.addEventListener('click', async () => {
-  if (window.sessionManager) {
-    await window.sessionManager.logout();
-  } else {
-    localStorage.clear();
-    location.href = 'index.html';
-  }
+  const logoutBtn = document.getElementById('logout');
+  logoutBtn && logoutBtn.addEventListener('click', async () => {
+    if (window.sessionManager) {
+      await window.sessionManager.logout();
+    } else {
+      localStorage.clear();
+      location.href = 'index.html';
+    }
+  });
 });
 
 // Validate token before making API calls
@@ -606,5 +615,4 @@ window.addEventListener('storage', (e) => {
 // Debug functionality
 
 
-// Start initialization
-initializePage();
+// Page initialization is now handled in DOMContentLoaded event above

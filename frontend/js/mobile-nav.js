@@ -4,11 +4,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const navLinks = document.getElementById('nav-links');
   
   if (hamburger && navLinks) {
-    // Initialize mobile menu as visible on mobile
+    // Initialize mobile menu as hidden on mobile (let user click to open)
     if (window.innerWidth <= 768) {
-      navLinks.classList.remove('hidden');
-      hamburger.setAttribute('aria-expanded', 'true');
-      hamburger.classList.add('active');
+      navLinks.classList.add('hidden');
+      hamburger.setAttribute('aria-expanded', 'false');
+      hamburger.classList.remove('active');
     }
     
     hamburger.addEventListener('click', function() {
@@ -54,12 +54,26 @@ document.addEventListener('DOMContentLoaded', function() {
         hamburger.classList.remove('active');
         hamburger.setAttribute('aria-expanded', 'false');
       } else {
-        // Mobile view - ensure menu is visible by default
+        // Mobile view - ensure menu is hidden by default
+        navLinks.classList.add('hidden');
+        hamburger.setAttribute('aria-expanded', 'false');
+        hamburger.classList.remove('active');
+      }
+    });
+    
+    // Prevent menu from hiding on scroll (mobile)
+    let lastScrollTop = 0;
+    window.addEventListener('scroll', function() {
+      if (window.innerWidth <= 768) {
+        const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // Only prevent hiding if menu is currently open
         if (!navLinks.classList.contains('hidden')) {
-          navLinks.classList.remove('hidden');
-          hamburger.setAttribute('aria-expanded', 'true');
-          hamburger.classList.add('active');
+          // Don't hide menu on scroll - keep it open until user clicks outside or on hamburger
+          return;
         }
+        
+        lastScrollTop = currentScrollTop;
       }
     });
   }

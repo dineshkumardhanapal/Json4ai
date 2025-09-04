@@ -631,34 +631,36 @@ const formatTimeAgo = (date) => {
   return date.toLocaleDateString();
 };
 
-// Show info notification
-const showInfo = (message) => {
-  if (window.showNotification) {
-    window.showNotification(message, 'info');
-  } else {
-    // Fallback notification
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 1rem 1.5rem;
-      background: #3b82f6;
-      color: white;
-      border-radius: 8px;
-      font-weight: 600;
-      z-index: 10001;
-      max-width: 300px;
-      word-wrap: break-word;
-    `;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-      notification.remove();
-    }, 5000);
-  }
-};
+// Ensure a global showInfo function exists without redeclaring if already provided by notifications.js
+if (typeof window.showInfo !== 'function') {
+  window.showInfo = function(message) {
+    if (window.showNotification) {
+      window.showNotification(message, 'info');
+    } else {
+      // Fallback notification
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        background: #3b82f6;
+        color: white;
+        border-radius: 8px;
+        font-weight: 600;
+        z-index: 10001;
+        max-width: 300px;
+        word-wrap: break-word;
+      `;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 5000);
+    }
+  };
+}
 
 // Show demo mode option when API is unavailable
 const showDemoModeOption = (comment) => {
@@ -703,7 +705,7 @@ const showDemoModeOption = (comment) => {
   displayResultWithTyping(comment, JSON.stringify(demoPrompt, null, 2), 'standard');
   
   // Show info message
-  showInfo('Demo mode: API service is currently unavailable. This is a sample JSON prompt.');
+  window.showInfo('Demo mode: API service is currently unavailable. This is a sample JSON prompt.');
 };
 
 // Event listeners

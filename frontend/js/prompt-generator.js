@@ -27,6 +27,11 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+// Global flag to allow demo mode when API is unavailable
+if (typeof window.apiUnavailable === 'undefined') {
+  window.apiUnavailable = false;
+}
+
 // Validate token before making API calls
 const validateToken = async () => {
   try {
@@ -58,7 +63,9 @@ const validateToken = async () => {
     
     if (res.status === 404) {
       console.log('API endpoint not found - server may be down');
-      return false;
+      // Switch to demo mode when API is down
+      window.apiUnavailable = true;
+      return true;
     }
     
     if (!res.ok) {
@@ -84,6 +91,25 @@ const historyList = document.getElementById('history-list');
 // Load usage status and check if user can generate prompts
 const loadUsageStatus = async () => {
   try {
+    // If API is unavailable, show demo mode notice and enable form
+    if (window.apiUnavailable) {
+      usageStatus.className = 'usage-status-card status-limit-reached';
+      usageStatus.innerHTML = `
+        <div class="status-icon">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+          </svg>
+        </div>
+        <div class="status-content">
+          <h3>Service Unavailable</h3>
+          <p>The server is unreachable. You can still generate a prompt in Demo mode.</p>
+        </div>
+      `;
+      generatorForm.style.display = 'block';
+      const submitBtn = promptForm.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = false;
+      return;
+    }
     const accessToken = window.sessionManager.getAccessToken();
     if (!accessToken) {
       console.log('No access token available, redirecting to login');
@@ -212,6 +238,11 @@ const updateUsageStatus = (usage) => {
 // Handle prompt generation
 const generatePrompt = async (comment) => {
   console.log('Starting prompt generation for:', comment);
+  // If server is down, immediately use demo mode
+  if (window.apiUnavailable) {
+    showDemoModeOption(comment);
+    return;
+  }
   
   // Check if user is logged in
   if (!window.sessionManager || !window.sessionManager.isLoggedIn()) {
@@ -549,6 +580,22 @@ const startNewPrompt = () => {
 // Load recent generation history
 const loadRecentHistory = async () => {
   try {
+    if (window.apiUnavailable) {
+      // Skip server call in demo mode
+      historyList.innerHTML = `
+        <div class="history-item">
+          <div class="history-icon">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div class="history-content">
+            <h4>No Generations Yet</h4>
+            <p>Server is unavailable. Generate a prompt in Demo mode above.</p>
+          </div>
+        </div>`;
+      return;
+    }
     const accessToken = window.sessionManager.getAccessToken();
     if (!accessToken) {
       console.log('No access token available for history');

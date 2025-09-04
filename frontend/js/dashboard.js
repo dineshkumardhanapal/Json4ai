@@ -15,14 +15,19 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 100);
 
   const logoutBtn = document.getElementById('logout');
-  logoutBtn && logoutBtn.addEventListener('click', async () => {
-    if (window.sessionManager) {
-      await window.sessionManager.logout();
-    } else {
-      localStorage.clear();
-      location.href = 'index.html';
-    }
-  });
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      console.log('Logout button clicked');
+      
+      if (window.sessionManager) {
+        await window.sessionManager.logout();
+      } else {
+        localStorage.clear();
+        location.href = 'index.html';
+      }
+    });
+  }
 });
 
 // Populate profile

@@ -424,13 +424,15 @@ class SessionManager {
   async logout() {
     try {
       if (this.refreshToken) {
-        await fetch('https://json4ai.onrender.com/api/logout', {
+        const response = await fetch('https://json4ai.onrender.com/api/logout', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({ refreshToken: this.refreshToken })
         });
+        
+        console.log('Logout response:', response.status);
       }
     } catch (error) {
       console.error('Logout request failed:', error);

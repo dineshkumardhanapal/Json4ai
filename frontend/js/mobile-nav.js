@@ -76,5 +76,37 @@ document.addEventListener('DOMContentLoaded', function() {
         lastScrollTop = currentScrollTop;
       }
     });
+    
+    // Add scroll behavior to keep navbar visible
+    let ticking = false;
+    function updateNavbarOnScroll() {
+      const navbar = document.querySelector('.navbar');
+      if (navbar) {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > 100) {
+          navbar.style.position = 'fixed';
+          navbar.style.top = '0';
+          navbar.style.width = '100%';
+          navbar.style.zIndex = '1000';
+          navbar.style.backdropFilter = 'blur(10px)';
+          navbar.style.backgroundColor = 'rgba(15, 23, 42, 0.8)';
+        } else {
+          navbar.style.position = 'relative';
+          navbar.style.backdropFilter = 'none';
+          navbar.style.backgroundColor = 'transparent';
+        }
+      }
+      ticking = false;
+    }
+    
+    function requestTick() {
+      if (!ticking) {
+        requestAnimationFrame(updateNavbarOnScroll);
+        ticking = true;
+      }
+    }
+    
+    window.addEventListener('scroll', requestTick);
   }
 });

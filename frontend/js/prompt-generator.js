@@ -12,14 +12,19 @@ document.addEventListener('DOMContentLoaded', function() {
   }, 100);
 
   const logoutBtn = document.getElementById('logout');
-  logoutBtn && logoutBtn.addEventListener('click', async () => {
-    if (window.sessionManager) {
-      await window.sessionManager.logout();
-    } else {
-      localStorage.clear();
-      location.href = 'index.html';
-    }
-  });
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      console.log('Logout button clicked');
+      
+      if (window.sessionManager) {
+        await window.sessionManager.logout();
+      } else {
+        localStorage.clear();
+        location.href = 'index.html';
+      }
+    });
+  }
 });
 
 // Validate token before making API calls
@@ -212,8 +217,19 @@ const generatePrompt = async (comment) => {
       body: JSON.stringify({ comment })
     });
     
+    console.log('Prompt generation response:', {
+      status: res.status,
+      statusText: res.statusText,
+      url: res.url
+    });
+    
     if (!res.ok) {
-      const errorData = await res.json();
+      let errorData;
+      try {
+        errorData = await res.json();
+      } catch (e) {
+        errorData = { message: 'Unknown error occurred' };
+      }
       
       if (res.status === 401) {
         // Token expired or invalid - let session manager handle this
@@ -229,7 +245,19 @@ const generatePrompt = async (comment) => {
         return;
       }
       
-      throw new Error(errorData.message || 'Failed to generate prompt');
+      if (res.status === 404) {
+        showError('API endpoint not found. Please check if the service is running.');
+        hideGenerationProgress();
+        return;
+      }
+      
+      if (res.status === 500) {
+        showError('Server error occurred. Please try again later.');
+        hideGenerationProgress();
+        return;
+      }
+      
+      throw new Error(errorData.message || `Failed to generate prompt (Status: ${res.status})`);
     }
     
     const result = await res.json();

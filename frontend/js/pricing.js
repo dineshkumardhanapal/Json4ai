@@ -160,7 +160,19 @@ async function handleUpgrade(e) {
       body: JSON.stringify({ planType: plan })
     });
 
-    const data = await res.json();
+    console.log('Payment order creation response:', {
+      status: res.status,
+      statusText: res.statusText,
+      url: res.url
+    });
+
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      console.error('Failed to parse response:', e);
+      throw new Error('Invalid response from server');
+    }
     if (res.ok && data.success) {
       // Store order details for tracking
       localStorage.setItem('pendingOrder', JSON.stringify({
@@ -210,12 +222,23 @@ async function handleUpgrade(e) {
       
     } else {
       // Show appropriate error messages
-      if (data.error && data.error.includes('You already have an active plan')) {
+      console.error('Payment order creation failed:', data);
+      
+      if (res.status === 401) {
+        showError('Session expired. Please log in again.');
+        setTimeout(() => {
+          location.href = 'login.html';
+        }, 2000);
+      } else if (res.status === 404) {
+        showError('Payment service not available. Please try again later.');
+      } else if (res.status === 500) {
+        showError('Server error occurred. Please try again later.');
+      } else if (data.error && data.error.includes('You already have an active plan')) {
         showInfo(`${data.error}. ${data.details || ''}`);
       } else if (data.error && data.error.includes('Failed to create payment order')) {
         showError(`${data.error}. ${data.details || ''}`);
       } else {
-        showError(data.error || 'Unable to create payment order.');
+        showError(data.error || `Unable to create payment order. (Status: ${res.status})`);
       }
     }
       } catch (err) {
@@ -403,5 +426,48 @@ function showInfo(message) {
     window.showInfo(message);
   } else {
     showNotification(message, 'info');
+  }
+}
+
+function showNotification(message, type = 'info') {
+  // Check if notification system exists
+  if (window.showNotification) {
+    window.showNotification(message, type);
+  } else {
+    // Fallback notification
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      z-index: 10001;
+      max-width: 300px;
+      word-wrap: break-word;
+    `;
+    
+    switch (type) {
+      case 'success':
+        notification.style.background = '#10b981';
+        break;
+      case 'error':
+        notification.style.background = '#ef4444';
+        break;
+      case 'warning':
+        notification.style.background = '#f59e0b';
+        break;
+      default:
+        notification.style.background = '#3b82f6';
+    }
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, 5000);
   }
 }

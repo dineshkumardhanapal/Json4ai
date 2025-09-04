@@ -32,24 +32,41 @@ const validateToken = async () => {
   try {
     const accessToken = window.sessionManager.getAccessToken();
     if (!accessToken) {
+      console.log('No access token available for validation');
       window.sessionManager.forceLogout('No access token available');
       return false;
     }
+    
+    console.log('Validating token...');
     
     const res = await fetch('https://json4ai.onrender.com/api/user/profile', {
       headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
+    console.log('Token validation response:', {
+      status: res.status,
+      statusText: res.statusText,
+      url: res.url
+    });
+    
     if (res.status === 401) {
       // Token is invalid or expired - let session manager handle this
+      console.log('Token expired during validation');
       window.sessionManager.forceLogout('Token expired during validation');
       return false;
     }
     
-    if (!res.ok) {
+    if (res.status === 404) {
+      console.log('API endpoint not found - server may be down');
       return false;
     }
     
+    if (!res.ok) {
+      console.log('Token validation failed with status:', res.status);
+      return false;
+    }
+    
+    console.log('Token validation successful');
     return true;
   } catch (error) {
     console.error('Token validation error:', error);
@@ -69,12 +86,21 @@ const loadUsageStatus = async () => {
   try {
     const accessToken = window.sessionManager.getAccessToken();
     if (!accessToken) {
+      console.log('No access token available, redirecting to login');
       window.sessionManager.forceLogout('No access token available');
       return;
     }
     
+    console.log('Loading usage status with token:', accessToken ? 'present' : 'missing');
+    
     const res = await fetch('https://json4ai.onrender.com/api/prompt/usage', {
       headers: { 'Authorization': `Bearer ${accessToken}` }
+    });
+    
+    console.log('Usage status response:', {
+      status: res.status,
+      statusText: res.statusText,
+      url: res.url
     });
     
     if (!res.ok) {
@@ -185,9 +211,23 @@ const updateUsageStatus = (usage) => {
 
 // Handle prompt generation
 const generatePrompt = async (comment) => {
+  console.log('Starting prompt generation for:', comment);
+  
+  // Check if user is logged in
+  if (!window.sessionManager || !window.sessionManager.isLoggedIn()) {
+    showError('Please log in to generate prompts.');
+    setTimeout(() => {
+      location.href = 'login.html';
+    }, 2000);
+    return;
+  }
+  
   // Validate token before proceeding
   const isValid = await validateToken();
-  if (!isValid) return; // Will redirect to login if invalid
+  if (!isValid) {
+    console.log('Token validation failed, cannot generate prompt');
+    return; // Will redirect to login if invalid
+  }
   
   const generateBtn = document.getElementById('generate-btn');
   const btnText = generateBtn.querySelector('.btn-text');
@@ -207,6 +247,8 @@ const generatePrompt = async (comment) => {
       showError('No access token available. Please log in again.');
       return;
     }
+    
+    console.log('Making API request to generate prompt...');
     
     const res = await fetch('https://json4ai.onrender.com/api/prompt/generate', {
       method: 'POST',
@@ -248,6 +290,8 @@ const generatePrompt = async (comment) => {
       if (res.status === 404) {
         showError('API endpoint not found. Please check if the service is running.');
         hideGenerationProgress();
+        // Show demo mode option
+        showDemoModeOption(comment);
         return;
       }
       
@@ -587,6 +631,81 @@ const formatTimeAgo = (date) => {
   return date.toLocaleDateString();
 };
 
+// Show info notification
+const showInfo = (message) => {
+  if (window.showNotification) {
+    window.showNotification(message, 'info');
+  } else {
+    // Fallback notification
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 1rem 1.5rem;
+      background: #3b82f6;
+      color: white;
+      border-radius: 8px;
+      font-weight: 600;
+      z-index: 10001;
+      max-width: 300px;
+      word-wrap: break-word;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, 5000);
+  }
+};
+
+// Show demo mode option when API is unavailable
+const showDemoModeOption = (comment) => {
+  const demoPrompt = {
+    user_query: comment,
+    main_instruction: `Generate a comprehensive response about: ${comment}`,
+    detailed_parameters: {
+      scope: "comprehensive_and_detailed",
+      depth: "moderate_detail",
+      include_examples: true,
+      include_step_by_step: true,
+      technical_level: "intermediate",
+      quality_standards: "good",
+      performance_expectations: "reliable"
+    },
+    output_format: {
+      structure: "organized_sections",
+      include_summary: true,
+      include_practical_steps: true,
+      include_resources: true,
+      formatting: "professional",
+      length: "moderate"
+    },
+    context: {
+      domain: "general_ai_education",
+      target_audience: "developers_and_learners",
+      use_case: "learning_and_implementation",
+      prerequisites: "basic_understanding",
+      assumptions: "user_wants_clear_guidance"
+    },
+    additional_requirements: {
+      tone: "educational_and_practical",
+      detail_level: "moderate",
+      include_code_examples: true,
+      include_best_practices: true,
+      success_criteria: "clear_understanding_and_actionable_steps"
+    },
+    note: "Demo mode - API service unavailable"
+  };
+  
+  // Display the demo result
+  displayResultWithTyping(comment, JSON.stringify(demoPrompt, null, 2), 'standard');
+  
+  // Show info message
+  showInfo('Demo mode: API service is currently unavailable. This is a sample JSON prompt.');
+};
+
 // Event listeners
 promptForm.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -606,20 +725,45 @@ const initializePage = async () => {
   
   // Check if we have a token
   if (!window.sessionManager || !window.sessionManager.isLoggedIn()) {
+    console.log('User not logged in, redirecting to login');
     location.href = 'login.html';
     return;
   }
+  
+  console.log('User is logged in, initializing page...');
   
   // Validate token first
   const isValid = await validateToken();
   
   if (!isValid) {
+    console.log('Token validation failed');
     return; // Will redirect to login if invalid
   }
   
+  console.log('Token is valid, loading page content...');
+  
   // Load page content
-  loadUsageStatus();
-  loadRecentHistory();
+  try {
+    await loadUsageStatus();
+    await loadRecentHistory();
+  } catch (error) {
+    console.error('Error loading page content:', error);
+    // Show error message to user
+    if (usageStatus) {
+      usageStatus.className = 'usage-status-card status-limit-reached';
+      usageStatus.innerHTML = `
+        <div class="status-icon">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+          </svg>
+        </div>
+        <div class="status-content">
+          <h3>Service Unavailable</h3>
+          <p>Unable to connect to the server. Please check your internet connection and try again.</p>
+        </div>
+      `;
+    }
+  }
   
   // Set up periodic token validation (every 5 minutes)
   setInterval(async () => {

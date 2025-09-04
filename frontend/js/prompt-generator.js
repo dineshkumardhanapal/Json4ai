@@ -74,6 +74,8 @@ const validateToken = async () => {
     }
     
     console.log('Token validation successful');
+    // Ensure we exit demo mode if server is back
+    window.apiUnavailable = false;
     return true;
   } catch (error) {
     console.error('Token validation error:', error);

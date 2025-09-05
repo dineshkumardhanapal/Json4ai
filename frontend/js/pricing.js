@@ -1,11 +1,7 @@
 // pricing.js — PayPal subscription + error handling
 const API = path => `https://json4ai.onrender.com${path}`;
 
-// Map plan → PayPal Plan ID you created in PayPal Dashboard
-const PAYPAL_PLAN_IDS = {
-  starter: 'P-XXXXXXXXXX', // 30 prompts / month
-  premium: 'P-XXXXXXXXXX'  // 100 prompts / month
-};
+// Note: PayPal plan IDs removed. Razorpay is the active gateway.
 
 // Initialize page when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {

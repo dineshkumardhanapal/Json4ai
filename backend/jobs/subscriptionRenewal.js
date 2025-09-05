@@ -1,4 +1,4 @@
-// backend/jobs/subscriptionRenewal.js
+// backend/legacy/subscriptionRenewal.js (moved)
 const cron = require('node-cron');
 const User = require('../models/User');
 const { sendSubscriptionConfirmation } = require('../mailer');

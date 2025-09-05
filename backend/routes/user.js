@@ -1,26 +1,13 @@
 const router = require('express').Router();
-const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { validateProfileUpdate } = require('../middleware/validation');
-
-// middleware
-const auth = (req, res, next) => {
-  const header = req.headers.authorization || '';
-  const token = header.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'No token' });
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.id;
-    next();
-  } catch {
-    res.status(401).json({ message: 'Invalid token' });
-  }
-};
+// Use the shared auth middleware to ensure consistent token handling
+const auth = require('../middleware/auth');
 
 // Get profile
 router.get('/profile', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('-password -verifyToken');
+    const user = await User.findById(req.user._id).select('-password -verifyToken');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -51,7 +38,7 @@ router.put('/profile', auth, validateProfileUpdate, async (req, res) => {
     }
     
     const user = await User.findByIdAndUpdate(
-      req.userId, 
+      req.user._id, 
       { firstName, lastName }, 
       { new: true, runValidators: true }
     ).select('-password -verifyToken');
@@ -78,7 +65,7 @@ router.put('/profile', auth, validateProfileUpdate, async (req, res) => {
 // Get usage information
 router.get('/usage', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.userId);
+    const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -112,7 +99,7 @@ router.put('/plan', auth, async (req, res) => {
       return res.status(400).json({ message: 'Invalid plan. Must be free, starter, or premium' });
     }
     
-    const user = await User.findById(req.userId);
+    const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }

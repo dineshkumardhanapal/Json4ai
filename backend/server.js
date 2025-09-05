@@ -148,14 +148,14 @@ app.use('/api/user', require('./routes/user'));
 app.use('/api/prompt', require('./routes/prompt'));
 app.use('/api/payment', require('./routes/payment'));
 
-// Start subscription renewal jobs
-const subscriptionJobs = require('./jobs/subscriptionRenewal');
-subscriptionJobs.startJobs();
+// Start subscription renewal jobs (disabled by default for one-time plans)
+// const subscriptionJobs = require('./legacy/subscriptionRenewal');
+// subscriptionJobs.startJobs();
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
   console.log('SIGTERM received, shutting down gracefully');
-  subscriptionJobs.stopJobs();
+  // if (subscriptionJobs) subscriptionJobs.stopJobs();
   mongoose.connection.close(() => {
     console.log('MongoDB connection closed');
     process.exit(0);
@@ -164,7 +164,7 @@ process.on('SIGTERM', () => {
 
 process.on('SIGINT', () => {
   console.log('SIGINT received, shutting down gracefully');
-  subscriptionJobs.stopJobs();
+  // if (subscriptionJobs) subscriptionJobs.stopJobs();
   mongoose.connection.close(() => {
     console.log('MongoDB connection closed');
     process.exit(0);

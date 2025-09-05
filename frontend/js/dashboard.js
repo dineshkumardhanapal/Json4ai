@@ -336,9 +336,14 @@ const showLoadingState = () => {
     console.warn('⚠️ Loading spinner element not found');
   }
   
-  // Disable form inputs
+  // Disable inputs and buttons but keep Logout usable
   const inputs = document.querySelectorAll('input, button');
-  inputs.forEach(input => input.disabled = true);
+  inputs.forEach(el => {
+    if (el.id === 'logout') return; // keep logout clickable
+    el.disabled = true;
+  });
+  const logoutBtnPersist = document.getElementById('logout');
+  if (logoutBtnPersist) logoutBtnPersist.disabled = false;
   
   // Show loading message
   const dashboardSubtitle = document.getElementById('dashboard-subtitle');
@@ -360,9 +365,9 @@ const hideLoadingState = () => {
     console.warn('⚠️ Loading spinner element not found');
   }
   
-  // Enable form inputs
-  const inputs = document.querySelectorAll('input, button');
-  inputs.forEach(input => input.disabled = false);
+  // Enable inputs and buttons
+  const enableEls = document.querySelectorAll('input, button');
+  enableEls.forEach(el => el.disabled = false);
   
   // Restore dashboard subtitle
   const dashboardSubtitle = document.getElementById('dashboard-subtitle');

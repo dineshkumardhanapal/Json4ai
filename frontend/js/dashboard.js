@@ -395,62 +395,58 @@ const addLoadingSpinner = () => {
   }
 };
 
-// Notification functions
-const showSuccess = (message) => {
-  if (window.showNotification) {
-    window.showNotification(message, 'success');
-  } else {
-    // Fallback notification
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 1rem 1.5rem;
-      background: #10b981;
-      color: white;
-      border-radius: 8px;
-      font-weight: 600;
-      z-index: 10001;
-      max-width: 300px;
-      word-wrap: break-word;
-    `;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-      notification.remove();
-    }, 5000);
-  }
-};
+// Notification functions (avoid redeclaration if notifications.js already defines these)
+if (typeof window.showSuccess !== 'function') {
+  window.showSuccess = function(message) {
+    if (window.showNotification) {
+      window.showNotification(message, 'success');
+    } else {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        background: #10b981;
+        color: white;
+        border-radius: 8px;
+        font-weight: 600;
+        z-index: 10001;
+        max-width: 300px;
+        word-wrap: break-word;
+      `;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 5000);
+    }
+  };
+}
 
-const showError = (message) => {
-  if (window.showNotification) {
-    window.showNotification(message, 'error');
-  } else {
-    // Fallback notification
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 1rem 1.5rem;
-      background: #ef4444;
-      color: white;
-      border-radius: 8px;
-      font-weight: 600;
-      z-index: 10001;
-      max-width: 300px;
-      word-wrap: break-word;
-    `;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-      notification.remove();
-    }, 5000);
-  }
-};
+if (typeof window.showError !== 'function') {
+  window.showError = function(message) {
+    if (window.showNotification) {
+      window.showNotification(message, 'error');
+    } else {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        background: #ef4444;
+        color: white;
+        border-radius: 8px;
+        font-weight: 600;
+        z-index: 10001;
+        max-width: 300px;
+        word-wrap: break-word;
+      `;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 5000);
+    }
+  };
+}
 
 // Load profile when page loads
 // loadProfile(); // Removed duplicate call - already called in DOMContentLoaded

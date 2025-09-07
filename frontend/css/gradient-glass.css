@@ -391,10 +391,61 @@ code, pre, .code-block {
 
 /* Lottie Checkmark Animation Styling */
 .feature-icon lottie-player {
-  display: inline-block;
+  display: inline-block !important;
   vertical-align: middle;
   margin-right: 0.5rem;
   filter: drop-shadow(0 2px 4px rgba(34, 197, 94, 0.3));
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px;
+  min-height: 20px;
+}
+
+/* Fallback for Lottie loading */
+.feature-icon {
+  display: flex;
+  align-items: center;
+  min-width: 20px;
+  min-height: 20px;
+  margin-right: 0.5rem;
+}
+
+/* Show fallback checkmark while Lottie loads */
+.feature-icon::before {
+  content: "✓";
+  color: var(--aurora-green);
+  font-weight: bold;
+  font-size: 16px;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.feature-icon lottie-player {
+  position: absolute;
+  z-index: 1;
+}
+
+/* Hide fallback when Lottie is loaded */
+.feature-icon:has(lottie-player)::before {
+  display: none;
+}
+
+/* Ensure Lottie players are visible */
+.feature-icon lottie-player {
+  position: relative;
+  z-index: 2;
+}
+
+/* Show fallback checkmark by default */
+.feature-icon::before {
+  content: "✓";
+  color: var(--aurora-green);
+  font-weight: bold;
+  font-size: 16px;
+  display: inline-block;
+  margin-right: 0.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .plan-value lottie-player {
@@ -1206,27 +1257,31 @@ input:checked + .toggle-slider:before {
 }
 
 .pricing-grid { 
-  display: grid; 
+  display: grid !important; 
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
   gap: 2rem; 
   margin-top: 3rem; 
   position: relative;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 /* Enhanced Plan Card Styles */
 .plan-card { 
-  background: var(--glass-bg); 
-  border: 1px solid var(--glass-border); 
+  background: var(--glass-bg) !important; 
+  border: 1px solid var(--glass-border) !important; 
   border-radius: var(--radius-lg); 
   padding: 2.5rem 2rem; 
   box-shadow: var(--shadow-medium); 
-  position: relative;
-  text-align: center;
-  min-height: 650px;
-  display: flex;
-  flex-direction: column;
-  transition: all 0.3s ease;
-  cursor: pointer;
+  position: relative; 
+  text-align: center; 
+  min-height: 650px; 
+  display: flex !important; 
+  flex-direction: column; 
+  transition: all 0.3s ease; 
+  cursor: pointer; 
   overflow: hidden;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .plan-card:hover {
@@ -2107,6 +2162,29 @@ body.cookie-modal-active {
 .plan-card .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: var(--glass-shadow-lg);
+}
+
+/* Force visibility for all plan content */
+.plan-card .plan-header,
+.plan-card .plan-description,
+.plan-card .plan-features,
+.plan-card .plan-popularity {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.plan-card .plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+
+.plan-card .plan-features li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0;
 }
 .plan-card.featured { outline: 2px solid rgba(34, 211, 238, 0.35); box-shadow: var(--glass-shadow); }
 .plan-card .plan-badge { 

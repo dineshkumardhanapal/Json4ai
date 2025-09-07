@@ -6,9 +6,63 @@ const API = path => `https://json4ai.onrender.com${path}`;
 
 // Initialize page when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('Pricing page loaded');
+  
+  // Force immediate visibility
+  forcePricingVisibility();
+  
+  ensurePlanContentVisible();
   initializePricingPage();
   initializePricingToggle();
+  
+  // Force visibility after a short delay
+  setTimeout(() => {
+    forcePricingVisibility();
+    ensurePlanContentVisible();
+    console.log('Plan content visibility forced');
+  }, 100);
+  
+  // Additional force after longer delay
+  setTimeout(() => {
+    forcePricingVisibility();
+    console.log('Final visibility check');
+  }, 500);
 });
+
+// Force pricing visibility with maximum priority
+function forcePricingVisibility() {
+  console.log('Forcing pricing visibility...');
+  
+  // Force all plan cards to be visible
+  const planCards = document.querySelectorAll('.plan-card');
+  console.log(`Found ${planCards.length} plan cards`);
+  
+  planCards.forEach((card, index) => {
+    console.log(`Card ${index}:`, card);
+    card.style.setProperty('display', 'flex', 'important');
+    card.style.setProperty('visibility', 'visible', 'important');
+    card.style.setProperty('opacity', '1', 'important');
+    card.classList.remove('hidden');
+    
+    // Force all child elements to be visible
+    const children = card.querySelectorAll('*');
+    children.forEach(child => {
+      child.style.setProperty('display', '', 'important');
+      child.style.setProperty('visibility', 'visible', 'important');
+      child.style.setProperty('opacity', '1', 'important');
+    });
+  });
+  
+  // Force pricing grid to be visible
+  const pricingGrid = document.querySelector('.pricing-grid');
+  if (pricingGrid) {
+    pricingGrid.style.setProperty('display', 'grid', 'important');
+    pricingGrid.style.setProperty('visibility', 'visible', 'important');
+    pricingGrid.style.setProperty('opacity', '1', 'important');
+  }
+  
+  console.log('Pricing visibility forced');
+}
 
 // Ensure all plan content is visible
 function ensurePlanContentVisible() {
@@ -43,6 +97,29 @@ function ensurePlanContentVisible() {
       planPopularity.style.display = 'block';
       planPopularity.style.visibility = 'visible';
       planPopularity.style.opacity = '1';
+    }
+  });
+  
+  // Ensure Lottie players are visible
+  ensureLottiePlayersVisible();
+}
+
+// Ensure Lottie players are visible and loaded
+function ensureLottiePlayersVisible() {
+  const lottiePlayers = document.querySelectorAll('lottie-player');
+  console.log(`Found ${lottiePlayers.length} Lottie players`);
+  
+  lottiePlayers.forEach((player, index) => {
+    console.log(`Lottie player ${index}:`, player);
+    player.style.display = 'inline-block';
+    player.style.visibility = 'visible';
+    player.style.opacity = '1';
+    player.style.width = '20px';
+    player.style.height = '20px';
+    
+    // Force reload if not loaded
+    if (player.load) {
+      player.load();
     }
   });
 }

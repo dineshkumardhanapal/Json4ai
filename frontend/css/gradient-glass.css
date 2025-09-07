@@ -985,12 +985,7 @@ code, pre, .code-block {
   font-size: 0.95rem;
 }
 
-.plan-features-list li:before {
-  content: "✓";
-  color: var(--aurora-green);
-  font-weight: bold;
-  margin-right: 0.5rem;
-}
+/* Removed duplicate checkmark - using HTML checkmarks instead */
 
 /* Quick Actions */
 .quick-actions {
@@ -1319,38 +1314,12 @@ input:checked + .toggle-slider:before {
   gap: 0.75rem;
 }
 
-.plan-features li::before {
-  content: "✓";
-  color: var(--aurora-green);
-  font-weight: bold;
-  font-size: 1.1rem;
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.3);
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
-}
+/* Removed duplicate checkmark - using HTML checkmarks instead */
 
-.plan-features li:hover::before {
-  background: rgba(34, 197, 94, 0.2);
-  border-color: rgba(34, 197, 94, 0.5);
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-  transform: scale(1.1);
-}
+/* Removed hover effects for duplicate checkmarks */
 
 /* Enhanced plan card interactions */
-.plan-card.selected .plan-features li::before {
-  background: rgba(34, 197, 94, 0.2);
-  border-color: rgba(34, 197, 94, 0.6);
-  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4);
-  animation: tickPulse 2s ease-in-out infinite;
-}
+/* Removed selected state for duplicate checkmarks */
 
 @keyframes tickPulse {
   0%, 100% {
@@ -2282,7 +2251,13 @@ body.cookie-modal-active {
   display: flex !important;
 }
 
+/* Hide monthly prices when yearly is active */
 .yearly-pricing .price:not(.yearly-price) {
+  display: none !important;
+}
+
+/* Hide yearly prices by default */
+.plan-card:not(.yearly-pricing) .yearly-price {
   display: none !important;
 }
 

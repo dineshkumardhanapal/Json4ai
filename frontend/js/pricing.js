@@ -238,6 +238,12 @@ async function initializePricingPage() {
   // Initialize pricing display (monthly by default)
   updatePricingDisplay(false);
   
+  // Ensure toggle is set to monthly by default
+  const toggle = document.getElementById('pricing-toggle');
+  if (toggle) {
+    toggle.checked = false; // Monthly is default
+  }
+  
   // Attach listeners to plan buttons
   attachPlanButtonListeners();
 }

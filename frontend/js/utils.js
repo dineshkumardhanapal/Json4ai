@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Wait for session manager to be available
   setTimeout(updateNavigationUI, 100);
   
-  // Secure links that require authentication (e.g., Prompt Generator)
-  const authLinks = Array.from(document.querySelectorAll('a[href$="prompt-generator.html"], a[data-requires-auth="true"]'));
+  // Secure links that require authentication (e.g., Prompt Generator, Dashboard)
+  const authLinks = Array.from(document.querySelectorAll('a[href$="prompt-generator.html"], a[href$="dashboard.html"], a[data-requires-auth="true"]'));
   const ensureAuthLinkState = () => {
     const isLoggedIn = !!(window.sessionManager && window.sessionManager.isLoggedIn());
     authLinks.forEach(link => {

@@ -1,5 +1,5 @@
 // pricing.js — PayPal subscription + error handling
-// Version: 2.1 - Fixed infinite recursion and network issues
+// Version: 2.2 - Enhanced pricing UI with toggle and better UX
 const API = path => `https://json4ai.onrender.com${path}`;
 
 // Note: PayPal plan IDs removed. Razorpay is the active gateway.
@@ -7,7 +7,42 @@ const API = path => `https://json4ai.onrender.com${path}`;
 // Initialize page when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   initializePricingPage();
+  initializePricingToggle();
 });
+
+// Pricing toggle functionality
+function initializePricingToggle() {
+  const toggle = document.getElementById('pricing-toggle');
+  if (!toggle) return;
+
+  toggle.addEventListener('change', function() {
+    const isYearly = this.checked;
+    updatePricingDisplay(isYearly);
+  });
+}
+
+function updatePricingDisplay(isYearly) {
+  const monthlyPrices = document.querySelectorAll('.price:not(.yearly-price)');
+  const yearlyPrices = document.querySelectorAll('.yearly-price');
+  
+  monthlyPrices.forEach(price => {
+    price.style.display = isYearly ? 'none' : 'flex';
+  });
+  
+  yearlyPrices.forEach(price => {
+    price.style.display = isYearly ? 'flex' : 'none';
+  });
+  
+  // Update plan cards with yearly pricing
+  const planCards = document.querySelectorAll('.plan-card');
+  planCards.forEach(card => {
+    if (isYearly) {
+      card.classList.add('yearly-pricing');
+    } else {
+      card.classList.remove('yearly-pricing');
+    }
+  });
+}
 
 // Initialize the pricing page
 async function initializePricingPage() {

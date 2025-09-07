@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css"/>
   <link rel="stylesheet" href="css/gradient-glass.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
@@ -40,73 +40,216 @@
 <main>
   <div class="container">
     <div class="pricing-header text-center">
-      <h1>Choose Your Favourite Plan</h1>
-      <p>Select the perfect plan based on your JSON output quality requirements</p>
+      <div class="pricing-badge">
+        <span class="badge-icon">🚀</span>
+        <span>Flexible Pricing</span>
+      </div>
+      <h1>Choose Your Perfect Plan</h1>
+      <p>Unlock the power of AI with our carefully crafted pricing tiers. Start free, scale as you grow.</p>
+      
+      <!-- Pricing Toggle -->
+      <div class="pricing-toggle">
+        <span class="toggle-label">Monthly</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="pricing-toggle">
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-label">Yearly <span class="savings-badge">Save 20%</span></span>
+      </div>
     </div>
     
     <div class="pricing-grid">
-      <div class="plan-card">
+      <div class="plan-card" data-plan="free">
         <div class="card__border"></div>
         <div class="plan-header">
+          <div class="plan-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </div>
           <h3>Free</h3>
           <div class="quality-badge quality-free">
             <span class="quality-icon">📝</span>
             <span class="quality-text">Basic Quality</span>
           </div>
         </div>
-        <div class="price">₹0<span>/always free</span></div>
+        <div class="price">
+          <span class="currency">₹</span>
+          <span class="amount">0</span>
+          <span class="period">/always free</span>
+        </div>
+        <div class="plan-description">
+          <p>Perfect for getting started with AI-powered JSON generation</p>
+        </div>
         <ul class="plan-features">
-          <li><strong>3 prompts per day</strong></li>
-          <li>Simple JSON structure</li>
-          <li>Essential information only</li>
-          <li>Basic NLP processing</li>
-          <li>100-150 word output</li>
-          <li>Standard accuracy</li>
+          <li><span class="feature-icon">✓</span><strong>3 prompts per day</strong></li>
+          <li><span class="feature-icon">✓</span>Simple JSON structure</li>
+          <li><span class="feature-icon">✓</span>Essential information only</li>
+          <li><span class="feature-icon">✓</span>Basic NLP processing</li>
+          <li><span class="feature-icon">✓</span>100-150 word output</li>
+          <li><span class="feature-icon">✓</span>Standard accuracy</li>
         </ul>
-        <button class="btn-primary" data-plan="free">Get Started</button>
+        <button class="btn-primary" data-plan="free">Get Started Free</button>
+        <div class="plan-popularity">
+          <span class="popularity-text">Most Popular for Beginners</span>
+        </div>
       </div>
       
-      <div class="plan-card featured">
+      <div class="plan-card featured" data-plan="starter">
         <div class="card__border"></div>
-        <div class="plan-badge">Recommended</div>
+        <div class="plan-badge">
+          <span class="badge-icon">⭐</span>
+          <span>Most Popular</span>
+        </div>
         <div class="plan-header">
+          <div class="plan-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </div>
           <h3>Starter</h3>
           <div class="quality-badge quality-standard">
             <span class="quality-icon">✨</span>
             <span class="quality-text">Standard Quality</span>
           </div>
         </div>
-        <div class="price">₹299<span>/month</span></div>
+        <div class="price">
+          <span class="currency">₹</span>
+          <span class="amount">299</span>
+          <span class="period">/month</span>
+          <div class="yearly-price" style="display: none;">
+            <span class="currency">₹</span>
+            <span class="amount">239</span>
+            <span class="period">/month</span>
+            <span class="yearly-note">billed yearly</span>
+          </div>
+        </div>
+        <div class="plan-description">
+          <p>Ideal for developers and small teams who need reliable AI assistance</p>
+        </div>
         <ul class="plan-features">
-          <li><strong>30 prompts per day</strong></li>
-          <li>Enhanced JSON structure</li>
-          <li>Moderate detail and depth</li>
-          <li>Improved NLP sophistication</li>
-          <li>150-200 word output</li>
-          <li>Enhanced accuracy</li>
+          <li><span class="feature-icon">✓</span><strong>30 prompts per day</strong></li>
+          <li><span class="feature-icon">✓</span>Enhanced JSON structure</li>
+          <li><span class="feature-icon">✓</span>Moderate detail and depth</li>
+          <li><span class="feature-icon">✓</span>Improved NLP sophistication</li>
+          <li><span class="feature-icon">✓</span>150-200 word output</li>
+          <li><span class="feature-icon">✓</span>Enhanced accuracy</li>
+          <li><span class="feature-icon">✓</span>Priority support</li>
         </ul>
-        <button class="btn-primary" data-plan="starter">Buy Now</button>
+        <button class="btn-primary" data-plan="starter">Start Free Trial</button>
+        <div class="plan-popularity">
+          <span class="popularity-text">10x more value than free</span>
+        </div>
       </div>
       
-      <div class="plan-card">
+      <div class="plan-card" data-plan="premium">
         <div class="card__border"></div>
         <div class="plan-header">
+          <div class="plan-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </div>
           <h3>Premium</h3>
           <div class="quality-badge quality-premium">
             <span class="quality-icon">⭐</span>
             <span class="quality-text">Premium Quality</span>
           </div>
         </div>
-        <div class="price">₹999<span>/month</span></div>
+        <div class="price">
+          <span class="currency">₹</span>
+          <span class="amount">999</span>
+          <span class="period">/month</span>
+          <div class="yearly-price" style="display: none;">
+            <span class="currency">₹</span>
+            <span class="amount">799</span>
+            <span class="period">/month</span>
+            <span class="yearly-note">billed yearly</span>
+          </div>
+        </div>
+        <div class="plan-description">
+          <p>For power users and enterprises who demand the highest quality output</p>
+        </div>
         <ul class="plan-features">
-          <li><strong>100 prompts per day</strong></li>
-          <li>Maximum JSON detail</li>
-          <li>Advanced NLP techniques</li>
-          <li>Comprehensive content</li>
-          <li>200+ word output</li>
-          <li>Maximum accuracy</li>
+          <li><span class="feature-icon">✓</span><strong>100 prompts per day</strong></li>
+          <li><span class="feature-icon">✓</span>Maximum JSON detail</li>
+          <li><span class="feature-icon">✓</span>Advanced NLP techniques</li>
+          <li><span class="feature-icon">✓</span>Comprehensive content</li>
+          <li><span class="feature-icon">✓</span>200+ word output</li>
+          <li><span class="feature-icon">✓</span>Maximum accuracy</li>
+          <li><span class="feature-icon">✓</span>24/7 priority support</li>
+          <li><span class="feature-icon">✓</span>API access</li>
+          <li><span class="feature-icon">✓</span>Custom templates</li>
         </ul>
-        <button class="btn-primary" data-plan="premium">Buy Now</button>
+        <button class="btn-primary" data-plan="premium">Go Premium</button>
+        <div class="plan-popularity">
+          <span class="popularity-text">Best for professionals</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Trust Indicators -->
+    <div class="trust-indicators">
+      <div class="trust-item">
+        <div class="trust-icon">🔒</div>
+        <span>Secure Payments</span>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">⚡</div>
+        <span>Instant Access</span>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">🔄</div>
+        <span>Cancel Anytime</span>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">💬</div>
+        <span>24/7 Support</span>
+      </div>
+    </div>
+    
+    <!-- Feature Comparison Table -->
+    <div class="comparison-section">
+      <h2>Compare Plans</h2>
+      <div class="comparison-table">
+        <div class="comparison-header">
+          <div class="feature-column">Features</div>
+          <div class="plan-column">Free</div>
+          <div class="plan-column featured">Starter</div>
+          <div class="plan-column">Premium</div>
+        </div>
+        <div class="comparison-row">
+          <div class="feature-name">Daily Prompts</div>
+          <div class="plan-value">3</div>
+          <div class="plan-value">30</div>
+          <div class="plan-value">100</div>
+        </div>
+        <div class="comparison-row">
+          <div class="feature-name">JSON Quality</div>
+          <div class="plan-value">Basic</div>
+          <div class="plan-value">Enhanced</div>
+          <div class="plan-value">Premium</div>
+        </div>
+        <div class="comparison-row">
+          <div class="feature-name">Word Output</div>
+          <div class="plan-value">100-150</div>
+          <div class="plan-value">150-200</div>
+          <div class="plan-value">200+</div>
+        </div>
+        <div class="comparison-row">
+          <div class="feature-name">Support</div>
+          <div class="plan-value">Community</div>
+          <div class="plan-value">Priority</div>
+          <div class="plan-value">24/7 Priority</div>
+        </div>
+        <div class="comparison-row">
+          <div class="feature-name">API Access</div>
+          <div class="plan-value">❌</div>
+          <div class="plan-value">❌</div>
+          <div class="plan-value">✅</div>
+        </div>
       </div>
     </div>
     

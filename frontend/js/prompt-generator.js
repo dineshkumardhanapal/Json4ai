@@ -803,7 +803,7 @@ const initializePage = async () => {
 };
 
 // Listen for storage changes (in case token is cleared from another tab/window)
-window.addEventListener('storage', (e) => {
+const handleStorageChange = (e) => {
   if (e.key === 'accessToken' && !e.newValue) {
     // Token was cleared from another tab/window
     if (window.sessionManager) {
@@ -812,7 +812,17 @@ window.addEventListener('storage', (e) => {
       location.href = 'login.html';
     }
   }
-});
+};
+
+window.addEventListener('storage', handleStorageChange);
+
+// Cleanup function for potential memory leaks
+const cleanup = () => {
+  window.removeEventListener('storage', handleStorageChange);
+};
+
+// Add cleanup on page unload
+window.addEventListener('beforeunload', cleanup);
 
 // Debug functionality
 

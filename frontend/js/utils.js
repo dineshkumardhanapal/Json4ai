@@ -1,4 +1,43 @@
-// Hamburger toggle
+// Utility functions
+
+// Error boundary for async operations
+const safeAsync = async (asyncFn, fallback = null) => {
+  try {
+    return await asyncFn();
+  } catch (error) {
+    console.error('Async operation failed:', error);
+    return fallback;
+  }
+};
+
+// Debounce function for performance
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
+
+// Throttle function for scroll events
+const throttle = (func, limit) => {
+  let inThrottle;
+  return function() {
+    const args = arguments;
+    const context = this;
+    if (!inThrottle) {
+      func.apply(context, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+};
+
+// Hamburger toggle (legacy - now handled by mobile-nav.js)
 const hamburger = document.getElementById('hamburger');
 const navLinks  = document.getElementById('nav-links');
 if (hamburger) {

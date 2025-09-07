@@ -240,7 +240,7 @@ body::before {
 
 .btn-secondary {
   background: var(--glass-bg);
-  color: var(--text-primary);
+  color: white;
   border: 2px solid var(--accent-primary);
   padding: 0.875rem 2rem;
   border-radius: var(--radius-lg);
@@ -824,7 +824,7 @@ body::before {
 .btn-secondary {
   background: transparent;
   border: 2px solid var(--border-color);
-  color: var(--text-secondary);
+  color: white;
   padding: 0.875rem 1.5rem;
   border-radius: var(--radius-lg);
   text-decoration: none;
@@ -838,7 +838,7 @@ body::before {
 
 .btn-secondary:hover {
   border-color: var(--accent-purple);
-  color: var(--accent-purple);
+  color: white;
   transform: translateY(-1px);
   box-shadow: var(--shadow-lg);
 }
@@ -2991,7 +2991,7 @@ footer,
 
 .btn-secondary {
   background: var(--glass-bg) !important;
-  color: var(--text-primary) !important;
+  color: white !important;
   border: 2px solid var(--accent-primary) !important;
   backdrop-filter: blur(10px) !important;
   -webkit-backdrop-filter: blur(10px) !important;

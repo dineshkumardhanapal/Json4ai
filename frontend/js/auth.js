@@ -5,7 +5,7 @@ const registerForm = document.getElementById('register-form');
 const API = path => `https://json4ai.onrender.com/api${path}`;
 
 // Google OAuth Configuration
-const GOOGLE_CLIENT_ID = 'your-google-client-id.googleusercontent.com'; // Replace with actual client ID
+const GOOGLE_CLIENT_ID = 'your-google-client-id.googleusercontent.com'; // TODO: Replace with actual client ID from Google Console
 
 // Initialize Google Sign-In
 function initializeGoogleAuth() {
@@ -144,11 +144,33 @@ if (registerForm) {
     }
     
     const fd = new FormData(registerForm);
+    
+    // Basic form validation
+    const firstName = fd.get('firstName')?.trim();
+    const lastName = fd.get('lastName')?.trim();
+    const email = fd.get('email')?.trim();
+    const password = fd.get('password');
+    
+    if (!firstName || !lastName || !email || !password) {
+      showError('Please fill in all required fields.');
+      return;
+    }
+    
+    if (password.length < 6) {
+      showError('Password must be at least 6 characters long.');
+      return;
+    }
+    
+    if (!email.includes('@') || !email.includes('.')) {
+      showError('Please enter a valid email address.');
+      return;
+    }
+    
     const body = {
-      firstName: fd.get('firstName'),
-      lastName:  fd.get('lastName'),
-      email:     fd.get('email'),
-      password:  fd.get('password')
+      firstName: firstName,
+      lastName:  lastName,
+      email:     email,
+      password:  password
     };
     
     // Registration data prepared
@@ -200,8 +222,14 @@ if (registerForm) {
 
 // Initialize Google Auth when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  // Initialize Google Auth
-  setTimeout(initializeGoogleAuth, 1000); // Delay to ensure Google SDK is loaded
+  // Initialize Google Auth with better error handling
+  setTimeout(() => {
+    try {
+      initializeGoogleAuth();
+    } catch (error) {
+      console.warn('Google Auth initialization failed:', error);
+    }
+  }, 1000); // Delay to ensure Google SDK is loaded
   
   // Handle Google Sign-In button clicks
   const googleSignInBtn = document.getElementById('google-signin');

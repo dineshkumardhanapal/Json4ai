@@ -1,4 +1,19 @@
 // Mobile Navigation Handler
+
+// Throttle function for performance
+const throttle = (func, limit) => {
+  let inThrottle;
+  return function() {
+    const args = arguments;
+    const context = this;
+    if (!inThrottle) {
+      func.apply(context, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+};
+
 document.addEventListener('DOMContentLoaded', function() {
   const hamburger = document.getElementById('hamburger');
   const navLinks = document.getElementById('nav-links');
@@ -74,10 +89,11 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-    // Add scroll behavior to keep navbar visible
+    // Add scroll behavior to keep navbar visible (throttled for performance)
     let ticking = false;
+    const navbar = document.querySelector('.navbar');
+    
     function updateNavbarOnScroll() {
-      const navbar = document.querySelector('.navbar');
       if (navbar) {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         
@@ -104,6 +120,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
     
-    window.addEventListener('scroll', requestTick);
+    // Throttle scroll events for better performance
+    const throttledScroll = throttle(requestTick, 16); // ~60fps
+    window.addEventListener('scroll', throttledScroll);
   }
 });

@@ -110,6 +110,13 @@ function updateUIForGuestUser() {
       });
     }
   });
+  
+  // Ensure all plan cards are visible
+  document.querySelectorAll('.plan-card').forEach(card => {
+    card.style.display = 'flex';
+    card.style.visibility = 'visible';
+    card.style.opacity = '1';
+  });
 }
 
 // Load user's current plan and update UI

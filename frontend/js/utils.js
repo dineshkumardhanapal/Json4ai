@@ -26,12 +26,58 @@ document.addEventListener('DOMContentLoaded', function() {
   // Wait for session manager to be available
   setTimeout(updateNavigationUI, 100);
   
+  // Secure links that require authentication (e.g., Prompt Generator)
+  const authLinks = Array.from(document.querySelectorAll('a[href$="prompt-generator.html"], a[data-requires-auth="true"]'));
+  const ensureAuthLinkState = () => {
+    const isLoggedIn = !!(window.sessionManager && window.sessionManager.isLoggedIn());
+    authLinks.forEach(link => {
+      link.setAttribute('data-requires-auth', 'true');
+      if (isLoggedIn) {
+        // Restore real destination
+        link.setAttribute('href', 'prompt-generator.html');
+        link.classList.remove('locked');
+        link.title = link.title && link.title.replace(/\s*\(Login required\)$/i, '');
+      } else {
+        // Point to login to avoid exposing the protected page URL directly
+        link.setAttribute('href', 'login.html');
+        link.classList.add('locked');
+        if (!/\(Login required\)$/i.test(link.title || '')) {
+          link.title = (link.title || 'Login required') + ' (Login required)';
+        }
+      }
+    });
+  };
+  
+  // Initial ensure
+  ensureAuthLinkState();
+  
+  // Intercept clicks on auth-required links to enforce login without page flash
+  document.addEventListener('click', (e) => {
+    const target = e.target.closest('a[data-requires-auth="true"]');
+    if (!target) return;
+    const isLoggedIn = !!(window.sessionManager && window.sessionManager.isLoggedIn());
+    if (!isLoggedIn) {
+      e.preventDefault();
+      // Redirect explicitly to login
+      window.location.href = 'login.html';
+    }
+  });
+  
+  // Re-evaluate links when session state might change
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'accessToken' || e.key === 'refreshToken') {
+      updateNavigationUI();
+      ensureAuthLinkState();
+    }
+  });
+  
   // Update navigation UI when session status changes
   if (window.sessionManager) {
     // Listen for storage changes (when tokens are cleared)
     window.addEventListener('storage', function(e) {
       if (e.key === 'accessToken' || e.key === 'refreshToken') {
         updateNavigationUI();
+        ensureAuthLinkState();
       }
     });
   }

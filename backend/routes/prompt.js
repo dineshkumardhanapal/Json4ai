@@ -6,6 +6,7 @@ const User   = require('../models/User');
 const creditCheck = require('../middleware/credit');
 const auth = require('../middleware/auth');
 const { validatePromptGeneration } = require('../middleware/validation');
+const jwt = require('jsonwebtoken');
 
 // Initialize Replicate client
 let replicate;
@@ -159,6 +160,141 @@ router.post('/generate', auth, creditCheck, validatePromptGeneration, async (req
     }
     
     res.status(500).json({ message: 'Failed to generate prompt. Please try again.' });
+  }
+});
+
+// SSE: Stream prompt generation progress and final result
+// GET /api/prompt/stream?comment=...
+router.get('/stream', async (req, res) => {
+  try {
+    // Authenticate via Authorization header (EventSource supports custom headers in some polyfills; fallback to query token if needed)
+    const header = req.headers.authorization || '';
+    const token = header.split(' ')[1] || req.query.token;
+    if (!token) {
+      res.status(401).end();
+      return;
+    }
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (e) {
+      res.status(401).end();
+      return;
+    }
+    const user = await User.findById(decoded.userId || decoded.id);
+    if (!user) {
+      res.status(401).end();
+      return;
+    }
+
+    // Basic validation
+    const comment = String(req.query.comment || '').trim();
+    if (!comment) {
+      res.status(400).end();
+      return;
+    }
+
+    // Apply day rollover and enforce limits
+    user.resetDailyUsage();
+    user.resetDailyCredits();
+    user.resetMonthlyUsage();
+    if (!user.canGeneratePrompt()) {
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive'
+      });
+      res.write(`event: error\n`);
+      res.write(`data: ${JSON.stringify({ message: 'Daily limit reached', dailyLimit: user.dailyLimit })}\n\n`);
+      res.end();
+      return;
+    }
+
+    // Use a credit up-front to avoid race; if generation fails, we won't decrement counters further (credit already counted)
+    user.useCredit();
+    await user.save();
+
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive'
+    });
+
+    const send = (event, payload) => {
+      res.write(`event: ${event}\n`);
+      res.write(`data: ${JSON.stringify(payload)}\n\n`);
+    };
+
+    // Early progress
+    send('progress', { stage: 'initializing' });
+
+    // Prepare prompts and parameters
+    const qualityTier = getQualityTier(user.plan);
+    const systemPrompt = generateSystemPrompt(qualityTier);
+    const userPrompt = generateUserPrompt(comment, qualityTier);
+    const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
+    const modelParams = getModelParameters(qualityTier);
+
+    send('progress', { stage: 'requesting_model', qualityTier });
+
+    // Run replicate (non-streaming, but we chunk updates for perceived speed)
+    const output = await replicate.run(
+      "meta/meta-llama-3-8b-instruct",
+      { input: { prompt: fullPrompt, ...modelParams } }
+    );
+
+    send('progress', { stage: 'received_output' });
+
+    // Parse JSON
+    let jsonPrompt;
+    try {
+      const cleanOutput = Array.isArray(output) ? output.join('') : String(output);
+      let jsonMatch = cleanOutput.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        jsonMatch = cleanOutput.match(/(?:```json\s*|\{[\s\S]*\})/);
+        if (jsonMatch && jsonMatch[0].startsWith('```json')) {
+          jsonMatch = jsonMatch[0].replace(/```json\s*/, '').match(/\{[\s\S]*\}/);
+        }
+      }
+      if (jsonMatch) {
+        jsonPrompt = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('No JSON');
+      }
+    } catch (e) {
+      jsonPrompt = generateFallbackJSON(comment, qualityTier, 'parse_error');
+    }
+
+    // Persist
+    const doc = await Prompt.create({ 
+      userId: user._id, 
+      comment, 
+      prompt: JSON.stringify(jsonPrompt),
+      qualityTier
+    });
+
+    send('result', { 
+      prompt: doc.prompt,
+      creditsLeft: user.remainingCredits,
+      plan: user.plan,
+      dailyLimit: user.dailyLimit,
+      totalPromptsUsed: user.totalPromptsUsed,
+      qualityTier
+    });
+
+    send('done', { ok: true });
+    res.end();
+  } catch (error) {
+    try {
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive'
+      });
+      res.write(`event: error\n`);
+      res.write(`data: ${JSON.stringify({ message: 'Streaming failed' })}\n\n`);
+    } catch (_) {}
+    res.end();
   }
 });
 

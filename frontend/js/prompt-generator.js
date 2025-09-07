@@ -267,102 +267,74 @@ const generatePrompt = async (comment) => {
   const btnLoading = generateBtn.querySelector('.btn-loading');
   
   try {
-    // Show loading state
+    // Show minimal loading state (no progress animation for speed)
     btnText.style.display = 'none';
     btnLoading.style.display = 'flex';
     generateBtn.disabled = true;
-    
-    // Show progress indicator
-    showGenerationProgress();
-    
+
     const accessToken = window.sessionManager.getAccessToken();
     if (!accessToken) {
       showError('No access token available. Please log in again.');
       return;
     }
-    
-    console.log('Making API request to generate prompt...');
-    
-    const res = await fetch('https://json4ai.onrender.com/api/prompt/generate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`
-      },
-      body: JSON.stringify({ comment })
-    });
-    
-    console.log('Prompt generation response:', {
-      status: res.status,
-      statusText: res.statusText,
-      url: res.url
-    });
-    
-    if (!res.ok) {
-      let errorData;
-      try {
-        errorData = await res.json();
-      } catch (e) {
-        errorData = { message: 'Unknown error occurred' };
-      }
-      
-      if (res.status === 401) {
-        // Token expired or invalid - let session manager handle this
-        window.sessionManager.forceLogout('Token expired during prompt generation');
-        return;
-      }
-      
-      if (res.status === 402) {
-        // Credit limit reached
-        showError(errorData.message);
-        hideGenerationProgress();
-        loadUsageStatus(); // Refresh usage status
-        return;
-      }
-      
-      if (res.status === 404) {
-        showError('API endpoint not found. Please check if the service is running.');
-        hideGenerationProgress();
-        // Show demo mode option
-        showDemoModeOption(comment);
-        return;
-      }
-      
-      if (res.status === 500) {
-        showError('Server error occurred. Please try again later.');
-        hideGenerationProgress();
-        return;
-      }
-      
-      throw new Error(errorData.message || `Failed to generate prompt (Status: ${res.status})`);
-    }
-    
-    const result = await res.json();
-    
-    // Complete progress animation
-    completeGenerationProgress();
-    
-    // Display the result with typing effect
-    displayResultWithTyping(comment, result.prompt, result.qualityTier);
-    
-    // Refresh usage status
-    loadUsageStatus();
-    
-    // Load recent history
-    loadRecentHistory();
-    
-    showSuccess('Prompt generated successfully!');
+
+    console.log('Starting SSE request for prompt generation...');
+    await streamPromptViaSSE(comment, accessToken);
     
   } catch (error) {
     console.error('Error generating prompt:', error);
     showError(error.message || 'Failed to generate prompt. Please try again.');
-    hideGenerationProgress();
+    // No progress UI to hide
   } finally {
     // Reset button state
     btnText.style.display = 'inline';
     btnLoading.style.display = 'none';
     generateBtn.disabled = false;
   }
+};
+
+// Stream prompt via SSE for faster perceived response
+const streamPromptViaSSE = async (comment, accessToken) => {
+  return new Promise((resolve) => {
+    const params = new URLSearchParams({ comment, token: accessToken });
+    const url = `https://json4ai.onrender.com/api/prompt/stream?${params.toString()}`;
+
+    const es = new EventSource(url);
+
+    es.addEventListener('progress', (e) => {
+      // Optional: parse and show progress
+      // const data = JSON.parse(e.data);
+      // console.log('progress', data);
+    });
+
+    es.addEventListener('result', (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        displayResultInstant(comment, data.prompt, data.qualityTier);
+        loadUsageStatus();
+        loadRecentHistory();
+        showSuccess('Prompt generated successfully!');
+      } catch (err) {
+        console.error('Failed to parse SSE result:', err);
+      }
+    });
+
+    es.addEventListener('error', (e) => {
+      try {
+        const data = JSON.parse(e.data || '{}');
+        showError(data.message || 'Streaming error');
+      } catch (_) {
+        showError('Streaming error');
+      }
+      es.close();
+      resolve();
+    });
+
+    es.addEventListener('done', () => {
+      es.close();
+      resolve();
+    });
+  });
 };
 
 // Show generation progress with animations
@@ -474,8 +446,8 @@ const hideGenerationProgress = () => {
   });
 };
 
-// Display result with typing effect
-const displayResultWithTyping = (input, promptJson, qualityTier = null) => {
+// Display result immediately (fast mode)
+const displayResultInstant = (input, promptJson, qualityTier = null) => {
   const originalInputText = document.getElementById('original-input-text');
   const jsonOutput = document.getElementById('json-output');
   
@@ -491,8 +463,15 @@ const displayResultWithTyping = (input, promptJson, qualityTier = null) => {
     displayQualityTier(qualityTier);
   }
   
-  // Start typing effect for JSON
-  startTypingEffect(promptJson, jsonOutput);
+  // Immediately render JSON content without typing
+  try {
+    const parsed = JSON.parse(promptJson);
+    jsonOutput.textContent = JSON.stringify(parsed, null, 2);
+    jsonOutput.className = 'json-valid';
+  } catch (e) {
+    jsonOutput.textContent = promptJson;
+    jsonOutput.className = 'json-invalid';
+  }
 };
 
 // Start typing effect for JSON output

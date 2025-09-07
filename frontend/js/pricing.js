@@ -217,10 +217,22 @@ function initializePricingToggle() {
   setTimeout(() => {
     console.log('Testing yearly pricing display...');
     updatePricingDisplay(true);
+    
+    // Force yearly prices to be visible
+    setTimeout(() => {
+      const yearlyPrices = document.querySelectorAll('.yearly-price');
+      yearlyPrices.forEach((price, index) => {
+        price.style.setProperty('display', 'flex', 'important');
+        price.style.setProperty('visibility', 'visible', 'important');
+        price.style.setProperty('opacity', '1', 'important');
+        console.log(`Forced yearly price ${index} to be visible`);
+      });
+    }, 100);
+    
     setTimeout(() => {
       console.log('Testing monthly pricing display...');
       updatePricingDisplay(false);
-    }, 2000);
+    }, 3000);
   }, 1000);
 }
 
@@ -250,10 +262,14 @@ function updatePricingDisplay(isYearly) {
   // Update yearly prices
   yearlyPrices.forEach((price, index) => {
     console.log(`Yearly price ${index}:`, price);
+    console.log(`Yearly price ${index} parent:`, price.parentElement);
+    console.log(`Yearly price ${index} computed display before:`, window.getComputedStyle(price).display);
+    
     if (isYearly) {
       price.style.setProperty('display', 'flex', 'important');
       price.style.setProperty('visibility', 'visible', 'important');
       price.style.setProperty('opacity', '1', 'important');
+      console.log(`Yearly price ${index} computed display after:`, window.getComputedStyle(price).display);
     } else {
       price.style.setProperty('display', 'none', 'important');
       price.style.setProperty('visibility', 'hidden', 'important');
@@ -294,11 +310,33 @@ async function initializePricingPage() {
   testButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: #ff4444; color: white; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;';
   testButton.onclick = () => {
     console.log('Testing yearly pricing...');
-    updatePricingDisplay(true);
+    
+    // Add yearly-pricing class to all plan cards
     document.querySelectorAll('.plan-card').forEach(card => {
       card.classList.add('yearly-pricing');
       console.log('Added yearly-pricing class to card:', card);
     });
+    
+    // Force all yearly prices to be visible
+    const yearlyPrices = document.querySelectorAll('.yearly-price');
+    console.log(`Found ${yearlyPrices.length} yearly price elements`);
+    
+    yearlyPrices.forEach((price, index) => {
+      price.style.setProperty('display', 'flex', 'important');
+      price.style.setProperty('visibility', 'visible', 'important');
+      price.style.setProperty('opacity', '1', 'important');
+      price.style.setProperty('position', 'relative', 'important');
+      price.style.setProperty('z-index', '10', 'important');
+      console.log(`Forced yearly price ${index} to be visible:`, price);
+    });
+    
+    // Hide monthly price spans
+    document.querySelectorAll('.plan-card.yearly-pricing .price > span:not(.yearly-price span)').forEach(span => {
+      span.style.setProperty('display', 'none', 'important');
+      console.log('Hidden monthly price span:', span);
+    });
+    
+    updatePricingDisplay(true);
   };
   document.body.appendChild(testButton);
   

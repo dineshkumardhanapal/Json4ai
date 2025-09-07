@@ -1590,7 +1590,7 @@ input:checked + .toggle-slider:before {
   box-shadow: var(--shadow-medium); 
   position: relative; 
   text-align: center; 
-  min-height: 700px; 
+  min-height: 600px; 
   height: auto; 
   display: flex !important; 
   flex-direction: column; 
@@ -2631,10 +2631,31 @@ body.cookie-modal-active {
   opacity: 1 !important;
 }
 
+/* Force yearly prices to show when yearly-pricing class is present */
+.plan-card.yearly-pricing .yearly-price {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Ultimate override for yearly prices */
+.plan-card[class*="yearly-pricing"] .yearly-price {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
 /* Hide monthly price content when yearly is active */
 .plan-card.yearly-pricing .price .currency:not(.yearly-price .currency),
 .plan-card.yearly-pricing .price .amount:not(.yearly-price .amount),
 .plan-card.yearly-pricing .price .period:not(.yearly-price .period) {
+  display: none !important;
+}
+
+/* Hide monthly price spans when yearly is active */
+.plan-card.yearly-pricing .price > span:not(.yearly-price span) {
   display: none !important;
 }
 
@@ -2645,7 +2666,7 @@ body.cookie-modal-active {
 
 /* Ensure yearly prices are properly styled when visible */
 .yearly-price {
-  display: none !important;
+  display: none;
   align-items: baseline;
   justify-content: center;
   gap: 0.25rem;
@@ -2690,7 +2711,7 @@ body.cookie-modal-active {
   margin: 1.5rem 0 !important;
   text-align: left;
   flex-grow: 1;
-  min-height: 200px;
+  min-height: 120px;
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
@@ -2906,7 +2927,7 @@ body.cookie-modal-active {
   }
   
   .plan-features {
-    min-height: 180px;
+    min-height: 100px;
   }
   
   .pricing-grid {

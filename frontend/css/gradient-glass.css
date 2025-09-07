@@ -389,8 +389,8 @@ code, pre, .code-block {
   font-feature-settings: 'liga' 0;
 }
 
-/* Simple Checkmark Styling */
-.feature-icon {
+/* Simple Checkmark Styling for pricing page */
+.plan-features .feature-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -522,7 +522,19 @@ code, pre, .code-block {
   text-align: left;
 }
 .feature-card:hover, .pricing-card:hover, .testimonial-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-strong); }
-.feature-icon { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.14), rgba(255,255,255,0.06) 60%); border: 1px solid var(--glass-border); box-shadow: 0 8px 24px rgba(34,211,238,0.12), 0 2px 8px rgba(96,165,250,0.12); }
+/* Feature icon for feature cards (not pricing) */
+.feature-card .feature-icon { 
+  width: 56px; 
+  height: 56px; 
+  border-radius: 50%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  margin-bottom: 1.25rem; 
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.14), rgba(255,255,255,0.06) 60%); 
+  border: 1px solid var(--glass-border); 
+  box-shadow: 0 8px 24px rgba(34,211,238,0.12), 0 2px 8px rgba(96,165,250,0.12); 
+}
 .feature-icon svg { width: 28px; height: 28px; color: var(--text-light); }
 .feature-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary); line-height: 1.3; }
 

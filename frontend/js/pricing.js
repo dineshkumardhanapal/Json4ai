@@ -200,28 +200,39 @@ function initializePricingToggle() {
 function updatePricingDisplay(isYearly) {
   console.log('Updating pricing display - yearly:', isYearly);
   
+  // Get all price elements
   const monthlyPrices = document.querySelectorAll('.price:not(.yearly-price)');
   const yearlyPrices = document.querySelectorAll('.yearly-price');
   
-  monthlyPrices.forEach(price => {
+  console.log('Found monthly prices:', monthlyPrices.length);
+  console.log('Found yearly prices:', yearlyPrices.length);
+  
+  // Update monthly prices
+  monthlyPrices.forEach((price, index) => {
+    console.log(`Monthly price ${index}:`, price);
     price.style.setProperty('display', isYearly ? 'none' : 'flex', 'important');
   });
   
-  yearlyPrices.forEach(price => {
+  // Update yearly prices
+  yearlyPrices.forEach((price, index) => {
+    console.log(`Yearly price ${index}:`, price);
     price.style.setProperty('display', isYearly ? 'flex' : 'none', 'important');
   });
   
-  // Update plan cards with yearly pricing
+  // Update plan cards with yearly pricing class
   const planCards = document.querySelectorAll('.plan-card');
-  planCards.forEach(card => {
+  planCards.forEach((card, index) => {
+    console.log(`Plan card ${index}:`, card);
     if (isYearly) {
       card.classList.add('yearly-pricing');
+      console.log('Added yearly-pricing class to card', index);
     } else {
       card.classList.remove('yearly-pricing');
+      console.log('Removed yearly-pricing class from card', index);
     }
   });
   
-  console.log('Pricing display updated');
+  console.log('Pricing display updated - yearly:', isYearly);
 }
 
 // Initialize the pricing page
@@ -242,6 +253,13 @@ async function initializePricingPage() {
   const toggle = document.getElementById('pricing-toggle');
   if (toggle) {
     toggle.checked = false; // Monthly is default
+    console.log('Toggle initialized to monthly');
+    
+    // Test the toggle functionality
+    setTimeout(() => {
+      console.log('Testing toggle functionality...');
+      updatePricingDisplay(false); // Ensure monthly is shown
+    }, 100);
   }
   
   // Attach listeners to plan buttons

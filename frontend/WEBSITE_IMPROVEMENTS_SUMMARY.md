@@ -81,7 +81,7 @@
 - `prompt-generator.html` - Fixed syntax error, mobile nav
 
 ### **CSS Improvements**
-- `aurora-glass.css` - Major theme refinements, mobile nav styles, hamburger animations
+- `gradient-glass.css` - Major theme refinements, mobile nav styles, hamburger animations
 - Enhanced responsive breakpoints
 - Better glass morphism effects
 - Improved button and form styling

@@ -10,6 +10,43 @@ document.addEventListener('DOMContentLoaded', () => {
   initializePricingToggle();
 });
 
+// Ensure all plan content is visible
+function ensurePlanContentVisible() {
+  document.querySelectorAll('.plan-card').forEach(card => {
+    card.style.display = 'flex';
+    card.style.visibility = 'visible';
+    card.style.opacity = '1';
+    card.classList.remove('hidden');
+    
+    // Ensure all plan content is visible
+    const planHeader = card.querySelector('.plan-header');
+    const planDescription = card.querySelector('.plan-description');
+    const planFeatures = card.querySelector('.plan-features');
+    const planPopularity = card.querySelector('.plan-popularity');
+    
+    if (planHeader) {
+      planHeader.style.display = 'block';
+      planHeader.style.visibility = 'visible';
+      planHeader.style.opacity = '1';
+    }
+    if (planDescription) {
+      planDescription.style.display = 'block';
+      planDescription.style.visibility = 'visible';
+      planDescription.style.opacity = '1';
+    }
+    if (planFeatures) {
+      planFeatures.style.display = 'block';
+      planFeatures.style.visibility = 'visible';
+      planFeatures.style.opacity = '1';
+    }
+    if (planPopularity) {
+      planPopularity.style.display = 'block';
+      planPopularity.style.visibility = 'visible';
+      planPopularity.style.opacity = '1';
+    }
+  });
+}
+
 // Pricing toggle functionality
 function initializePricingToggle() {
   const toggle = document.getElementById('pricing-toggle');
@@ -46,6 +83,9 @@ function updatePricingDisplay(isYearly) {
 
 // Initialize the pricing page
 async function initializePricingPage() {
+  // Ensure all plan content is visible first
+  ensurePlanContentVisible();
+  
   // Check if user is logged in
   const sessionManager = window.sessionManager;
   if (sessionManager && sessionManager.isLoggedIn()) {
@@ -111,11 +151,39 @@ function updateUIForGuestUser() {
     }
   });
   
-  // Ensure all plan cards are visible
+  // Ensure all plan cards are visible and remove any hidden classes
   document.querySelectorAll('.plan-card').forEach(card => {
     card.style.display = 'flex';
     card.style.visibility = 'visible';
     card.style.opacity = '1';
+    card.classList.remove('hidden');
+    
+    // Ensure all plan content is visible
+    const planHeader = card.querySelector('.plan-header');
+    const planDescription = card.querySelector('.plan-description');
+    const planFeatures = card.querySelector('.plan-features');
+    const planPopularity = card.querySelector('.plan-popularity');
+    
+    if (planHeader) {
+      planHeader.style.display = 'block';
+      planHeader.style.visibility = 'visible';
+      planHeader.style.opacity = '1';
+    }
+    if (planDescription) {
+      planDescription.style.display = 'block';
+      planDescription.style.visibility = 'visible';
+      planDescription.style.opacity = '1';
+    }
+    if (planFeatures) {
+      planFeatures.style.display = 'block';
+      planFeatures.style.visibility = 'visible';
+      planFeatures.style.opacity = '1';
+    }
+    if (planPopularity) {
+      planPopularity.style.display = 'block';
+      planPopularity.style.visibility = 'visible';
+      planPopularity.style.opacity = '1';
+    }
   });
 }
 

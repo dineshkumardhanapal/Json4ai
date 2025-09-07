@@ -396,7 +396,7 @@ code, pre, .code-block {
   justify-content: center;
   width: 20px;
   height: 20px;
-  margin-right: 0.5rem;
+  margin-right: 0.75rem;
   background: var(--aurora-green);
   border-radius: 50%;
   color: white;
@@ -404,6 +404,8 @@ code, pre, .code-block {
   font-size: 14px;
   box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
   flex-shrink: 0;
+  vertical-align: middle;
+  margin-top: -2px; /* Fine-tune vertical alignment */
 }
 
 .plan-value lottie-player {
@@ -1232,7 +1234,8 @@ input:checked + .toggle-slider:before {
   box-shadow: var(--shadow-medium); 
   position: relative; 
   text-align: center; 
-  min-height: 650px; 
+  min-height: 700px; 
+  height: 700px; 
   display: flex !important; 
   flex-direction: column; 
   transition: all 0.3s ease; 
@@ -2177,6 +2180,15 @@ body.cookie-modal-active {
   align-items: center;
   margin-bottom: 0.75rem;
   padding: 0.5rem 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.plan-card .plan-features li:hover {
+  color: var(--text-primary);
+  transform: translateX(4px);
+  transition: all 0.2s ease;
 }
 .plan-card.featured { outline: 2px solid rgba(34, 211, 238, 0.35); box-shadow: var(--glass-shadow); }
 .plan-card .plan-badge { 
@@ -2252,7 +2264,7 @@ body.cookie-modal-active {
 }
 
 .yearly-price {
-  display: flex;
+  display: none !important;
   align-items: baseline;
   justify-content: center;
   gap: 0.25rem;
@@ -2263,6 +2275,15 @@ body.cookie-modal-active {
   font-size: 0.8rem;
   color: var(--text-muted);
   margin-left: 0.5rem;
+}
+
+/* Show yearly prices only when yearly toggle is active */
+.yearly-pricing .yearly-price {
+  display: flex !important;
+}
+
+.yearly-pricing .price:not(.yearly-price) {
+  display: none !important;
 }
 
 .plan-features {

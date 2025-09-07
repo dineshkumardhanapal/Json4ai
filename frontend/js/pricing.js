@@ -198,15 +198,17 @@ function initializePricingToggle() {
 }
 
 function updatePricingDisplay(isYearly) {
+  console.log('Updating pricing display - yearly:', isYearly);
+  
   const monthlyPrices = document.querySelectorAll('.price:not(.yearly-price)');
   const yearlyPrices = document.querySelectorAll('.yearly-price');
   
   monthlyPrices.forEach(price => {
-    price.style.display = isYearly ? 'none' : 'flex';
+    price.style.setProperty('display', isYearly ? 'none' : 'flex', 'important');
   });
   
   yearlyPrices.forEach(price => {
-    price.style.display = isYearly ? 'flex' : 'none';
+    price.style.setProperty('display', isYearly ? 'flex' : 'none', 'important');
   });
   
   // Update plan cards with yearly pricing
@@ -218,6 +220,8 @@ function updatePricingDisplay(isYearly) {
       card.classList.remove('yearly-pricing');
     }
   });
+  
+  console.log('Pricing display updated');
 }
 
 // Initialize the pricing page
@@ -230,6 +234,9 @@ async function initializePricingPage() {
   
   // Don't run any logic that might hide content
   console.log('Pricing page initialized - all content should be visible');
+  
+  // Initialize pricing display (monthly by default)
+  updatePricingDisplay(false);
   
   // Attach listeners to plan buttons
   attachPlanButtonListeners();

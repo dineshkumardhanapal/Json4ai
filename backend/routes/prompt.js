@@ -25,6 +25,8 @@ router.post('/generate', auth, creditCheck, validatePromptGeneration, async (req
     if (!comment) return res.status(400).json({ message: 'Missing comment' });
 
     const user = req.userObj;
+    // Ensure day rollover is applied right before usage check
+    user.resetDailyUsage();
     
     // Use credit using the new method
     if (!user.useCredit()) {

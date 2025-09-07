@@ -12,7 +12,8 @@ router.get('/profile', auth, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
     
-    // Reset credits and usage based on plan
+    // Reset usage counters on read to ensure UI shows accurate daily values
+    user.resetDailyUsage();
     user.resetDailyCredits();
     user.resetMonthlyUsage();
     await user.save();
@@ -70,7 +71,8 @@ router.get('/usage', auth, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
     
-    // Reset credits and usage based on plan
+    // Reset usage counters on read to ensure UI shows accurate daily values
+    user.resetDailyUsage();
     user.resetDailyCredits();
     user.resetMonthlyUsage();
     await user.save();

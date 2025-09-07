@@ -22,7 +22,9 @@ module.exports = async (req, res, next) => {
       // If there is no planEndDate yet (fresh activation race), still allow and rely on usage limits
     }
 
-    // Reset credits and usage based on plan
+    // Reset credits and usage based on plan and date boundaries
+    // Ensure daily usage counter is reset so remainingCredits reflects the new day
+    user.resetDailyUsage();
     user.resetDailyCredits();
     user.resetMonthlyUsage();
     await user.save();

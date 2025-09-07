@@ -195,18 +195,29 @@ select:focus {
     grid-template-columns: 1fr;
     gap: 1.5rem;
     margin-top: 2rem;
+    justify-items: center;
   }
   
   .plan-card {
     padding: 1.5rem;
+    max-width: 100%;
+    width: 100%;
   }
   
   .plan-card h3 {
     font-size: 1.5rem;
+    text-align: center;
   }
   
   .plan-card .price .amount {
     font-size: 2.5rem;
+  }
+  
+  .pricing-toggle {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+    max-width: 100%;
   }
   
   /* Mobile comparison table */
@@ -1458,6 +1469,11 @@ code, pre, .code-block {
 .pricing-header {
   margin-bottom: 4rem;
   position: relative;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .pricing-badge {
@@ -1483,15 +1499,14 @@ code, pre, .code-block {
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  margin-top: 2rem;
-  padding: 1rem;
+  margin: 2rem auto 0;
+  padding: 1rem 1.5rem;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 50px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  max-width: 300px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 350px;
+  width: 100%;
 }
 
 .toggle-label {
@@ -1621,6 +1636,7 @@ input:checked + .toggle-slider:before {
   justify-content: center; 
   margin-bottom: 1.5rem;
   position: relative;
+  text-align: center;
 }
 
 .plan-card h3 { 
@@ -1635,6 +1651,12 @@ input:checked + .toggle-slider:before {
   font-weight: 800; 
   margin: 1rem 0 1.5rem; 
   color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
 }
 
 .plan-card .price span { 
@@ -1644,6 +1666,17 @@ input:checked + .toggle-slider:before {
   font-weight: 600; 
 }
 
+.plan-card .plan-description {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.plan-card .plan-description p {
+  margin: 0;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
 /* Removed conflicting plan-features rule - using consolidated version */
 
 .plan-features li {
@@ -1651,8 +1684,9 @@ input:checked + .toggle-slider:before {
   font-size: 1rem;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.75rem;
+  text-align: left;
 }
 
 /* Removed duplicate checkmark - using HTML checkmarks instead */
@@ -2581,6 +2615,8 @@ body.cookie-modal-active {
 /* Show yearly prices only when yearly toggle is active */
 .yearly-pricing .yearly-price {
   display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* Hide monthly prices when yearly is active */
@@ -2588,9 +2624,63 @@ body.cookie-modal-active {
   display: none !important;
 }
 
+/* Alternative selector for yearly prices */
+.plan-card.yearly-pricing .price .yearly-price {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Hide monthly price content when yearly is active */
+.plan-card.yearly-pricing .price .currency:not(.yearly-price .currency),
+.plan-card.yearly-pricing .price .amount:not(.yearly-price .amount),
+.plan-card.yearly-pricing .price .period:not(.yearly-price .period) {
+  display: none !important;
+}
+
 /* Hide yearly prices by default */
 .plan-card:not(.yearly-pricing) .yearly-price {
   display: none !important;
+}
+
+/* Ensure yearly prices are properly styled when visible */
+.yearly-price {
+  display: none !important;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  flex-direction: column;
+  text-align: center;
+}
+
+.yearly-price .currency {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.yearly-price .amount {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.yearly-price .period {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.yearly-price .yearly-note {
+  font-size: 0.8rem;
+  color: var(--accent-primary);
+  font-weight: 500;
+  margin-top: 0.25rem;
+  background: rgba(34, 211, 238, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
 }
 
 /* Consolidated plan features styling */
@@ -2632,7 +2722,7 @@ body.cookie-modal-active {
 }
 
 .plan-popularity {
-  margin-top: 0.5rem;
+  margin-top: auto;
   padding: 0.5rem 1rem;
   background: rgba(139, 92, 246, 0.1);
   border-radius: 20px;
@@ -2730,6 +2820,7 @@ body.cookie-modal-active {
   justify-content: center;
   font-weight: 600;
   text-align: center;
+  min-height: 60px;
 }
 
 .feature-column {
@@ -4536,12 +4627,14 @@ footer { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border-
 .quality-badge {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border-radius: var(--radius-lg);
   font-weight: 600;
   font-size: 1rem;
-  margin-bottom: 1rem;
+  margin: 0 auto 1rem;
+  text-align: center;
 }
 
 .quality-free {

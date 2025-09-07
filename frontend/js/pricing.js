@@ -199,12 +199,29 @@ function ensurePlanContentVisible() {
 // Pricing toggle functionality
 function initializePricingToggle() {
   const toggle = document.getElementById('pricing-toggle');
-  if (!toggle) return;
+  if (!toggle) {
+    console.error('Pricing toggle not found!');
+    return;
+  }
 
+  console.log('Initializing pricing toggle...');
+  
   toggle.addEventListener('change', function() {
     const isYearly = this.checked;
+    console.log('Toggle changed - yearly:', isYearly);
     updatePricingDisplay(isYearly);
   });
+  
+  // Test the toggle immediately
+  console.log('Testing toggle functionality...');
+  setTimeout(() => {
+    console.log('Testing yearly pricing display...');
+    updatePricingDisplay(true);
+    setTimeout(() => {
+      console.log('Testing monthly pricing display...');
+      updatePricingDisplay(false);
+    }, 2000);
+  }, 1000);
 }
 
 function updatePricingDisplay(isYearly) {
@@ -217,6 +234,13 @@ function updatePricingDisplay(isYearly) {
   console.log('Found monthly prices:', monthlyPrices.length);
   console.log('Found yearly prices:', yearlyPrices.length);
   
+  // Debug: Log all yearly price elements
+  yearlyPrices.forEach((price, index) => {
+    console.log(`Yearly price ${index} element:`, price);
+    console.log(`Yearly price ${index} parent:`, price.parentElement);
+    console.log(`Yearly price ${index} computed display:`, window.getComputedStyle(price).display);
+  });
+  
   // Update monthly prices
   monthlyPrices.forEach((price, index) => {
     console.log(`Monthly price ${index}:`, price);
@@ -226,7 +250,15 @@ function updatePricingDisplay(isYearly) {
   // Update yearly prices
   yearlyPrices.forEach((price, index) => {
     console.log(`Yearly price ${index}:`, price);
-    price.style.setProperty('display', isYearly ? 'flex' : 'none', 'important');
+    if (isYearly) {
+      price.style.setProperty('display', 'flex', 'important');
+      price.style.setProperty('visibility', 'visible', 'important');
+      price.style.setProperty('opacity', '1', 'important');
+    } else {
+      price.style.setProperty('display', 'none', 'important');
+      price.style.setProperty('visibility', 'hidden', 'important');
+      price.style.setProperty('opacity', '0', 'important');
+    }
   });
   
   // Update plan cards with yearly pricing class
@@ -256,6 +288,23 @@ async function initializePricingPage() {
   // Don't run any logic that might hide content
   console.log('Pricing page initialized - all content should be visible');
   
+  // Add test button for debugging yearly pricing
+  const testButton = document.createElement('button');
+  testButton.textContent = 'Test Yearly';
+  testButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: #ff4444; color: white; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;';
+  testButton.onclick = () => {
+    console.log('Testing yearly pricing...');
+    updatePricingDisplay(true);
+    document.querySelectorAll('.plan-card').forEach(card => {
+      card.classList.add('yearly-pricing');
+      console.log('Added yearly-pricing class to card:', card);
+    });
+  };
+  document.body.appendChild(testButton);
+  
+  // Initialize pricing toggle
+  initializePricingToggle();
+  
   // Initialize pricing display (monthly by default)
   updatePricingDisplay(false);
   
@@ -264,12 +313,6 @@ async function initializePricingPage() {
   if (toggle) {
     toggle.checked = false; // Monthly is default
     console.log('Toggle initialized to monthly');
-    
-    // Test the toggle functionality
-    setTimeout(() => {
-      console.log('Testing toggle functionality...');
-      updatePricingDisplay(false); // Ensure monthly is shown
-    }, 100);
   }
   
   // Attach listeners to plan buttons

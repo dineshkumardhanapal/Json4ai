@@ -1,11 +1,19 @@
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
+  // Hide content immediately until authentication is verified
+  document.body.style.display = 'none';
+  
   // Check authentication using session manager - wait for session manager to initialize
   setTimeout(() => {
     if (!window.sessionManager || !window.sessionManager.isLoggedIn()) {
       location.href = 'login.html';
       return;
     }
+    
+    // Show content and initialize if authenticated
+    document.body.style.display = 'block';
+    const authLoading = document.getElementById('auth-loading');
+    if (authLoading) authLoading.style.display = 'none';
     
     // Initialize loading spinner
     addLoadingSpinner();

@@ -105,10 +105,10 @@ if (loginForm) {
         const data = await res.json();
         
         if (res.ok) {
-          showSuccess(data.message);
+          showSuccess('Verification email sent! Please check your inbox and spam folder.');
           verificationSection.style.display = 'none';
         } else {
-          showError(data.message || 'Failed to resend verification email');
+          showError(data.message || 'Failed to resend verification email. Please try again.');
         }
       } catch (_) {
         showError('Network error. Please try again.');

@@ -1,4 +1,5 @@
 // pricing.js — PayPal subscription + error handling
+// Version: 2.1 - Fixed infinite recursion and network issues
 const API = path => `https://json4ai.onrender.com${path}`;
 
 // Note: PayPal plan IDs removed. Razorpay is the active gateway.
@@ -25,6 +26,16 @@ async function initializePricingPage() {
   
   // Attach listeners to plan buttons
   attachPlanButtonListeners();
+  
+  // Check if we're offline
+  if (!navigator.onLine) {
+    console.log('User is offline, using cached plan data');
+    const cachedPlan = localStorage.getItem('userPlan');
+    if (cachedPlan) {
+      const planData = JSON.parse(cachedPlan);
+      updatePlanButtons(planData.plan);
+    }
+  }
 }
 
 // Update UI for logged-in users
@@ -71,11 +82,15 @@ async function loadUserPlan() {
   try {
     const sessionManager = window.sessionManager;
     if (!sessionManager || !sessionManager.isLoggedIn()) {
+      console.log('User not logged in, skipping plan load');
       return;
     }
     
     const token = sessionManager.getAccessToken();
-    if (!token) return;
+    if (!token) {
+      console.log('No access token available');
+      return;
+    }
     
     const response = await fetch(API('/api/user/profile'), {
       headers: {
@@ -85,26 +100,26 @@ async function loadUserPlan() {
     
     if (response.ok) {
       const user = await response.json();
-      console.log('User data received:', user);
-      console.log('User plan:', user.plan);
       updatePlanButtons(user.plan);
+    } else {
+      console.error('Failed to load user plan:', response.status, response.statusText);
+      // Fallback to free plan if API fails
+      updatePlanButtons('free');
     }
   } catch (error) {
     console.error('Error loading user plan:', error);
+    // Fallback to free plan if network fails
+    updatePlanButtons('free');
   }
 }
 
 // Update plan buttons based on user's current plan
 function updatePlanButtons(currentPlan) {
-  console.log('Updating plan buttons for current plan:', currentPlan);
-  
   document.querySelectorAll('[data-plan]').forEach(btn => {
     const planType = btn.dataset.plan;
-    console.log(`Processing button for plan: ${planType}, current plan: ${currentPlan}`);
     
     if (planType === currentPlan) {
       // This is the user's current plan
-      console.log(`Setting ${planType} as current plan`);
       btn.textContent = 'Current Plan';
       btn.disabled = true;
       btn.classList.add('btn-secondary');
@@ -113,14 +128,12 @@ function updatePlanButtons(currentPlan) {
       // This is not the user's current plan
       if (planType === 'free') {
         // Free plan - show as available option
-        console.log(`Setting ${planType} as downgrade option`);
         btn.textContent = 'Downgrade to Free';
         btn.disabled = false;
         btn.classList.add('btn-secondary');
         btn.classList.remove('btn-primary');
       } else {
         // Paid plans - show as upgrade options
-        console.log(`Setting ${planType} as upgrade option`);
         btn.textContent = 'Upgrade';
         btn.disabled = false;
         btn.classList.add('btn-primary');
@@ -362,7 +375,10 @@ if (window.location.search.includes('success') ||
 const refreshUserPlan = async () => {
   try {
     const sessionManager = window.sessionManager;
-    if (!sessionManager || !sessionManager.isLoggedIn()) return;
+    if (!sessionManager || !sessionManager.isLoggedIn()) {
+      console.log('User not logged in, skipping plan refresh');
+      return;
+    }
     
     // Force refresh user plan data
     const res = await fetch(API('/api/user/profile'), {
@@ -381,9 +397,12 @@ const refreshUserPlan = async () => {
         timestamp: Date.now()
       }));
       return user;
+    } else {
+      console.error('Plan refresh failed:', res.status, res.statusText);
     }
   } catch (error) {
     console.error('Error refreshing user plan:', error);
+    // Don't throw error, just log it
   }
 };
 
@@ -400,12 +419,21 @@ const updateUIForNewPlan = () => {
 
 // Auto-refresh plan data every 30 seconds if user is on pricing page
 let planRefreshInterval;
+let isRefreshing = false; // Prevent concurrent refreshes
+
 const startPlanRefresh = () => {
   if (planRefreshInterval) clearInterval(planRefreshInterval);
   
   planRefreshInterval = setInterval(async () => {
-    if (window.sessionManager && window.sessionManager.isLoggedIn()) {
-      await refreshUserPlan();
+    if (window.sessionManager && window.sessionManager.isLoggedIn() && !isRefreshing) {
+      isRefreshing = true;
+      try {
+        await refreshUserPlan();
+      } catch (error) {
+        console.error('Error in plan refresh interval:', error);
+      } finally {
+        isRefreshing = false;
+      }
     }
   }, 30000); // 30 seconds
 };
@@ -415,30 +443,49 @@ document.addEventListener('DOMContentLoaded', () => {
   startPlanRefresh();
 });
 
-// Notification functions
+// Notification functions with enhanced safety
 function showError(message) {
-  // Prevent infinite recursion by checking if this is already the global function
-  if (window.showError && window.showError !== showError) {
-    window.showError(message);
-  } else {
-    // Use a simple alert as fallback to prevent infinite loops
-    showNotification(message, 'error');
+  try {
+    // Prevent infinite recursion by checking if this is already the global function
+    if (window.showError && window.showError !== showError) {
+      window.showError(message);
+    } else {
+      // Use a simple alert as fallback to prevent infinite loops
+      showNotification(message, 'error');
+    }
+  } catch (error) {
+    console.error('Error in showError:', error);
+    // Ultimate fallback
+    alert('Error: ' + message);
   }
 }
 
 function showSuccess(message) {
-  if (window.showSuccess) {
-    window.showSuccess(message);
-  } else {
-    showNotification(message, 'success');
+  try {
+    if (window.showSuccess && window.showSuccess !== showSuccess) {
+      window.showSuccess(message);
+    } else {
+      showNotification(message, 'success');
+    }
+  } catch (error) {
+    console.error('Error in showSuccess:', error);
+    // Ultimate fallback
+    alert('Success: ' + message);
   }
 }
 
 function showInfo(message) {
-  if (window.showInfo) {
-    window.showInfo(message);
-  } else {
-    showNotification(message, 'info');
+  try {
+    // Prevent infinite recursion by checking if this is already the global function
+    if (window.showInfo && window.showInfo !== showInfo) {
+      window.showInfo(message);
+    } else {
+      showNotification(message, 'info');
+    }
+  } catch (error) {
+    console.error('Error in showInfo:', error);
+    // Ultimate fallback
+    alert('Info: ' + message);
   }
 }
 

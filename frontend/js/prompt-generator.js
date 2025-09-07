@@ -1,5 +1,8 @@
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
+  // Hide content immediately until authentication is verified
+  document.body.style.display = 'none';
+  
   // Check authentication using session manager - wait for session manager to initialize
   setTimeout(() => {
     if (!window.sessionManager || !window.sessionManager.isLoggedIn()) {
@@ -7,7 +10,10 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
     
-    // Initialize page if authenticated
+    // Show content and initialize page if authenticated
+    document.body.style.display = 'block';
+    const authLoading = document.getElementById('auth-loading');
+    if (authLoading) authLoading.style.display = 'none';
     initializePage();
   }, 100);
 

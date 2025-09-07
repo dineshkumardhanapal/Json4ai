@@ -19,10 +19,12 @@ router.post('/register', validateRegistration, async (req, res) => {
     await User.create({ firstName, lastName, email, password: hash, verified: false, verifyToken: token });
 
     const verifyLink = `${process.env.BACKEND_URL || 'https://json4ai.onrender.com'}/api/verify/${token}`;
-    await transporter.sendMail({
-      from: '"JSON4AI" <json4ai@gmail.com>',
-      to: email,
-      subject: 'Verify your JSON4AI account',
+    
+    try {
+      await transporter.sendMail({
+        from: '"JSON4AI" <json4ai@gmail.com>',
+        to: email,
+        subject: 'Verify your JSON4AI account',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
           <div style="text-align: center; margin-bottom: 30px;">
@@ -65,8 +67,13 @@ router.post('/register', validateRegistration, async (req, res) => {
             </p>
           </div>
         </div>
-      `
-    });
+      `});
+      
+      console.log(`Verification email sent to ${email}`);
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+      // Don't fail registration if email fails - user can resend later
+    }
 
     res.json({ message: 'Registration successful! Please check your email to verify your account before logging in.' });
   } catch (err) {
@@ -195,6 +202,43 @@ router.get('/verify/:token', async (req, res) => {
     `);
   } catch (err) {
     res.status(500).send('Verification failed. Please try again.');
+  }
+});
+
+// POST /api/manual-verify (Admin endpoint for manual verification)
+router.post('/manual-verify', async (req, res) => {
+  try {
+    const { email, adminKey } = req.body;
+    
+    // Simple admin key check (in production, use proper admin authentication)
+    if (adminKey !== 'json4ai_admin_2025') {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    if (user.verified) {
+      return res.status(400).json({ message: 'User is already verified' });
+    }
+    
+    user.verified = true;
+    user.verifyToken = undefined;
+    await user.save();
+    
+    res.json({ 
+      message: 'User verified successfully', 
+      user: { 
+        email: user.email, 
+        firstName: user.firstName, 
+        lastName: user.lastName,
+        verified: user.verified 
+      } 
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 

@@ -19,6 +19,12 @@
   <script src="js/mobile-nav.js" defer></script>
 </head>
 <body>
+<!-- Loading screen for authentication check -->
+<div id="auth-loading" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-primary); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000;">
+  <div class="spinner" style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--accent-primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
+  <p style="color: var(--text-secondary);">Verifying authentication...</p>
+</div>
+
 <header class="navbar">
   <div class="container flex-between">
     <a href="index.html" class="logo">JSON4<span>AI</span></a>

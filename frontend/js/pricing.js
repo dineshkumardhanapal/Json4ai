@@ -27,6 +27,50 @@ document.addEventListener('DOMContentLoaded', () => {
     forcePricingVisibility();
     console.log('Final visibility check');
   }, 500);
+  
+  // Continuous monitoring to prevent content from disappearing
+  setInterval(() => {
+    const planCards = document.querySelectorAll('.plan-card');
+    planCards.forEach(card => {
+      if (card.classList.contains('hidden') || 
+          card.style.display === 'none' || 
+          card.style.visibility === 'hidden' || 
+          card.style.opacity === '0') {
+        console.log('Detected hidden plan card, forcing visibility');
+        forcePricingVisibility();
+      }
+    });
+  }, 1000);
+  
+  // MutationObserver to watch for changes that might hide content
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && 
+          (mutation.attributeName === 'class' || 
+           mutation.attributeName === 'style')) {
+        const target = mutation.target;
+        if (target.classList.contains('plan-card') && 
+            (target.classList.contains('hidden') || 
+             target.style.display === 'none' || 
+             target.style.visibility === 'hidden' || 
+             target.style.opacity === '0')) {
+          console.log('MutationObserver detected hidden plan card, forcing visibility');
+          forcePricingVisibility();
+        }
+      }
+    });
+  });
+  
+  // Start observing
+  const pricingGrid = document.querySelector('.pricing-grid');
+  if (pricingGrid) {
+    observer.observe(pricingGrid, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      attributeFilter: ['class', 'style']
+    });
+  }
 });
 
 // Force pricing visibility with maximum priority
@@ -195,6 +239,8 @@ function updateUIForLoggedInUser() {
 
 // Update UI for guest users
 function updateUIForGuestUser() {
+  console.log('Updating UI for guest user - ensuring all content is visible');
+  
   // Show login prompt for subscription buttons
   document.querySelectorAll('[data-plan]').forEach(btn => {
     if (btn.dataset.plan !== 'free') {
@@ -209,12 +255,15 @@ function updateUIForGuestUser() {
     }
   });
   
-  // Ensure all plan cards are visible and remove any hidden classes
+  // Force all plan cards to be visible with maximum priority
   document.querySelectorAll('.plan-card').forEach(card => {
-    card.style.display = 'flex';
-    card.style.visibility = 'visible';
-    card.style.opacity = '1';
+    // Remove any classes that might hide the card
     card.classList.remove('hidden');
+    
+    // Force visibility with maximum priority
+    card.style.setProperty('display', 'flex', 'important');
+    card.style.setProperty('visibility', 'visible', 'important');
+    card.style.setProperty('opacity', '1', 'important');
     
     // Ensure all plan content is visible
     const planHeader = card.querySelector('.plan-header');
@@ -223,26 +272,28 @@ function updateUIForGuestUser() {
     const planPopularity = card.querySelector('.plan-popularity');
     
     if (planHeader) {
-      planHeader.style.display = 'block';
-      planHeader.style.visibility = 'visible';
-      planHeader.style.opacity = '1';
+      planHeader.style.setProperty('display', 'block', 'important');
+      planHeader.style.setProperty('visibility', 'visible', 'important');
+      planHeader.style.setProperty('opacity', '1', 'important');
     }
     if (planDescription) {
-      planDescription.style.display = 'block';
-      planDescription.style.visibility = 'visible';
-      planDescription.style.opacity = '1';
+      planDescription.style.setProperty('display', 'block', 'important');
+      planDescription.style.setProperty('visibility', 'visible', 'important');
+      planDescription.style.setProperty('opacity', '1', 'important');
     }
     if (planFeatures) {
-      planFeatures.style.display = 'block';
-      planFeatures.style.visibility = 'visible';
-      planFeatures.style.opacity = '1';
+      planFeatures.style.setProperty('display', 'block', 'important');
+      planFeatures.style.setProperty('visibility', 'visible', 'important');
+      planFeatures.style.setProperty('opacity', '1', 'important');
     }
     if (planPopularity) {
-      planPopularity.style.display = 'block';
-      planPopularity.style.visibility = 'visible';
-      planPopularity.style.opacity = '1';
+      planPopularity.style.setProperty('display', 'block', 'important');
+      planPopularity.style.setProperty('visibility', 'visible', 'important');
+      planPopularity.style.setProperty('opacity', '1', 'important');
     }
   });
+  
+  console.log('Guest user UI updated - all content should be visible');
 }
 
 // Load user's current plan and update UI

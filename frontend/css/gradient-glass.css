@@ -2132,6 +2132,20 @@ body.cookie-modal-active {
   opacity: 1 !important;
 }
 
+/* Override .hidden class for plan cards */
+.plan-card.hidden {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Ensure plan cards are never hidden */
+.plan-card {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
 .plan-card .plan-features {
   list-style: none;
   padding: 0;

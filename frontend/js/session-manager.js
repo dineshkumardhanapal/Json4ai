@@ -432,7 +432,6 @@ class SessionManager {
           body: JSON.stringify({ refreshToken: this.refreshToken })
         });
         
-        console.log('Logout response:', response.status);
       }
     } catch (error) {
       console.error('Logout request failed:', error);

@@ -6,15 +6,12 @@ const API = path => `https://json4ai.onrender.com${path}`;
 
 // Force visibility immediately when script loads
 (function() {
-  console.log('Pricing script loaded - forcing immediate visibility');
   
   // Force visibility immediately
   function forceImmediateVisibility() {
     const planCards = document.querySelectorAll('.plan-card');
-    console.log(`Found ${planCards.length} plan cards`);
     
     planCards.forEach((card, index) => {
-      console.log(`Forcing visibility for card ${index}:`, card);
       card.style.setProperty('display', 'flex', 'important');
       card.style.setProperty('visibility', 'visible', 'important');
       card.style.setProperty('opacity', '1', 'important');
@@ -30,12 +27,10 @@ const API = path => `https://json4ai.onrender.com${path}`;
       
       // Specifically ensure all features are visible
       const features = card.querySelectorAll('.plan-features li');
-      console.log(`Card ${index} has ${features.length} features`);
       features.forEach((feature, featureIndex) => {
         feature.style.setProperty('display', 'flex', 'important');
         feature.style.setProperty('visibility', 'visible', 'important');
         feature.style.setProperty('opacity', '1', 'important');
-        console.log(`Feature ${featureIndex}:`, feature.textContent.trim());
       });
     });
   }
@@ -53,7 +48,6 @@ const API = path => `https://json4ai.onrender.com${path}`;
 
 // Initialize page when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('Pricing page loaded');
   
   // Force immediate visibility
   forcePricingVisibility();
@@ -66,13 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     forcePricingVisibility();
     ensurePlanContentVisible();
-    console.log('Plan content visibility forced');
   }, 100);
   
   // Additional force after longer delay
   setTimeout(() => {
     forcePricingVisibility();
-    console.log('Final visibility check');
   }, 500);
   
   // Continuous monitoring to prevent content from disappearing
@@ -83,7 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
           card.style.display === 'none' || 
           card.style.visibility === 'hidden' || 
           card.style.opacity === '0') {
-        console.log('Detected hidden plan card, forcing visibility');
         forcePricingVisibility();
       }
     });
@@ -101,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
              target.style.display === 'none' || 
              target.style.visibility === 'hidden' || 
              target.style.opacity === '0')) {
-          console.log('MutationObserver detected hidden plan card, forcing visibility');
           forcePricingVisibility();
         }
       }
@@ -122,14 +112,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Force pricing visibility with maximum priority
 function forcePricingVisibility() {
-  console.log('Forcing pricing visibility...');
   
   // Force all plan cards to be visible
   const planCards = document.querySelectorAll('.plan-card');
-  console.log(`Found ${planCards.length} plan cards`);
   
   planCards.forEach((card, index) => {
-    console.log(`Card ${index}:`, card);
     card.style.setProperty('display', 'flex', 'important');
     card.style.setProperty('visibility', 'visible', 'important');
     card.style.setProperty('opacity', '1', 'important');
@@ -152,7 +139,6 @@ function forcePricingVisibility() {
     pricingGrid.style.setProperty('opacity', '1', 'important');
   }
   
-  console.log('Pricing visibility forced');
 }
 
 // Ensure all plan content is visible
@@ -204,18 +190,14 @@ function initializePricingToggle() {
     return;
   }
 
-  console.log('Initializing pricing toggle...');
   
   toggle.addEventListener('change', function() {
     const isYearly = this.checked;
-    console.log('Toggle changed - yearly:', isYearly);
     updatePricingDisplay(isYearly);
   });
   
   // Test the toggle immediately
-  console.log('Testing toggle functionality...');
   setTimeout(() => {
-    console.log('Testing yearly pricing display...');
     updatePricingDisplay(true);
     
     // Force yearly prices to be visible
@@ -225,120 +207,75 @@ function initializePricingToggle() {
         price.style.setProperty('display', 'flex', 'important');
         price.style.setProperty('visibility', 'visible', 'important');
         price.style.setProperty('opacity', '1', 'important');
-        console.log(`Forced yearly price ${index} to be visible`);
       });
     }, 100);
     
     setTimeout(() => {
-      console.log('Testing monthly pricing display...');
       updatePricingDisplay(false);
     }, 3000);
   }, 1000);
 }
 
 function updatePricingDisplay(isYearly) {
-  console.log('Updating pricing display - yearly:', isYearly);
-  
   // Get all price elements
   const monthlyPrices = document.querySelectorAll('.price:not(.yearly-price)');
   const yearlyPrices = document.querySelectorAll('.yearly-price');
   
-  console.log('Found monthly prices:', monthlyPrices.length);
-  console.log('Found yearly prices:', yearlyPrices.length);
-  
-  // Debug: Log all yearly price elements
-  yearlyPrices.forEach((price, index) => {
-    console.log(`Yearly price ${index} element:`, price);
-    console.log(`Yearly price ${index} parent:`, price.parentElement);
-    console.log(`Yearly price ${index} computed display:`, window.getComputedStyle(price).display);
+  // Update plan cards with yearly pricing class first
+  const planCards = document.querySelectorAll('.plan-card');
+  planCards.forEach((card) => {
+    if (isYearly) {
+      card.classList.add('yearly-pricing');
+    } else {
+      card.classList.remove('yearly-pricing');
+    }
   });
   
   // Update monthly prices
-  monthlyPrices.forEach((price, index) => {
-    console.log(`Monthly price ${index}:`, price);
+  monthlyPrices.forEach((price) => {
     price.style.setProperty('display', isYearly ? 'none' : 'flex', 'important');
   });
   
-  // Update yearly prices
-  yearlyPrices.forEach((price, index) => {
-    console.log(`Yearly price ${index}:`, price);
-    console.log(`Yearly price ${index} parent:`, price.parentElement);
-    console.log(`Yearly price ${index} computed display before:`, window.getComputedStyle(price).display);
-    
+  // Update yearly prices with maximum force
+  yearlyPrices.forEach((price) => {
     if (isYearly) {
-      price.style.setProperty('display', 'flex', 'important');
-      price.style.setProperty('visibility', 'visible', 'important');
-      price.style.setProperty('opacity', '1', 'important');
-      console.log(`Yearly price ${index} computed display after:`, window.getComputedStyle(price).display);
-    } else {
-      price.style.setProperty('display', 'none', 'important');
-      price.style.setProperty('visibility', 'hidden', 'important');
-      price.style.setProperty('opacity', '0', 'important');
-    }
-  });
-  
-  // Update plan cards with yearly pricing class
-  const planCards = document.querySelectorAll('.plan-card');
-  planCards.forEach((card, index) => {
-    console.log(`Plan card ${index}:`, card);
-    if (isYearly) {
-      card.classList.add('yearly-pricing');
-      console.log('Added yearly-pricing class to card', index);
-    } else {
-      card.classList.remove('yearly-pricing');
-      console.log('Removed yearly-pricing class from card', index);
-    }
-  });
-  
-  console.log('Pricing display updated - yearly:', isYearly);
-}
-
-// Initialize the pricing page
-async function initializePricingPage() {
-  console.log('Initializing pricing page - forcing all content visible');
-  
-  // Force all content to be visible immediately
-  forcePricingVisibility();
-  ensurePlanContentVisible();
-  
-  // Don't run any logic that might hide content
-  console.log('Pricing page initialized - all content should be visible');
-  
-  // Add test button for debugging yearly pricing
-  const testButton = document.createElement('button');
-  testButton.textContent = 'Test Yearly';
-  testButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: #ff4444; color: white; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;';
-  testButton.onclick = () => {
-    console.log('Testing yearly pricing...');
-    
-    // Add yearly-pricing class to all plan cards
-    document.querySelectorAll('.plan-card').forEach(card => {
-      card.classList.add('yearly-pricing');
-      console.log('Added yearly-pricing class to card:', card);
-    });
-    
-    // Force all yearly prices to be visible
-    const yearlyPrices = document.querySelectorAll('.yearly-price');
-    console.log(`Found ${yearlyPrices.length} yearly price elements`);
-    
-    yearlyPrices.forEach((price, index) => {
+      // Force all possible display properties
       price.style.setProperty('display', 'flex', 'important');
       price.style.setProperty('visibility', 'visible', 'important');
       price.style.setProperty('opacity', '1', 'important');
       price.style.setProperty('position', 'relative', 'important');
       price.style.setProperty('z-index', '10', 'important');
-      console.log(`Forced yearly price ${index} to be visible:`, price);
-    });
-    
-    // Hide monthly price spans
-    document.querySelectorAll('.plan-card.yearly-pricing .price > span:not(.yearly-price span)').forEach(span => {
-      span.style.setProperty('display', 'none', 'important');
-      console.log('Hidden monthly price span:', span);
-    });
-    
-    updatePricingDisplay(true);
-  };
-  document.body.appendChild(testButton);
+      price.style.setProperty('flex-direction', 'column', 'important');
+      price.style.setProperty('align-items', 'center', 'important');
+      price.style.setProperty('justify-content', 'center', 'important');
+      price.style.setProperty('text-align', 'center', 'important');
+      
+      // Also set the class directly
+      price.classList.add('yearly-price-visible');
+    } else {
+      price.style.setProperty('display', 'none', 'important');
+      price.style.setProperty('visibility', 'hidden', 'important');
+      price.style.setProperty('opacity', '0', 'important');
+      price.classList.remove('yearly-price-visible');
+    }
+  });
+  
+  // Force a reflow to ensure changes take effect
+  if (isYearly) {
+    setTimeout(() => {
+      yearlyPrices.forEach((price) => {
+        price.style.setProperty('display', 'flex', 'important');
+      });
+    }, 100);
+  }
+}
+
+// Initialize the pricing page
+async function initializePricingPage() {
+  // Force all content to be visible immediately
+  forcePricingVisibility();
+  ensurePlanContentVisible();
+  
   
   // Initialize pricing toggle
   initializePricingToggle();
@@ -350,7 +287,6 @@ async function initializePricingPage() {
   const toggle = document.getElementById('pricing-toggle');
   if (toggle) {
     toggle.checked = false; // Monthly is default
-    console.log('Toggle initialized to monthly');
   }
   
   // Attach listeners to plan buttons
@@ -381,7 +317,6 @@ function updateUIForLoggedInUser() {
 
 // Update UI for guest users - DISABLED to prevent content hiding
 function updateUIForGuestUser() {
-  console.log('Guest user function disabled - keeping all content visible');
   // This function is disabled to prevent any content from being hidden
   // All content should remain visible as defined in HTML
 }
@@ -391,13 +326,11 @@ async function loadUserPlan() {
   try {
     const sessionManager = window.sessionManager;
     if (!sessionManager || !sessionManager.isLoggedIn()) {
-      console.log('User not logged in, skipping plan load');
       return;
     }
     
     const token = sessionManager.getAccessToken();
     if (!token) {
-      console.log('No access token available');
       return;
     }
     
@@ -443,10 +376,10 @@ function updatePlanButtons(currentPlan) {
         btn.classList.remove('btn-primary');
       } else {
         // Paid plans - show as upgrade options
-        btn.textContent = 'Upgrade';
-        btn.disabled = false;
-        btn.classList.add('btn-primary');
-        btn.classList.remove('btn-secondary');
+      btn.textContent = 'Upgrade';
+      btn.disabled = false;
+      btn.classList.add('btn-primary');
+      btn.classList.remove('btn-secondary');
       }
     }
   });
@@ -495,7 +428,6 @@ async function handleUpgrade(e) {
       body: JSON.stringify({ planType: plan })
     });
 
-    console.log('Payment order creation response:', {
       status: res.status,
       statusText: res.statusText,
       url: res.url
@@ -685,7 +617,6 @@ const refreshUserPlan = async () => {
   try {
     const sessionManager = window.sessionManager;
     if (!sessionManager || !sessionManager.isLoggedIn()) {
-      console.log('User not logged in, skipping plan refresh');
       return;
     }
     
@@ -737,7 +668,7 @@ const startPlanRefresh = () => {
     if (window.sessionManager && window.sessionManager.isLoggedIn() && !isRefreshing) {
       isRefreshing = true;
       try {
-        await refreshUserPlan();
+      await refreshUserPlan();
       } catch (error) {
         console.error('Error in plan refresh interval:', error);
       } finally {
@@ -755,12 +686,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // Notification functions with enhanced safety
 function showError(message) {
   try {
-    // Prevent infinite recursion by checking if this is already the global function
-    if (window.showError && window.showError !== showError) {
-      window.showError(message);
-    } else {
-      // Use a simple alert as fallback to prevent infinite loops
-      showNotification(message, 'error');
+  // Prevent infinite recursion by checking if this is already the global function
+  if (window.showError && window.showError !== showError) {
+    window.showError(message);
+  } else {
+    // Use a simple alert as fallback to prevent infinite loops
+    showNotification(message, 'error');
     }
   } catch (error) {
     console.error('Error in showError:', error);
@@ -772,9 +703,9 @@ function showError(message) {
 function showSuccess(message) {
   try {
     if (window.showSuccess && window.showSuccess !== showSuccess) {
-      window.showSuccess(message);
-    } else {
-      showNotification(message, 'success');
+    window.showSuccess(message);
+  } else {
+    showNotification(message, 'success');
     }
   } catch (error) {
     console.error('Error in showSuccess:', error);
@@ -787,9 +718,9 @@ function showInfo(message) {
   try {
     // Prevent infinite recursion by checking if this is already the global function
     if (window.showInfo && window.showInfo !== showInfo) {
-      window.showInfo(message);
-    } else {
-      showNotification(message, 'info');
+    window.showInfo(message);
+  } else {
+    showNotification(message, 'info');
     }
   } catch (error) {
     console.error('Error in showInfo:', error);

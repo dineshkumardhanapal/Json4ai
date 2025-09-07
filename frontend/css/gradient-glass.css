@@ -1669,12 +1669,17 @@ input:checked + .toggle-slider:before {
 .plan-card .plan-description {
   text-align: center;
   margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .plan-card .plan-description p {
   margin: 0;
   line-height: 1.6;
   color: var(--text-secondary);
+  text-align: center;
+  max-width: 280px;
 }
 
 /* Removed conflicting plan-features rule - using consolidated version */
@@ -2647,6 +2652,19 @@ body.cookie-modal-active {
   z-index: 10 !important;
 }
 
+/* Force yearly prices to be visible with maximum specificity */
+.plan-card.yearly-pricing .price .yearly-price {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 10 !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
 /* Hide monthly price content when yearly is active */
 .plan-card.yearly-pricing .price .currency:not(.yearly-price .currency),
 .plan-card.yearly-pricing .price .amount:not(.yearly-price .amount),
@@ -2667,12 +2685,28 @@ body.cookie-modal-active {
 /* Ensure yearly prices are properly styled when visible */
 .yearly-price {
   display: none;
-  align-items: baseline;
+  align-items: center;
   justify-content: center;
   gap: 0.25rem;
   margin-top: 0.5rem;
   flex-direction: column;
   text-align: center;
+}
+
+/* Force yearly prices to show when parent has yearly-pricing class */
+div[class*="yearly-pricing"] .yearly-price {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Additional class for forced visibility */
+.yearly-price-visible {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 10 !important;
 }
 
 .yearly-price .currency {
@@ -2847,18 +2881,24 @@ body.cookie-modal-active {
 .feature-column {
   justify-content: flex-start;
   text-align: left;
-}
-
-.feature-column {
   background: rgba(255, 255, 255, 0.02);
   color: var(--text-primary);
   font-size: 0.95rem;
+  padding-left: 1.5rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .plan-column {
   color: var(--text-secondary);
+  background: transparent;
+  transition: background 0.2s ease;
   font-size: 0.9rem;
   justify-content: center;
+  text-align: center;
+}
+
+.plan-column:hover {
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .plan-column.featured {

@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async (e) => {
       e.preventDefault();
-      console.log('Logout button clicked');
       
       if (window.sessionManager) {
         await window.sessionManager.logout();
@@ -43,18 +42,15 @@ const validateToken = async () => {
   try {
     const accessToken = window.sessionManager.getAccessToken();
     if (!accessToken) {
-      console.log('No access token available for validation');
       window.sessionManager.forceLogout('No access token available');
       return false;
     }
     
-    console.log('Validating token...');
     
     const res = await fetch('https://json4ai.onrender.com/api/user/profile', {
       headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
-    console.log('Token validation response:', {
       status: res.status,
       statusText: res.statusText,
       url: res.url
@@ -62,24 +58,20 @@ const validateToken = async () => {
     
     if (res.status === 401) {
       // Token is invalid or expired - let session manager handle this
-      console.log('Token expired during validation');
       window.sessionManager.forceLogout('Token expired during validation');
       return false;
     }
     
     if (res.status === 404) {
-      console.log('API endpoint not found - server may be down');
       // Switch to demo mode when API is down
       window.apiUnavailable = true;
       return true;
     }
     
     if (!res.ok) {
-      console.log('Token validation failed with status:', res.status);
       return false;
     }
     
-    console.log('Token validation successful');
     // Ensure we exit demo mode if server is back
     window.apiUnavailable = false;
     return true;
@@ -120,18 +112,15 @@ const loadUsageStatus = async () => {
     }
     const accessToken = window.sessionManager.getAccessToken();
     if (!accessToken) {
-      console.log('No access token available, redirecting to login');
       window.sessionManager.forceLogout('No access token available');
       return;
     }
     
-    console.log('Loading usage status with token:', accessToken ? 'present' : 'missing');
     
     const res = await fetch('https://json4ai.onrender.com/api/prompt/usage', {
       headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
-    console.log('Usage status response:', {
       status: res.status,
       statusText: res.statusText,
       url: res.url
@@ -245,7 +234,6 @@ const updateUsageStatus = (usage) => {
 
 // Handle prompt generation
 const generatePrompt = async (comment) => {
-  console.log('Starting prompt generation for:', comment);
   // If server is down, immediately use demo mode
   if (window.apiUnavailable) {
     showDemoModeOption(comment);
@@ -264,7 +252,6 @@ const generatePrompt = async (comment) => {
   // Validate token before proceeding
   const isValid = await validateToken();
   if (!isValid) {
-    console.log('Token validation failed, cannot generate prompt');
     return; // Will redirect to login if invalid
   }
   
@@ -284,7 +271,6 @@ const generatePrompt = async (comment) => {
       return;
     }
 
-    console.log('Starting SSE request for prompt generation...');
     await streamPromptViaSSE(comment, accessToken);
     
   } catch (error) {
@@ -310,7 +296,6 @@ const streamPromptViaSSE = async (comment, accessToken) => {
     es.addEventListener('progress', (e) => {
       // Optional: parse and show progress
       // const data = JSON.parse(e.data);
-      // console.log('progress', data);
     });
 
     es.addEventListener('result', (e) => {
@@ -585,7 +570,6 @@ const loadRecentHistory = async () => {
     }
     const accessToken = window.sessionManager.getAccessToken();
     if (!accessToken) {
-      console.log('No access token available for history');
       return;
     }
     
@@ -761,22 +745,18 @@ const initializePage = async () => {
   
   // Check if we have a token
   if (!window.sessionManager || !window.sessionManager.isLoggedIn()) {
-    console.log('User not logged in, redirecting to login');
     location.href = 'login.html';
     return;
   }
   
-  console.log('User is logged in, initializing page...');
   
   // Validate token first
   const isValid = await validateToken();
   
   if (!isValid) {
-    console.log('Token validation failed');
     return; // Will redirect to login if invalid
   }
   
-  console.log('Token is valid, loading page content...');
   
   // Load page content
   try {

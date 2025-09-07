@@ -50,7 +50,6 @@ class PayPalHelper {
 
   // Handle PayPal token
   handlePayPalToken(token) {
-    console.log('PayPal token received:', token);
     // You can implement additional token handling here
   }
 

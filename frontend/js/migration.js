@@ -7,7 +7,6 @@ function migrateOldTokens() {
   const oldToken = localStorage.getItem('token');
   
   if (oldToken && !localStorage.getItem('accessToken')) {
-    console.log('Migrating old token system...');
     
     try {
       // Set the old token as both access and refresh token temporarily
@@ -18,7 +17,6 @@ function migrateOldTokens() {
       // Remove the old token
       localStorage.removeItem('token');
       
-      console.log('Token migration completed');
       
       // Show notification to user
       showMigrationNotification();

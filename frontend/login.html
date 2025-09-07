@@ -265,38 +265,28 @@ document.addEventListener('DOMContentLoaded', function() {
   const lottiePlayer = lottieContainer?.querySelector('lottie-player');
   const lottieLoading = lottieContainer?.querySelector('.lottie-loading');
   
-  console.log('Lottie container:', lottieContainer);
-  console.log('Lottie player:', lottiePlayer);
-  console.log('Fallback cube:', fallbackCube);
-  console.log('Lottie loading:', lottieLoading);
-  console.log('Lottie player script loaded:', typeof LottiePlayer !== 'undefined');
   
   // Check if Lottie player is available
   if (lottiePlayer && typeof LottiePlayer !== 'undefined') {
-    console.log('Lottie player found, setting up event listeners');
     
     // Listen for Lottie player events
     lottiePlayer.addEventListener('error', function(e) {
-      console.log('Lottie animation failed to load:', e);
       lottieLoading.style.display = 'none';
       lottiePlayer.style.display = 'none';
       fallbackCube.style.display = 'block';
     });
     
     lottiePlayer.addEventListener('ready', function() {
-      console.log('Lottie animation is ready');
       lottieLoading.style.display = 'none';
       lottiePlayer.style.display = 'block';
     });
     
     lottiePlayer.addEventListener('complete', function() {
-      console.log('Lottie animation completed');
     });
     
     // Fallback timeout in case the error event doesn't fire
     setTimeout(() => {
       if (lottieLoading && lottieLoading.style.display !== 'none') {
-        console.log('Lottie animation timeout, showing fallback');
         lottieLoading.style.display = 'none';
         lottiePlayer.style.display = 'none';
         fallbackCube.style.display = 'block';
@@ -304,7 +294,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 5000);
   } else {
     // If lottie-player is not available at all, show fallback immediately
-    console.log('Lottie player not available, showing fallback');
     lottieLoading.style.display = 'none';
     lottiePlayer.style.display = 'none';
     fallbackCube.style.display = 'block';

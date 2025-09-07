@@ -183,18 +183,15 @@ if (registerForm) {
       const res = await fetch(API('/register'), { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
       const data = await res.json();
       
-      console.log('Registration response:', { status: res.status, data });
       
       if (res.ok) {
         // Hide the form and show success message
-        console.log('Registration successful, hiding form and showing success message');
         registerForm.style.display = 'none';
         
         if (successMessage) {
           successMessage.style.display = 'block';
           // Scroll to top to show the success message
           window.scrollTo({ top: 0, behavior: 'smooth' });
-          console.log('Success message displayed');
         } else {
           console.error('Success message element not found, using fallback');
           // Fallback if success message element not found

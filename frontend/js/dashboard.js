@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async (e) => {
       e.preventDefault();
-      console.log('Logout button clicked');
       
       if (window.sessionManager) {
         await window.sessionManager.logout();
@@ -40,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Populate profile
 const loadProfile = async () => {
-  console.log('🔄 Starting to load profile...');
   
   // Hide any existing error messages
   const errorMessage = document.getElementById('error-message');
@@ -50,7 +48,6 @@ const loadProfile = async () => {
   showLoadingState();
   
   try {
-    console.log('📡 Fetching profile and usage data...');
     
     // Load both profile and usage information in parallel with timeout
     const controller = new AbortController();
@@ -59,7 +56,6 @@ const loadProfile = async () => {
     // Get current token from session manager
     const accessToken = window.sessionManager.getAccessToken();
     if (!accessToken) {
-      console.log('🔒 No access token available, redirecting to login...');
       location.href = 'login.html';
       return;
     }
@@ -77,7 +73,6 @@ const loadProfile = async () => {
     
     clearTimeout(timeoutId);
     
-    console.log('📊 API responses received:', {
       profileStatus: profileRes.status,
       usageStatus: usageRes.status,
       profileOk: profileRes.ok,
@@ -86,7 +81,6 @@ const loadProfile = async () => {
     
     if (!profileRes.ok || !usageRes.ok) {
       if (profileRes.status === 401 || usageRes.status === 401) {
-        console.log('🔒 Token expired or invalid, redirecting to login...');
         // Token expired or invalid - let session manager handle this
         window.sessionManager.forceLogout('Token expired');
         return;
@@ -97,7 +91,6 @@ const loadProfile = async () => {
     const user = await profileRes.json();
     const usage = await usageRes.json();
     
-    console.log('✅ Profile and usage data loaded successfully:', { user, usage });
     
     const first = document.getElementById('firstName');
     const last  = document.getElementById('lastName');
@@ -217,7 +210,6 @@ const loadProfile = async () => {
     const subtitle = document.getElementById('dashboard-subtitle');
     if (subtitle) subtitle.textContent = `Welcome back, ${user.firstName || 'User'}! Manage your profile, view usage, and upgrade your plan`;
     
-    console.log('✅ Profile loaded successfully:', user);
     
     // Load recent activity
     loadRecentActivity();
@@ -248,7 +240,6 @@ const loadRecentActivity = async () => {
   try {
     const accessToken = window.sessionManager.getAccessToken();
     if (!accessToken) {
-      console.log('🔒 No access token available for activity history');
       return;
     }
     
@@ -333,13 +324,11 @@ const formatTimeAgo = (date) => {
 
 // Loading state management
 const showLoadingState = () => {
-  console.log('🔄 Showing loading state...');
   
   // Show loading spinner
   const loadingSpinner = document.getElementById('loading-spinner');
   if (loadingSpinner) {
     loadingSpinner.style.display = 'block';
-    console.log('✅ Loading spinner shown');
   } else {
     console.warn('⚠️ Loading spinner element not found');
   }
@@ -362,13 +351,11 @@ const showLoadingState = () => {
 };
 
 const hideLoadingState = () => {
-  console.log('✅ Hiding loading state...');
   
   // Hide loading spinner
   const loadingSpinner = document.getElementById('loading-spinner');
   if (loadingSpinner) {
     loadingSpinner.style.display = 'none';
-    console.log('✅ Loading spinner hidden');
   } else {
     console.warn('⚠️ Loading spinner element not found');
   }

@@ -100,29 +100,10 @@ function ensurePlanContentVisible() {
     }
   });
   
-  // Ensure Lottie players are visible
-  ensureLottiePlayersVisible();
+  // Lottie players removed to prevent loading issues
 }
 
-// Ensure Lottie players are visible and loaded
-function ensureLottiePlayersVisible() {
-  const lottiePlayers = document.querySelectorAll('lottie-player');
-  console.log(`Found ${lottiePlayers.length} Lottie players`);
-  
-  lottiePlayers.forEach((player, index) => {
-    console.log(`Lottie player ${index}:`, player);
-    player.style.display = 'inline-block';
-    player.style.visibility = 'visible';
-    player.style.opacity = '1';
-    player.style.width = '20px';
-    player.style.height = '20px';
-    
-    // Force reload if not loaded
-    if (player.load) {
-      player.load();
-    }
-  });
-}
+// Lottie function removed to prevent loading issues
 
 // Pricing toggle functionality
 function initializePricingToggle() {
@@ -677,10 +658,9 @@ function showInfo(message) {
 }
 
 function showNotification(message, type = 'info') {
-  // Check if notification system exists
-  if (window.showNotification) {
-    window.showNotification(message, type);
-  } else {
+  // Prevent infinite recursion by not calling window.showNotification
+  // Always use the fallback notification
+  try {
     // Fallback notification
     const notification = document.createElement('div');
     notification.style.cssText = `
@@ -716,5 +696,9 @@ function showNotification(message, type = 'info') {
     setTimeout(() => {
       notification.remove();
     }, 5000);
+  } catch (error) {
+    console.error('Error creating notification:', error);
+    // Ultimate fallback
+    alert(`${type.toUpperCase()}: ${message}`);
   }
 }

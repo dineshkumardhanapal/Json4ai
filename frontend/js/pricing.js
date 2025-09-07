@@ -85,6 +85,8 @@ async function loadUserPlan() {
     
     if (response.ok) {
       const user = await response.json();
+      console.log('User data received:', user);
+      console.log('User plan:', user.plan);
       updatePlanButtons(user.plan);
     }
   } catch (error) {
@@ -94,26 +96,36 @@ async function loadUserPlan() {
 
 // Update plan buttons based on user's current plan
 function updatePlanButtons(currentPlan) {
+  console.log('Updating plan buttons for current plan:', currentPlan);
+  
   document.querySelectorAll('[data-plan]').forEach(btn => {
     const planType = btn.dataset.plan;
+    console.log(`Processing button for plan: ${planType}, current plan: ${currentPlan}`);
     
     if (planType === currentPlan) {
-      btn.textContent = 'Current Plan';
-      btn.disabled = true;
-      btn.classList.add('btn-secondary');
-      btn.classList.remove('btn-primary');
-    } else if (planType === 'free') {
-      // Free plan button should always be disabled for logged-in users
+      // This is the user's current plan
+      console.log(`Setting ${planType} as current plan`);
       btn.textContent = 'Current Plan';
       btn.disabled = true;
       btn.classList.add('btn-secondary');
       btn.classList.remove('btn-primary');
     } else {
-      // Upgrade options
-      btn.textContent = 'Upgrade';
-      btn.disabled = false;
-      btn.classList.add('btn-primary');
-      btn.classList.remove('btn-secondary');
+      // This is not the user's current plan
+      if (planType === 'free') {
+        // Free plan - show as available option
+        console.log(`Setting ${planType} as downgrade option`);
+        btn.textContent = 'Downgrade to Free';
+        btn.disabled = false;
+        btn.classList.add('btn-secondary');
+        btn.classList.remove('btn-primary');
+      } else {
+        // Paid plans - show as upgrade options
+        console.log(`Setting ${planType} as upgrade option`);
+        btn.textContent = 'Upgrade';
+        btn.disabled = false;
+        btn.classList.add('btn-primary');
+        btn.classList.remove('btn-secondary');
+      }
     }
   });
 }
@@ -128,8 +140,13 @@ function attachPlanButtonListeners() {
 async function handleUpgrade(e) {
   const plan = e.target.dataset.plan;
   
-  // Don't allow upgrading to free plan
+  // Handle free plan downgrade
   if (plan === 'free') {
+    const confirmed = confirm('Are you sure you want to downgrade to the free plan? You will lose access to your current paid features.');
+    if (confirmed) {
+      // TODO: Implement downgrade to free plan
+      showInfo('Downgrade to free plan feature coming soon. Please contact support for assistance.');
+    }
     return;
   }
   

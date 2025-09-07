@@ -2146,6 +2146,26 @@ body.cookie-modal-active {
   opacity: 1 !important;
 }
 
+/* Force all plan content to be visible by default */
+.pricing-grid .plan-card,
+.pricing-grid .plan-card * {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.pricing-grid .plan-card {
+  display: flex !important;
+}
+
+.pricing-grid .plan-card .plan-features {
+  display: block !important;
+}
+
+.pricing-grid .plan-card .plan-features li {
+  display: flex !important;
+}
+
 .plan-card .plan-features {
   list-style: none;
   padding: 0;

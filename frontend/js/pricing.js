@@ -4,6 +4,43 @@ const API = path => `https://json4ai.onrender.com${path}`;
 
 // Note: PayPal plan IDs removed. Razorpay is the active gateway.
 
+// Force visibility immediately when script loads
+(function() {
+  console.log('Pricing script loaded - forcing immediate visibility');
+  
+  // Force visibility immediately
+  function forceImmediateVisibility() {
+    const planCards = document.querySelectorAll('.plan-card');
+    console.log(`Found ${planCards.length} plan cards`);
+    
+    planCards.forEach((card, index) => {
+      console.log(`Forcing visibility for card ${index}:`, card);
+      card.style.setProperty('display', 'flex', 'important');
+      card.style.setProperty('visibility', 'visible', 'important');
+      card.style.setProperty('opacity', '1', 'important');
+      card.classList.remove('hidden');
+      
+      // Force all child elements to be visible
+      const children = card.querySelectorAll('*');
+      children.forEach(child => {
+        child.style.setProperty('display', '', 'important');
+        child.style.setProperty('visibility', 'visible', 'important');
+        child.style.setProperty('opacity', '1', 'important');
+      });
+    });
+  }
+  
+  // Run immediately
+  forceImmediateVisibility();
+  
+  // Run when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', forceImmediateVisibility);
+  } else {
+    forceImmediateVisibility();
+  }
+})();
+
 // Initialize page when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Pricing page loaded');
@@ -185,34 +222,17 @@ function updatePricingDisplay(isYearly) {
 
 // Initialize the pricing page
 async function initializePricingPage() {
-  // Ensure all plan content is visible first
+  console.log('Initializing pricing page - forcing all content visible');
+  
+  // Force all content to be visible immediately
+  forcePricingVisibility();
   ensurePlanContentVisible();
   
-  // Check if user is logged in
-  const sessionManager = window.sessionManager;
-  if (sessionManager && sessionManager.isLoggedIn()) {
-    // User is logged in, update UI
-    updateUIForLoggedInUser();
-    
-    // Get user's current plan and update UI accordingly
-    await loadUserPlan();
-  } else {
-    // User is not logged in, show login prompt
-    updateUIForGuestUser();
-  }
+  // Don't run any logic that might hide content
+  console.log('Pricing page initialized - all content should be visible');
   
   // Attach listeners to plan buttons
   attachPlanButtonListeners();
-  
-  // Check if we're offline
-  if (!navigator.onLine) {
-    console.log('User is offline, using cached plan data');
-    const cachedPlan = localStorage.getItem('userPlan');
-    if (cachedPlan) {
-      const planData = JSON.parse(cachedPlan);
-      updatePlanButtons(planData.plan);
-    }
-  }
 }
 
 // Update UI for logged-in users
@@ -237,63 +257,11 @@ function updateUIForLoggedInUser() {
   }
 }
 
-// Update UI for guest users
+// Update UI for guest users - DISABLED to prevent content hiding
 function updateUIForGuestUser() {
-  console.log('Updating UI for guest user - ensuring all content is visible');
-  
-  // Show login prompt for subscription buttons
-  document.querySelectorAll('[data-plan]').forEach(btn => {
-    if (btn.dataset.plan !== 'free') {
-      btn.textContent = 'Login to Subscribe';
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        showError('Please log in to subscribe to a plan.');
-        setTimeout(() => {
-          location.href = 'login.html';
-        }, 1500);
-      });
-    }
-  });
-  
-  // Force all plan cards to be visible with maximum priority
-  document.querySelectorAll('.plan-card').forEach(card => {
-    // Remove any classes that might hide the card
-    card.classList.remove('hidden');
-    
-    // Force visibility with maximum priority
-    card.style.setProperty('display', 'flex', 'important');
-    card.style.setProperty('visibility', 'visible', 'important');
-    card.style.setProperty('opacity', '1', 'important');
-    
-    // Ensure all plan content is visible
-    const planHeader = card.querySelector('.plan-header');
-    const planDescription = card.querySelector('.plan-description');
-    const planFeatures = card.querySelector('.plan-features');
-    const planPopularity = card.querySelector('.plan-popularity');
-    
-    if (planHeader) {
-      planHeader.style.setProperty('display', 'block', 'important');
-      planHeader.style.setProperty('visibility', 'visible', 'important');
-      planHeader.style.setProperty('opacity', '1', 'important');
-    }
-    if (planDescription) {
-      planDescription.style.setProperty('display', 'block', 'important');
-      planDescription.style.setProperty('visibility', 'visible', 'important');
-      planDescription.style.setProperty('opacity', '1', 'important');
-    }
-    if (planFeatures) {
-      planFeatures.style.setProperty('display', 'block', 'important');
-      planFeatures.style.setProperty('visibility', 'visible', 'important');
-      planFeatures.style.setProperty('opacity', '1', 'important');
-    }
-    if (planPopularity) {
-      planPopularity.style.setProperty('display', 'block', 'important');
-      planPopularity.style.setProperty('visibility', 'visible', 'important');
-      planPopularity.style.setProperty('opacity', '1', 'important');
-    }
-  });
-  
-  console.log('Guest user UI updated - all content should be visible');
+  console.log('Guest user function disabled - keeping all content visible');
+  // This function is disabled to prevent any content from being hidden
+  // All content should remain visible as defined in HTML
 }
 
 // Load user's current plan and update UI

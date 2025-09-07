@@ -27,6 +27,16 @@ const API = path => `https://json4ai.onrender.com${path}`;
         child.style.setProperty('visibility', 'visible', 'important');
         child.style.setProperty('opacity', '1', 'important');
       });
+      
+      // Specifically ensure all features are visible
+      const features = card.querySelectorAll('.plan-features li');
+      console.log(`Card ${index} has ${features.length} features`);
+      features.forEach((feature, featureIndex) => {
+        feature.style.setProperty('display', 'flex', 'important');
+        feature.style.setProperty('visibility', 'visible', 'important');
+        feature.style.setProperty('opacity', '1', 'important');
+        console.log(`Feature ${featureIndex}:`, feature.textContent.trim());
+      });
     });
   }
   

@@ -1306,16 +1306,7 @@ input:checked + .toggle-slider:before {
   font-weight: 600; 
 }
 
-.plan-features { 
-  list-style: none; 
-  margin: 0 0 2rem 0; 
-  color: var(--text-secondary); 
-  line-height: 1.7; 
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
+/* Removed conflicting plan-features rule - using consolidated version */
 
 .plan-features li {
   padding: 0.5rem 0;
@@ -2150,21 +2141,7 @@ body.cookie-modal-active {
   display: flex !important;
 }
 
-.plan-card .plan-features {
-  list-style: none;
-  padding: 0;
-  margin: 1.5rem 0;
-}
-
-.plan-card .plan-features li {
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.75rem;
-  padding: 0.5rem 0;
-  font-size: 0.95rem;
-  line-height: 1.4;
-  color: var(--text-secondary);
-}
+/* Removed duplicate plan-card .plan-features rule - using consolidated version */
 
 .plan-card .plan-features li:hover {
   color: var(--text-primary);
@@ -2273,23 +2250,31 @@ body.cookie-modal-active {
   display: none !important;
 }
 
+/* Consolidated plan features styling */
 .plan-features {
-  list-style: none;
-  padding: 0;
-  margin: 2rem 0;
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 1.5rem 0 !important;
   text-align: left;
   flex-grow: 1;
   min-height: 200px;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .plan-features li {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 0;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 0.75rem !important;
+  padding: 0.5rem 0 !important;
+  margin-bottom: 0.75rem !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  color: var(--text-secondary);
-  font-size: 0.95rem;
+  color: var(--text-secondary) !important;
+  font-size: 0.95rem !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .plan-features li:last-child {

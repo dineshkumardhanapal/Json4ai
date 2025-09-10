@@ -10,6 +10,47 @@
   <link rel="stylesheet" href="css/main.css"/>
   <link rel="stylesheet" href="css/gradient-glass.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
+  <style>
+    .yearly-price {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    
+    .yearly-note {
+      font-size: 0.75rem;
+      color: #10b981;
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.1);
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.375rem;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    
+    .savings-amount {
+      font-size: 0.875rem;
+      color: #f59e0b;
+      font-weight: 700;
+      background: rgba(245, 158, 11, 0.1);
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.375rem;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      margin-top: 0.25rem;
+    }
+    
+    .toggle-label {
+      transition: color 0.3s ease;
+    }
+    
+    .pricing-toggle {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 2rem 0;
+      justify-content: center;
+    }
+  </style>
   <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="js/notifications.js" defer></script>
@@ -121,7 +162,8 @@
             <span class="currency">₹</span>
             <span class="amount">239</span>
             <span class="period">/month</span>
-            <span class="yearly-note">billed yearly</span>
+            <span class="yearly-note">billed yearly (20% off)</span>
+            <span class="savings-amount">Save ₹720/year</span>
           </div>
         </div>
         <div class="plan-description">
@@ -161,7 +203,8 @@
             <span class="currency">₹</span>
             <span class="amount">799</span>
             <span class="period">/month</span>
-            <span class="yearly-note">billed yearly</span>
+            <span class="yearly-note">billed yearly (20% off)</span>
+            <span class="savings-amount">Save ₹2,400/year</span>
           </div>
         </div>
         <div class="plan-description">

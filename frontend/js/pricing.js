@@ -190,107 +190,75 @@ function initializePricingToggle() {
     return;
   }
 
+  console.log('Initializing pricing toggle...');
   
   toggle.addEventListener('change', function() {
     const isYearly = this.checked;
+    console.log('Toggle changed to:', isYearly ? 'Yearly' : 'Monthly');
     updatePricingDisplay(isYearly);
   });
   
-  // Test the toggle immediately
-  setTimeout(() => {
-    updatePricingDisplay(true);
-    
-    // Force yearly prices to be visible
-    setTimeout(() => {
-      const yearlyPrices = document.querySelectorAll('.yearly-price');
-      yearlyPrices.forEach((price, index) => {
-        price.style.setProperty('display', 'flex', 'important');
-        price.style.setProperty('visibility', 'visible', 'important');
-        price.style.setProperty('opacity', '1', 'important');
-      });
-    }, 100);
-    
-    setTimeout(() => {
-      updatePricingDisplay(false);
-    }, 3000);
-  }, 1000);
+  // Initialize with monthly pricing
+  updatePricingDisplay(false);
 }
 
 function updatePricingDisplay(isYearly) {
-  // Get all price elements
-  const monthlyPrices = document.querySelectorAll('.price:not(.yearly-price)');
-  const yearlyPrices = document.querySelectorAll('.yearly-price');
+  console.log('Updating pricing display for:', isYearly ? 'Yearly' : 'Monthly');
   
-  // Update plan cards with yearly pricing class first
-  const planCards = document.querySelectorAll('.plan-card');
-  planCards.forEach((card) => {
-    if (isYearly) {
-      card.classList.add('yearly-pricing');
-    } else {
-      card.classList.remove('yearly-pricing');
+  // Get all price containers
+  const priceContainers = document.querySelectorAll('.price');
+  
+  priceContainers.forEach((container) => {
+    const monthlyPrice = container.querySelector('.amount:not(.yearly-price .amount)');
+    const yearlyPrice = container.querySelector('.yearly-price');
+    
+    if (monthlyPrice && yearlyPrice) {
+      if (isYearly) {
+        // Show yearly pricing
+        monthlyPrice.style.display = 'none';
+        yearlyPrice.style.display = 'flex';
+        yearlyPrice.style.visibility = 'visible';
+        yearlyPrice.style.opacity = '1';
+      } else {
+        // Show monthly pricing
+        monthlyPrice.style.display = 'inline';
+        yearlyPrice.style.display = 'none';
+        yearlyPrice.style.visibility = 'hidden';
+        yearlyPrice.style.opacity = '0';
+      }
     }
   });
   
-  // Update monthly prices
-  monthlyPrices.forEach((price) => {
-    price.style.setProperty('display', isYearly ? 'none' : 'flex', 'important');
-  });
-  
-  // Update yearly prices with maximum force
-  yearlyPrices.forEach((price) => {
-    if (isYearly) {
-      // Force all possible display properties
-      price.style.setProperty('display', 'flex', 'important');
-      price.style.setProperty('visibility', 'visible', 'important');
-      price.style.setProperty('opacity', '1', 'important');
-      price.style.setProperty('position', 'relative', 'important');
-      price.style.setProperty('z-index', '10', 'important');
-      price.style.setProperty('flex-direction', 'column', 'important');
-      price.style.setProperty('align-items', 'center', 'important');
-      price.style.setProperty('justify-content', 'center', 'important');
-      price.style.setProperty('text-align', 'center', 'important');
-      
-      // Also set the class directly
-      price.classList.add('yearly-price-visible');
-    } else {
-      price.style.setProperty('display', 'none', 'important');
-      price.style.setProperty('visibility', 'hidden', 'important');
-      price.style.setProperty('opacity', '0', 'important');
-      price.classList.remove('yearly-price-visible');
-    }
-  });
-  
-  // Force a reflow to ensure changes take effect
-  if (isYearly) {
-    setTimeout(() => {
-      yearlyPrices.forEach((price) => {
-        price.style.setProperty('display', 'flex', 'important');
-      });
-    }, 100);
+  // Update toggle labels
+  const toggleLabels = document.querySelectorAll('.toggle-label');
+  if (toggleLabels.length >= 2) {
+    toggleLabels[0].style.color = isYearly ? '#9ca3af' : '#ffffff';
+    toggleLabels[1].style.color = isYearly ? '#ffffff' : '#9ca3af';
   }
+  
+  console.log('Pricing display updated successfully');
 }
 
 // Initialize the pricing page
 async function initializePricingPage() {
+  console.log('Initializing pricing page...');
+  
   // Force all content to be visible immediately
   forcePricingVisibility();
   ensurePlanContentVisible();
   
-  
   // Initialize pricing toggle
   initializePricingToggle();
   
-  // Initialize pricing display (monthly by default)
-  updatePricingDisplay(false);
-  
-  // Ensure toggle is set to monthly by default
-  const toggle = document.getElementById('pricing-toggle');
-  if (toggle) {
-    toggle.checked = false; // Monthly is default
-  }
-  
   // Attach listeners to plan buttons
   attachPlanButtonListeners();
+  
+  // Load user plan if logged in
+  if (window.sessionManager && window.sessionManager.isLoggedIn()) {
+    await loadUserPlan();
+  }
+  
+  console.log('Pricing page initialized successfully');
 }
 
 // Update UI for logged-in users
@@ -428,6 +396,7 @@ async function handleUpgrade(e) {
       body: JSON.stringify({ planType: plan })
     });
 
+    console.log('Payment order creation response:', {
       status: res.status,
       statusText: res.statusText,
       url: res.url

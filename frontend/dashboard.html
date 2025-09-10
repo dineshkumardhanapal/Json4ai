@@ -13,9 +13,9 @@
   <link rel="stylesheet" href="css/responsive.css"/>
   
   <script src="js/notifications.js" defer></script>
+  <script src="js/session-manager.js" defer></script>
   <script src="js/dashboard.js" defer></script>
   <script src="js/migration.js" defer></script>
-  <script src="js/session-manager.js" defer></script>
   <script src="js/utils.js" defer></script>
   <script src="js/mobile-nav.js" defer></script>
 </head>
@@ -24,6 +24,13 @@
 <div id="auth-loading" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-primary); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000;">
   <div class="spinner" style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--accent-primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
   <p style="color: var(--text-secondary);">Verifying authentication...</p>
+  <button id="debug-toggle" onclick="toggleDebug()" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem; border-radius: 4px; cursor: pointer; font-size: 12px;">Debug</button>
+</div>
+
+<!-- Debug panel -->
+<div id="debug-panel" style="position: fixed; top: 60px; right: 20px; background: rgba(0,0,0,0.9); color: white; padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 12px; max-width: 300px; z-index: 10001; display: none;">
+  <h4 style="margin: 0 0 1rem 0; color: #10b981;">Debug Info</h4>
+  <div id="debug-content"></div>
 </div>
 
 <header class="navbar">

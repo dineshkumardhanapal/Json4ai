@@ -446,3 +446,10 @@ const sessionManager = new SessionManager();
 
 // Export for use in other files
 window.sessionManager = sessionManager;
+
+// Add debug logging
+console.log('SessionManager initialized:', {
+  hasAccessToken: !!sessionManager.accessToken,
+  hasRefreshToken: !!sessionManager.refreshToken,
+  isLoggedIn: sessionManager.isLoggedIn()
+});

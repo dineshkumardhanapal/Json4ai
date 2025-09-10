@@ -4,10 +4,42 @@ document.addEventListener('DOMContentLoaded', function() {
   document.body.style.display = 'none';
   
   // Check authentication using session manager - wait for session manager to initialize
-  setTimeout(() => {
-    if (!window.sessionManager || !window.sessionManager.isLoggedIn()) {
-      location.href = 'login.html';
+  let retryCount = 0;
+  const maxRetries = 50; // 5 seconds max wait time
+  
+  const checkAuth = () => {
+    retryCount++;
+    updateDebugInfo();
+    
+    // Check if session manager is available
+    if (!window.sessionManager) {
+      if (retryCount >= maxRetries) {
+        console.error('Session manager failed to load after maximum retries');
+        showAuthError('Authentication system failed to load. Please refresh the page.');
+        return;
+      }
+      console.warn(`Session manager not available, retrying... (${retryCount}/${maxRetries})`);
+      setTimeout(checkAuth, 100);
       return;
+    }
+    
+    console.log('Session manager available, checking login status...');
+    
+    // Check if user is logged in
+    if (!window.sessionManager.isLoggedIn()) {
+      console.log('User not logged in, checking localStorage...');
+      // Fallback check using localStorage directly
+      const accessToken = localStorage.getItem('accessToken');
+      const refreshToken = localStorage.getItem('refreshToken');
+      
+      if (!accessToken || !refreshToken) {
+        console.log('No tokens found in localStorage, redirecting to login');
+        location.href = 'login.html';
+        return;
+      }
+      
+      // If tokens exist but session manager says not logged in, there might be an issue
+      console.warn('Tokens exist but session manager reports not logged in - proceeding anyway');
     }
     
     // Show content and initialize page if authenticated
@@ -15,7 +47,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const authLoading = document.getElementById('auth-loading');
     if (authLoading) authLoading.style.display = 'none';
     initializePage();
-  }, 100);
+  };
+  
+  // Start checking authentication
+  checkAuth();
 
   const logoutBtn = document.getElementById('logout');
   if (logoutBtn) {
@@ -37,6 +72,55 @@ if (typeof window.apiUnavailable === 'undefined') {
   window.apiUnavailable = false;
 }
 
+// Show authentication error
+const showAuthError = (message) => {
+  const authLoading = document.getElementById('auth-loading');
+  if (authLoading) {
+    authLoading.innerHTML = `
+      <div style="text-align: center; color: #ef4444;">
+        <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #ef4444; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+        <p style="color: #ef4444; margin-bottom: 1rem;">${message}</p>
+        <button onclick="location.reload()" style="background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Retry</button>
+      </div>
+    `;
+  }
+};
+
+// Debug functionality
+let debugEnabled = false;
+const updateDebugInfo = () => {
+  if (!debugEnabled) return;
+  
+  const debugContent = document.getElementById('debug-content');
+  if (!debugContent) return;
+  
+  const accessToken = localStorage.getItem('accessToken');
+  const refreshToken = localStorage.getItem('refreshToken');
+  const sessionManager = window.sessionManager;
+  
+  debugContent.innerHTML = `
+    <div><strong>Session Manager:</strong> ${sessionManager ? 'Available' : 'Not Available'}</div>
+    <div><strong>Access Token:</strong> ${accessToken ? 'Present' : 'Missing'}</div>
+    <div><strong>Refresh Token:</strong> ${refreshToken ? 'Present' : 'Missing'}</div>
+    <div><strong>Is Logged In:</strong> ${sessionManager ? sessionManager.isLoggedIn() : 'N/A'}</div>
+    <div><strong>Retry Count:</strong> ${retryCount || 0}</div>
+    <div><strong>Current Time:</strong> ${new Date().toLocaleTimeString()}</div>
+  `;
+};
+
+// Toggle debug panel
+window.toggleDebug = () => {
+  debugEnabled = !debugEnabled;
+  const debugPanel = document.getElementById('debug-panel');
+  if (debugPanel) {
+    debugPanel.style.display = debugEnabled ? 'block' : 'none';
+    if (debugEnabled) {
+      updateDebugInfo();
+      setInterval(updateDebugInfo, 1000);
+    }
+  }
+};
+
 // Validate token before making API calls
 const validateToken = async () => {
   try {
@@ -51,6 +135,7 @@ const validateToken = async () => {
       headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
+    console.log('Token validation response:', {
       status: res.status,
       statusText: res.statusText,
       url: res.url
@@ -121,6 +206,7 @@ const loadUsageStatus = async () => {
       headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
+    console.log('Usage check response:', {
       status: res.status,
       statusText: res.statusText,
       url: res.url

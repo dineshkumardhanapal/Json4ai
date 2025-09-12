@@ -4,7 +4,84 @@ const userSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
   lastName:  { type: String, required: true },
   email:     { type: String, required: true, unique: true, lowercase: true },
-  password:  { type: String, required: true, minlength: 6 },
+  password:  { type: String, required: true, minlength: 8 },
+  passwordSalt: { type: String }, // Additional salt for enhanced security
+  passwordRounds: { type: Number, default: 12 }, // bcrypt rounds used
+  passwordCreatedAt: { type: Date, default: Date.now },
+  // Login security fields
+  loginAttempts: { type: Number, default: 0 },
+  lockUntil: { type: Date },
+  lastFailedLogin: { type: Date },
+  
+  // Zero Trust Security fields
+  role: { 
+    type: String, 
+    enum: ['super_admin', 'admin', 'moderator', 'premium_user', 'standard_user', 'free_user', 'suspended_user'],
+    default: 'free_user' 
+  },
+  permissions: [{ 
+    action: String, 
+    resource: String, 
+    allowed: { type: Boolean, default: true },
+    grantedAt: { type: Date, default: Date.now },
+    grantedBy: String
+  }],
+  trustedDevices: [{
+    fingerprint: String,
+    name: String,
+    lastUsed: { type: Date, default: Date.now },
+    createdAt: { type: Date, default: Date.now },
+    isActive: { type: Boolean, default: true }
+  }],
+  lastKnownLocation: {
+    latitude: Number,
+    longitude: Number,
+    country: String,
+    city: String,
+    timestamp: { type: Date, default: Date.now }
+  },
+  activeSessions: [{
+    sessionId: String,
+    deviceFingerprint: String,
+    ip: String,
+    userAgent: String,
+    createdAt: { type: Date, default: Date.now },
+    lastActivity: { type: Date, default: Date.now }
+  }],
+  
+  // MFA and Advanced Security
+  mfaEnabled: { type: Boolean, default: false },
+  mfaSecret: String,
+  mfaBackupCodes: [String],
+  mfaVerifiedAt: Date,
+  
+  // Password Policy Compliance
+  passwordHistory: [{
+    hash: String,
+    createdAt: { type: Date, default: Date.now },
+    expiresAt: Date
+  }],
+  passwordExpiryDate: Date,
+  passwordExpiryWarningSent: { type: Boolean, default: false },
+  
+  // Behavioral Analysis
+  behaviorPatterns: {
+    averageSessionDuration: Number,
+    typicalAccessTimes: [Number],
+    commonIPs: [String],
+    typicalUserAgent: String,
+    lastUpdated: { type: Date, default: Date.now }
+  },
+  
+  // Security Status
+  securityStatus: {
+    riskScore: { type: Number, default: 0 },
+    lastRiskAssessment: Date,
+    securityFlags: [String],
+    requiresPasswordChange: { type: Boolean, default: false },
+    accountLocked: { type: Boolean, default: false },
+    lockReason: String
+  },
   verified:  { type: Boolean, default: false },
   verifyToken: String,
   resetToken: String,
@@ -49,6 +126,7 @@ const userSchema = new mongoose.Schema({
   pendingOrderId: String,
   razorpayOrderId: String, // Store Razorpay's order ID for verification
   pendingPlanType: String,
+  pendingBillingPeriod: String, // 'monthly' or 'yearly'
   orderCreatedAt: Date
 }, { timestamps: true });
 

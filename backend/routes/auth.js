@@ -5,7 +5,11 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const transporter = require('../mailer');
-const { validateRegistration, validateLogin } = require('../middleware/validation');
+const { validateRegistration, validateLogin, validatePasswordUpdate } = require('../middleware/validation');
+const { PasswordSecurity, JWTSecurity } = require('../middleware/authSecurity');
+const { PasswordPolicyEnforcer } = require('../middleware/passwordPolicy');
+const { AccessControlManager } = require('../middleware/accessControl');
+const { ZeroTrustManager } = require('../middleware/zeroTrust');
 
 // POST /api/register
 router.post('/register', validateRegistration, async (req, res) => {
@@ -13,10 +17,53 @@ router.post('/register', validateRegistration, async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
     if (await User.findOne({ email })) return res.status(400).json({ message: 'Email already registered' });
 
-    const hash = await bcrypt.hash(password, 10);
+    // Enhanced password policy validation
+    const userInfo = { firstName, lastName, email };
+    const passwordValidation = PasswordPolicyEnforcer.validatePassword(password, userInfo);
+    
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({
+        message: 'Password does not meet security requirements',
+        errors: passwordValidation.errors,
+        recommendations: passwordValidation.recommendations,
+        strength: passwordValidation.strength,
+        compliance: passwordValidation.compliance
+      });
+    }
+    
+    // Enhanced password hashing with additional security
+    const passwordData = await PasswordSecurity.hashPassword(password);
     const token = crypto.randomBytes(32).toString('hex');
+    
+    // Calculate password expiry date
+    const passwordExpiryDate = new Date();
+    passwordExpiryDate.setDate(passwordExpiryDate.getDate() + 90); // 90 days
 
-    await User.create({ firstName, lastName, email, password: hash, verified: false, verifyToken: token });
+    await User.create({ 
+      firstName, 
+      lastName, 
+      email, 
+      password: passwordData.hash,
+      passwordSalt: passwordData.salt,
+      passwordRounds: passwordData.rounds,
+      passwordCreatedAt: passwordData.timestamp,
+      passwordExpiryDate,
+      passwordHistory: [{
+        hash: passwordData.hash,
+        createdAt: passwordData.timestamp,
+        expiresAt: passwordExpiryDate
+      }],
+      verified: false, 
+      verifyToken: token,
+      role: 'free_user',
+      securityStatus: {
+        riskScore: 0,
+        lastRiskAssessment: new Date(),
+        securityFlags: [],
+        requiresPasswordChange: false,
+        accountLocked: false
+      }
+    });
 
     const verifyLink = `${process.env.BACKEND_URL || 'https://json4ai.onrender.com'}/api/verify/${token}`;
     
@@ -323,35 +370,125 @@ router.post('/login', validateLogin, async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     
-    if (!user) return res.status(400).json({ message: 'Invalid email or password' });
-    if (!user.verified) return res.status(400).json({ message: 'Please verify your email before logging in' });
+    if (!user) {
+      // Log failed attempt for security monitoring
+      console.warn(`Failed login attempt - User not found: ${email}, IP: ${req.ip}`);
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
     
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) return res.status(400).json({ message: 'Invalid email or password' });
+    if (!user.verified) {
+      return res.status(400).json({ message: 'Please verify your email before logging in' });
+    }
     
-    // Create access token
-    const accessToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    // Check for account lockout
+    if (user.loginAttempts >= 5 && user.lockUntil && user.lockUntil > new Date()) {
+      const retryAfter = Math.ceil((user.lockUntil - new Date()) / 1000);
+      return res.status(423).json({ 
+        message: 'Account temporarily locked due to too many failed attempts',
+        retryAfter: retryAfter
+      });
+    }
     
-    // Create refresh token
-    const refreshToken = jwt.sign(
-      { 
-        id: user._id, 
-        type: 'refresh',
-        iat: Math.floor(Date.now() / 1000)
-      }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: '30d' }
-    );
+    // Enhanced password verification
+    const validPassword = await PasswordSecurity.verifyPassword(password, user.password, user.passwordSalt);
     
-    // Hash and store refresh token
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    if (!validPassword) {
+      // Increment failed attempts
+      const updateData = {
+        $inc: { loginAttempts: 1 },
+        $set: { lastFailedLogin: new Date() }
+      };
+      
+      // Lock account after 5 failed attempts for 15 minutes
+      if (user.loginAttempts + 1 >= 5) {
+        updateData.$set.lockUntil = new Date(Date.now() + 15 * 60 * 1000);
+      }
+      
+      await User.findByIdAndUpdate(user._id, updateData);
+      
+      console.warn(`Failed login attempt - Invalid password: ${email}, IP: ${req.ip}`);
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
+    
+    // Reset failed attempts on successful login
+    await User.findByIdAndUpdate(user._id, {
+      $unset: { 
+        loginAttempts: 1, 
+        lockUntil: 1, 
+        lastFailedLogin: 1 
+      },
+      $set: { 
+        lastLogin: new Date(),
+        lastActivity: new Date()
+      }
+    });
+    
+    // Generate secure tokens using enhanced JWT security
+    const { accessToken, refreshToken } = JWTSecurity.generateTokens(user._id, user.email);
+    
+    // Hash and store refresh token securely
+    const hashedRefreshToken = await JWTSecurity.hashRefreshToken(refreshToken);
     user.refreshToken = hashedRefreshToken;
     await user.save();
+    
+    // Zero Trust evaluation for login
+    const zeroTrustEvaluation = await ZeroTrustManager.evaluateAccess(req, user, 'login', 'user_profile');
+    
+    if (!zeroTrustEvaluation.allowed) {
+      console.warn('Zero Trust login denied:', {
+        userId: user._id,
+        email,
+        riskScore: zeroTrustEvaluation.riskScore,
+        factors: zeroTrustEvaluation.factors
+      });
+      
+      return res.status(403).json({
+        message: 'Login denied by security policy',
+        code: 'ZERO_TRUST_DENIED',
+        riskScore: zeroTrustEvaluation.riskScore,
+        requirements: zeroTrustEvaluation.requirements
+      });
+    }
+    
+    // Update user's last known location and device info
+    const deviceFingerprint = ZeroTrustManager.generateDeviceFingerprint(req);
+    const location = await ZeroTrustManager.getIPLocation(req.ip);
+    
+    await User.findByIdAndUpdate(user._id, {
+      $set: {
+        lastKnownLocation: {
+          latitude: location.latitude,
+          longitude: location.longitude,
+          country: location.country,
+          city: location.city,
+          timestamp: new Date()
+        }
+      },
+      $addToSet: {
+        trustedDevices: {
+          fingerprint: deviceFingerprint,
+          name: req.headers['user-agent'] || 'Unknown Device',
+          lastUsed: new Date(),
+          createdAt: new Date(),
+          isActive: true
+        }
+      }
+    });
+    
+    // Log successful login with Zero Trust evaluation
+    console.log(`Successful login with Zero Trust: ${email}, IP: ${req.ip}, Risk Score: ${zeroTrustEvaluation.riskScore}`);
     
     res.json({ 
       message: 'Login successful!', 
       accessToken, 
       refreshToken,
+      zeroTrustEvaluation: {
+        riskScore: zeroTrustEvaluation.riskScore,
+        factors: zeroTrustEvaluation.factors.map(f => ({
+          factor: f.factor,
+          message: f.message
+        }))
+      },
       user: { 
         id: user._id, 
         firstName: user.firstName, 
@@ -359,11 +496,15 @@ router.post('/login', validateLogin, async (req, res) => {
         email: user.email,
         plan: user.plan,
         dailyUsage: user.dailyUsage,
-        credits: user.credits
+        credits: user.credits,
+        role: user.role,
+        mfaEnabled: user.mfaEnabled,
+        securityStatus: user.securityStatus
       } 
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Login error:', err);
+    res.status(500).json({ message: 'Authentication service temporarily unavailable' });
   }
 });
 
@@ -561,6 +702,204 @@ router.post('/logout', async (req, res) => {
   } catch (error) {
     // Even if token verification fails, still return success
     res.json({ message: 'Logged out successfully' });
+  }
+});
+
+// POST /api/change-password - Change user password with enhanced security
+router.post('/change-password', auth, validatePasswordUpdate, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user._id);
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Verify current password
+    const isCurrentPasswordValid = await PasswordSecurity.verifyPassword(
+      currentPassword, 
+      user.password, 
+      user.passwordSalt
+    );
+    
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+    
+    // Check if new password is different from current password
+    if (currentPassword === newPassword) {
+      return res.status(400).json({ message: 'New password must be different from current password' });
+    }
+    
+    // Enhanced password policy validation for new password
+    const userInfo = { 
+      firstName: user.firstName, 
+      lastName: user.lastName, 
+      email: user.email 
+    };
+    const passwordHistory = user.passwordHistory || [];
+    const passwordValidation = PasswordPolicyEnforcer.validatePassword(newPassword, userInfo, passwordHistory);
+    
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({
+        message: 'New password does not meet security requirements',
+        errors: passwordValidation.errors,
+        recommendations: passwordValidation.recommendations,
+        strength: passwordValidation.strength,
+        compliance: passwordValidation.compliance
+      });
+    }
+    
+    // Hash new password with enhanced security
+    const passwordData = await PasswordSecurity.hashPassword(newPassword);
+    
+    // Calculate new password expiry date
+    const passwordExpiryDate = new Date();
+    passwordExpiryDate.setDate(passwordExpiryDate.getDate() + 90); // 90 days
+    
+    // Add to password history
+    const newPasswordHistory = [
+      {
+        hash: passwordData.hash,
+        createdAt: passwordData.timestamp,
+        expiresAt: passwordExpiryDate
+      },
+      ...passwordHistory.slice(0, 11) // Keep last 12 passwords
+    ];
+    
+    // Update user password with new security data
+    await User.findByIdAndUpdate(user._id, {
+      password: passwordData.hash,
+      passwordSalt: passwordData.salt,
+      passwordRounds: passwordData.rounds,
+      passwordCreatedAt: passwordData.timestamp,
+      passwordExpiryDate,
+      passwordHistory: newPasswordHistory,
+      passwordExpiryWarningSent: false,
+      // Reset login attempts and lock status
+      $unset: { 
+        loginAttempts: 1, 
+        lockUntil: 1, 
+        lastFailedLogin: 1 
+      },
+      $set: {
+        'securityStatus.requiresPasswordChange': false
+      }
+    });
+    
+    // Invalidate all existing refresh tokens for security
+    await User.findByIdAndUpdate(user._id, {
+      $unset: { refreshToken: 1 }
+    });
+    
+    // Log password change
+    console.log(`Password changed successfully for user: ${user.email}, IP: ${req.ip}`);
+    
+    res.json({ 
+      message: 'Password changed successfully. Please log in again with your new password.',
+      requiresReauth: true
+    });
+  } catch (error) {
+    console.error('Password change error:', error);
+    res.status(500).json({ message: 'Password change failed. Please try again.' });
+  }
+});
+
+// POST /api/check-password-strength - Check password strength with enhanced policy
+router.post('/check-password-strength', async (req, res) => {
+  try {
+    const { password, userInfo } = req.body;
+    
+    if (!password) {
+      return res.status(400).json({ message: 'Password is required' });
+    }
+    
+    // Use enhanced password policy validation
+    const validation = PasswordPolicyEnforcer.validatePassword(password, userInfo || {});
+    
+    res.json({
+      isValid: validation.isValid,
+      errors: validation.errors,
+      warnings: validation.warnings,
+      strength: validation.strength,
+      compliance: validation.compliance,
+      recommendations: validation.recommendations,
+      strengthLevel: validation.strength >= 80 ? 'strong' : 
+                    validation.strength >= 60 ? 'medium' : 
+                    validation.strength >= 40 ? 'weak' : 'very weak'
+    });
+  } catch (error) {
+    console.error('Password strength check error:', error);
+    res.status(500).json({ message: 'Password strength check failed' });
+  }
+});
+
+// POST /api/generate-secure-password - Generate secure password based on policy
+router.post('/generate-secure-password', async (req, res) => {
+  try {
+    const { length = 16 } = req.body;
+    
+    if (length < 12 || length > 128) {
+      return res.status(400).json({ 
+        message: 'Password length must be between 12 and 128 characters' 
+      });
+    }
+    
+    const securePassword = PasswordPolicyEnforcer.generateSecurePassword(length);
+    
+    // Validate the generated password
+    const validation = PasswordPolicyEnforcer.validatePassword(securePassword);
+    
+    res.json({
+      password: securePassword,
+      strength: validation.strength,
+      compliance: validation.compliance,
+      isValid: validation.isValid,
+      length: securePassword.length
+    });
+  } catch (error) {
+    console.error('Password generation error:', error);
+    res.status(500).json({ message: 'Password generation failed' });
+  }
+});
+
+// GET /api/password-policy - Get current password policy requirements
+router.get('/password-policy', async (req, res) => {
+  try {
+    const { PASSWORD_POLICY } = require('../middleware/passwordPolicy');
+    
+    res.json({
+      policy: {
+        minLength: PASSWORD_POLICY.MIN_LENGTH,
+        maxLength: PASSWORD_POLICY.MAX_LENGTH,
+        requireUppercase: PASSWORD_POLICY.REQUIRE_UPPERCASE,
+        requireLowercase: PASSWORD_POLICY.REQUIRE_LOWERCASE,
+        requireNumbers: PASSWORD_POLICY.REQUIRE_NUMBERS,
+        requireSpecialChars: PASSWORD_POLICY.REQUIRE_SPECIAL_CHARS,
+        minUppercase: PASSWORD_POLICY.MIN_UPPERCASE,
+        minLowercase: PASSWORD_POLICY.MIN_LOWERCASE,
+        minNumbers: PASSWORD_POLICY.MIN_NUMBERS,
+        minSpecialChars: PASSWORD_POLICY.MIN_SPECIAL_CHARS,
+        allowedSpecialChars: PASSWORD_POLICY.ALLOWED_SPECIAL_CHARS,
+        passwordExpiryDays: PASSWORD_POLICY.PASSWORD_EXPIRY_DAYS,
+        passwordHistoryCount: PASSWORD_POLICY.PASSWORD_HISTORY_COUNT
+      },
+      requirements: [
+        `Minimum ${PASSWORD_POLICY.MIN_LENGTH} characters`,
+        `At least ${PASSWORD_POLICY.MIN_UPPERCASE} uppercase letters`,
+        `At least ${PASSWORD_POLICY.MIN_LOWERCASE} lowercase letters`,
+        `At least ${PASSWORD_POLICY.MIN_NUMBERS} numbers`,
+        `At least ${PASSWORD_POLICY.MIN_SPECIAL_CHARS} special characters`,
+        'No common words or patterns',
+        'No personal information',
+        'No sequential characters',
+        'No repeated characters',
+        `Expires every ${PASSWORD_POLICY.PASSWORD_EXPIRY_DAYS} days`
+      ]
+    });
+  } catch (error) {
+    console.error('Password policy retrieval error:', error);
+    res.status(500).json({ message: 'Failed to retrieve password policy' });
   }
 });
 

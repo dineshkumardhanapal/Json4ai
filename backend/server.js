@@ -5,6 +5,19 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { validateEnvironment } = require('./config/envValidation');
+const { 
+  securityHeaders, 
+  generalLimiter, 
+  authLimiter, 
+  promptLimiter, 
+  paymentLimiter,
+  preventNoSQLInjection,
+  requestSizeLimiter,
+  securityLogger
+} = require('./middleware/security');
+const { sanitizeAllInputs } = require('./middleware/validation');
+const { zeroTrustMiddleware } = require('./middleware/zeroTrust');
+const { accessControlMiddleware } = require('./middleware/accessControl');
 
 // Validate environment variables before starting
 try {
@@ -19,57 +32,26 @@ const app = express();
 // Trust proxy for Render deployment (fixes rate limiter X-Forwarded-For issue)
 app.set('trust proxy', 1);
 
-// Security middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:", "blob:"],
-      connectSrc: ["'self'", "https://*.onrender.com", "https://json4ai.onrender.com", "https://*.netlify.app"],
-      frameSrc: ["'self'"],
-      frameAncestors: ["'self'"],
-      formAction: ["'self'"]
-    }
-  },
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true
-  },
-  noSniff: true,
-  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
-}));
+// Enhanced security middleware
+app.use(securityHeaders);
+app.use(requestSizeLimiter);
+app.use(preventNoSQLInjection);
+app.use(securityLogger);
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-// Apply rate limiting to all routes
-app.use(limiter);
+// Apply general rate limiting to all routes
+app.use(generalLimiter);
 
 // Handle CORS preflight requests
 app.options('*', cors());
 
-// Stricter rate limiting for auth routes
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // limit each IP to 5 requests per windowMs
-  message: 'Too many authentication attempts, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// Apply specific rate limiting to different route types
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
+app.use('/api/auth/resend-verification', authLimiter);
+app.use('/api/auth/forgot-password', authLimiter);
 
-// Apply stricter rate limiting to auth routes
-app.use('/api/login', authLimiter);
-app.use('/api/register', authLimiter);
-app.use('/api/resend-verification', authLimiter);
+app.use('/api/prompt/generate', promptLimiter);
+app.use('/api/payment', paymentLimiter);
 
 // CORS configuration - more flexible for production
 const corsOrigins = process.env.NODE_ENV === 'production' 
@@ -122,6 +104,12 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Input sanitization middleware
+app.use(sanitizeAllInputs);
+
+// Zero Trust Security Middleware (applied to all routes)
+app.use(zeroTrustMiddleware);
+
 // MongoDB connection with security options
 mongoose.connect(process.env.MONGO_URI, {
   maxPoolSize: 10,
@@ -147,6 +135,7 @@ app.use('/api', require('./routes/auth'));
 app.use('/api/user', require('./routes/user'));
 app.use('/api/prompt', require('./routes/prompt'));
 app.use('/api/payment', require('./routes/payment'));
+app.use('/api/admin', require('./routes/admin'));
 
 // Start subscription renewal jobs (disabled by default for one-time plans)
 // const subscriptionJobs = require('./legacy/subscriptionRenewal');

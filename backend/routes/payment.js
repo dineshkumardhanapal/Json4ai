@@ -39,13 +39,14 @@ function verifyRazorpayWebhookSignature(payload, signature) {
 const PLANS = {
   'starter': {
     name: 'Starter',
-    price: 299, // INR 299 per month
+    monthlyPrice: 299, // INR 299 per month
+    yearlyPrice: 2870, // INR 2870 per year (20% discount)
     currency: 'INR',
     dailyLimit: 30, // 30 prompts per day
-    duration: 30, // 30 days (1 month)
+    monthlyDuration: 30, // 30 days (1 month)
+    yearlyDuration: 365, // 365 days (1 year)
     features: [
       '30 JSON prompts per day',
-      'Valid for 1 month',
       'Advanced prompt templates',
       'Priority support',
       'Export functionality'
@@ -53,13 +54,14 @@ const PLANS = {
   },
   'premium': {
     name: 'Premium',
-    price: 999, // INR 999 per month
+    monthlyPrice: 999, // INR 999 per month
+    yearlyPrice: 9590, // INR 9590 per year (20% discount)
     currency: 'INR',
     dailyLimit: 100, // 100 prompts per day
-    duration: 30, // 30 days (1 month)
+    monthlyDuration: 30, // 30 days (1 month)
+    yearlyDuration: 365, // 365 days (1 year)
     features: [
       '100 JSON prompts per day',
-      'Valid for 1 month',
       'All Starter features',
       'Custom prompt templates',
       'API access',
@@ -70,9 +72,9 @@ const PLANS = {
 };
 
 // POST /api/payment/create-order - Create Razorpay order
-router.post('/create-order', auth, async (req, res) => {
+router.post('/create-order', auth, validatePaymentSubscription, async (req, res) => {
   try {
-    const { planType } = req.body;
+    const { planType, billingPeriod = 'monthly' } = req.body;
     const user = req.user;
 
     // Validate plan type
@@ -80,7 +82,16 @@ router.post('/create-order', auth, async (req, res) => {
       return res.status(400).json({ error: 'Invalid plan type' });
     }
 
+    // Validate billing period
+    if (!['monthly', 'yearly'].includes(billingPeriod)) {
+      return res.status(400).json({ error: 'Invalid billing period' });
+    }
+
     const plan = PLANS[planType];
+    
+    // Determine price and duration based on billing period
+    const price = billingPeriod === 'yearly' ? plan.yearlyPrice : plan.monthlyPrice;
+    const duration = billingPeriod === 'yearly' ? plan.yearlyDuration : plan.monthlyDuration;
 
     // Check if user already has an active plan
     if (user.plan !== 'free' && user.planEndDate && new Date(user.planEndDate) > new Date()) {
@@ -96,12 +107,13 @@ router.post('/create-order', auth, async (req, res) => {
     
     // Create Razorpay order
     const orderOptions = {
-      amount: plan.price * 100, // Razorpay expects amount in paise (smallest currency unit)
+      amount: price * 100, // Razorpay expects amount in paise (smallest currency unit)
       currency: plan.currency,
       receipt: shortReceipt, // Use shorter receipt (max 40 chars)
       notes: {
         order_id: orderId, // Store full order ID in notes
         plan_type: planType,
+        billing_period: billingPeriod,
         user_id: user._id.toString(),
         plan_name: plan.name,
         source: 'json4ai'
@@ -111,8 +123,10 @@ router.post('/create-order', auth, async (req, res) => {
     try {
       console.log('Creating Razorpay order:', {
         orderId: orderId,
-        amount: plan.price,
+        amount: price,
         currency: plan.currency,
+        billingPeriod: billingPeriod,
+        duration: duration,
         environment: process.env.NODE_ENV
       });
 
@@ -131,6 +145,7 @@ router.post('/create-order', auth, async (req, res) => {
         pendingOrderId: orderId, // Use our full order ID for tracking
         razorpayOrderId: order.id, // Store Razorpay's order ID for verification
         pendingPlanType: planType,
+        pendingBillingPeriod: billingPeriod,
         orderCreatedAt: new Date()
       });
 
@@ -143,7 +158,7 @@ router.post('/create-order', auth, async (req, res) => {
         currency: order.currency,
         key: process.env.RAZORPAY_KEY_ID, // Frontend needs this for payment
         name: 'JSON4AI',
-        description: `${plan.name} Plan - 1 Month Access`,
+        description: `${plan.name} Plan - ${billingPeriod === 'yearly' ? '1 Year' : '1 Month'} Access`,
         prefill: {
           name: `${user.firstName} ${user.lastName}`,
           email: user.email,
@@ -151,6 +166,7 @@ router.post('/create-order', auth, async (req, res) => {
         },
         notes: {
           plan_type: planType,
+          billing_period: billingPeriod,
           user_id: user._id.toString()
         }
       });
@@ -251,6 +267,7 @@ async function handlePaymentSuccess(order, payment) {
     }
 
     const planType = user.pendingPlanType;
+    const billingPeriod = user.pendingBillingPeriod || 'monthly';
     const plan = PLANS[planType];
     
     if (!plan) {
@@ -258,10 +275,11 @@ async function handlePaymentSuccess(order, payment) {
       return;
     }
 
-    // Calculate plan end date (30 days from now)
+    // Calculate plan end date based on billing period
     const planStartDate = new Date();
     const planEndDate = new Date();
-    planEndDate.setDate(planEndDate.getDate() + plan.duration);
+    const duration = billingPeriod === 'yearly' ? plan.yearlyDuration : plan.monthlyDuration;
+    planEndDate.setDate(planEndDate.getDate() + duration);
 
     // Activate the plan
     await User.findByIdAndUpdate(user._id, {
@@ -275,6 +293,7 @@ async function handlePaymentSuccess(order, payment) {
       pendingOrderId: null,
       razorpayOrderId: null,
       pendingPlanType: null,
+      pendingBillingPeriod: null,
       orderCreatedAt: null,
       // Update activity
       lastActivity: new Date()

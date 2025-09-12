@@ -317,14 +317,6 @@ const validatePasswordUpdate = [
   }
 ];
 
-// Sanitize MongoDB ObjectId
-const sanitizeObjectId = (req, res, next) => {
-  if (req.params.id && !/^[0-9a-fA-F]{24}$/.test(req.params.id)) {
-    return res.status(400).json({ message: 'Invalid ID format' });
-  }
-  next();
-};
-
 // Enhanced ObjectId sanitization
 const sanitizeObjectId = (req, res, next) => {
   if (req.params.id && !/^[0-9a-fA-F]{24}$/.test(req.params.id)) {

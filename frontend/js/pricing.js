@@ -387,13 +387,20 @@ async function handleUpgrade(e) {
     e.target.disabled = true;
     e.target.textContent = 'Creating Order…';
 
+    // Get billing period from toggle
+    const pricingToggle = document.getElementById('pricing-toggle');
+    const isYearly = pricingToggle ? pricingToggle.checked : false;
+
     const res = await fetch(API('/api/payment/create-order'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${sessionManager.getAccessToken()}`
       },
-      body: JSON.stringify({ planType: plan })
+      body: JSON.stringify({ 
+        planType: plan,
+        billingPeriod: isYearly ? 'yearly' : 'monthly'
+      })
     });
 
     console.log('Payment order creation response:', {

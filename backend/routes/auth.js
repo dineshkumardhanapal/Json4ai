@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const transporter = require('../mailer');
+const auth = require('../middleware/auth');
 const { validateRegistration, validateLogin, validatePasswordUpdate } = require('../middleware/validation');
 const { PasswordSecurity, JWTSecurity } = require('../middleware/authSecurity');
 const { PasswordPolicyEnforcer } = require('../middleware/passwordPolicy');

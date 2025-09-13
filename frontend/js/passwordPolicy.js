@@ -1,5 +1,9 @@
 // Enhanced Password Policy Frontend Implementation
 
+// API Configuration
+const API_BASE_URL = 'https://json4ai.onrender.com';
+const API = path => `${API_BASE_URL}/api${path}`;
+
 class PasswordPolicyManager {
   constructor() {
     this.policy = null;
@@ -21,7 +25,7 @@ class PasswordPolicyManager {
   // Load password policy from server
   async loadPasswordPolicy() {
     try {
-      const response = await fetch('/api/password-policy');
+      const response = await fetch(API('/password-policy'));
       if (response.ok) {
         this.policy = await response.json();
         console.log('Password policy loaded:', this.policy);
@@ -126,7 +130,7 @@ class PasswordPolicyManager {
       // Get user info if available
       const userInfo = this.getUserInfo();
       
-      const response = await fetch('/api/check-password-strength', {
+      const response = await fetch(API('/check-password-strength'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -349,7 +353,7 @@ class PasswordPolicyManager {
   // Generate secure password
   async generateSecurePassword(inputElement) {
     try {
-      const response = await fetch('/api/generate-secure-password', {
+      const response = await fetch(API('/generate-secure-password'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

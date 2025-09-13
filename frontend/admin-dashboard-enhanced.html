@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Dashboard - JSON4AI</title>
+    <link rel="stylesheet" href="css/aurora-glass.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        :root {
+            --admin-primary: #6366f1;
+            --admin-secondary: #8b5cf6;
+            --admin-success: #10b981;
+            --admin-warning: #f59e0b;
+            --admin-danger: #ef4444;
+            --admin-info: #3b82f6;
+            --admin-dark: #1f2937;
+            --admin-light: #f8fafc;
+            --admin-gradient: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary));
+        }
+
+        .admin-dashboard {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .admin-dashboard::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .admin-content {
+            position: relative;
+            z-index: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-medium);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--admin-gradient);
+        }
+
+        .admin-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .admin-title h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--admin-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0;
+        }
+
+        .admin-title .badge {
+            background: var(--admin-gradient);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tab:hover,
+        .nav-tab.active {
+            background: var(--admin-gradient);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-medium);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--admin-gradient);
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .metric-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .metric-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-change {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .metric-change.positive {
+            color: var(--admin-success);
+        }
+
+        .metric-change.negative {
+            color: var(--admin-danger);
+        }
+
+        .chart-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-medium);
+            margin-bottom: 2rem;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chart-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chart-control:hover,
+        .chart-control.active {
+            background: var(--admin-gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        .alert-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 0.75rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .alert-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(4px);
+        }
+
+        .alert-item.high {
+            border-left-color: var(--admin-danger);
+        }
+
+        .alert-item.medium {
+            border-left-color: var(--admin-warning);
+        }
+
+        .alert-item.low {
+            border-left-color: var(--admin-info);
+        }
+
+        .alert-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .alert-icon.high {
+            background: var(--admin-danger);
+        }
+
+        .alert-icon.medium {
+            background: var(--admin-warning);
+        }
+
+        .alert-icon.low {
+            background: var(--admin-info);
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .table-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .table-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .table-content {
+            overflow-x: auto;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .admin-table th {
+            background: rgba(255, 255, 255, 0.02);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .admin-table td {
+            color: var(--text-primary);
+        }
+
+        .admin-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--admin-success);
+        }
+
+        .status-badge.inactive {
+            background: rgba(107, 114, 128, 0.2);
+            color: #6b7280;
+        }
+
+        .status-badge.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--admin-warning);
+        }
+
+        .status-badge.danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--admin-danger);
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: var(--admin-gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--admin-primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .admin-content {
+                padding: 1rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .admin-nav {
+                flex-direction: column;
+            }
+
+            .metric-card {
+                padding: 1.5rem;
+            }
+
+            .chart-container {
+                padding: 1.5rem;
+            }
+
+            .admin-table th,
+            .admin-table td {
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+        }
+
+        .real-time-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--admin-success);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .real-time-indicator::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--admin-success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="admin-dashboard">
+    <div class="admin-content">
+        <!-- Admin Header -->
+        <div class="admin-header">
+            <div class="admin-title">
+                <h1><i class="fas fa-shield-alt"></i> Super Admin Dashboard</h1>
+                <span class="badge">SUPER ADMIN</span>
+                <span class="real-time-indicator">LIVE</span>
+            </div>
+            <div class="admin-nav">
+                <a href="#" class="nav-tab active" data-section="overview">
+                    <i class="fas fa-tachometer-alt"></i> Overview
+                </a>
+                <a href="#" class="nav-tab" data-section="security">
+                    <i class="fas fa-shield-alt"></i> Security
+                </a>
+                <a href="#" class="nav-tab" data-section="analytics">
+                    <i class="fas fa-chart-line"></i> Analytics
+                </a>
+                <a href="#" class="nav-tab" data-section="users">
+                    <i class="fas fa-users"></i> Users
+                </a>
+                <a href="#" class="nav-tab" data-section="system">
+                    <i class="fas fa-server"></i> System
+                </a>
+                <a href="#" class="nav-tab" data-section="alerts">
+                    <i class="fas fa-bell"></i> Alerts
+                </a>
+            </div>
+        </div>
+
+        <!-- Overview Section -->
+        <div id="overview-section" class="dashboard-section">
+            <!-- Key Metrics -->
+            <div class="dashboard-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Total Users</span>
+                        <div class="metric-icon" style="background: var(--admin-primary);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value" id="total-users">-</div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="user-growth">+0%</span> from last month
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Active Users (24h)</span>
+                        <div class="metric-icon" style="background: var(--admin-success);">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value" id="active-users">-</div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="active-growth">+0%</span> from yesterday
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Monthly Revenue</span>
+                        <div class="metric-icon" style="background: var(--admin-secondary);">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value" id="monthly-revenue">$0</div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="revenue-growth">+0%</span> from last month
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Security Score</span>
+                        <div class="metric-icon" style="background: var(--admin-warning);">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value" id="security-score">-</div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-check"></i>
+                        <span>System Secure</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">User Growth Trend</h3>
+                        <div class="chart-controls">
+                            <button class="chart-control active" data-period="7d">7D</button>
+                            <button class="chart-control" data-period="30d">30D</button>
+                            <button class="chart-control" data-period="90d">90D</button>
+                        </div>
+                    </div>
+                    <canvas id="userGrowthChart" height="300"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">User Distribution</h3>
+                    </div>
+                    <canvas id="userDistributionChart" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Recent Activity</h3>
+                </div>
+                <div class="table-content">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-activity">
+                            <tr>
+                                <td colspan="4" class="empty-state">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <div>Loading recent activity...</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Section -->
+        <div id="security-section" class="dashboard-section" style="display: none;">
+            <div class="dashboard-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Failed Logins (24h)</span>
+                        <div class="metric-icon" style="background: var(--admin-danger);">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value" id="failed-logins">-</div>
+                    <div class="metric-change">
+                        <span>Security monitoring active</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">MFA Adoption</span>
+                        <div class="metric-icon" style="background: var(--admin-info);">
+                            <i class="fas fa-key"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value" id="mfa-rate">-</div>
+                    <div class="metric-change">
+                        <span>% of users enabled</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">High Risk Users</span>
+                        <div class="metric-icon" style="background: var(--admin-warning);">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value" id="high-risk-users">-</div>
+                    <div class="metric-change">
+                        <span>Requires attention</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Security Alerts</h3>
+                </div>
+                <div id="security-alerts">
+                    <div class="empty-state">
+                        <i class="fas fa-shield-alt"></i>
+                        <div>No security alerts at this time</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div id="analytics-section" class="dashboard-section" style="display: none;">
+            <div class="dashboard-grid">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Revenue Analytics</h3>
+                        <div class="chart-controls">
+                            <button class="chart-control active" data-period="30d">30D</button>
+                            <button class="chart-control" data-period="90d">90D</button>
+                            <button class="chart-control" data-period="1y">1Y</button>
+                        </div>
+                    </div>
+                    <canvas id="revenueChart" height="300"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">User Engagement</h3>
+                    </div>
+                    <canvas id="engagementChart" height="300"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Feature Usage</h3>
+                </div>
+                <div id="feature-usage">
+                    <div class="empty-state">
+                        <i class="fas fa-chart-bar"></i>
+                        <div>Loading feature usage data...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Section -->
+        <div id="users-section" class="dashboard-section" style="display: none;">
+            <div class="table-container">
+                <div class="table-header">
+                    <h3 class="table-title">User Management</h3>
+                </div>
+                <div class="table-content">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Plan</th>
+                                <th>Status</th>
+                                <th>Last Login</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table">
+                            <tr>
+                                <td colspan="7" class="empty-state">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <div>Loading users...</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Section -->
+        <div id="system-section" class="dashboard-section" style="display: none;">
+            <div class="dashboard-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Server Uptime</span>
+                        <div class="metric-icon" style="background: var(--admin-success);">
+                            <i class="fas fa-server"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value" id="server-uptime">-</div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-check"></i>
+                        <span>All systems operational</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Memory Usage</span>
+                        <div class="metric-icon" style="background: var(--admin-info);">
+                            <i class="fas fa-memory"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value" id="memory-usage">-</div>
+                    <div class="metric-change">
+                        <span>% of total memory</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">API Response Time</span>
+                        <div class="metric-icon" style="background: var(--admin-warning);">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value" id="api-response-time">-</div>
+                    <div class="metric-change">
+                        <span>ms average</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">System Performance</h3>
+                </div>
+                <canvas id="systemChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- Alerts Section -->
+        <div id="alerts-section" class="dashboard-section" style="display: none;">
+            <div class="alert-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Active Alerts</h3>
+                </div>
+                <div id="alerts-list">
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash"></i>
+                        <div>No active alerts</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/session-manager.js"></script>
+    <script src="js/admin-dashboard-enhanced.js"></script>
+</body>
+</html>

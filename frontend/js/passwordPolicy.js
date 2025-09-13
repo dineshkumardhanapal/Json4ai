@@ -1,8 +1,5 @@
 // Enhanced Password Policy Frontend Implementation
-
-// API Configuration
-const API_BASE_URL = 'https://json4ai.onrender.com';
-const API = path => `${API_BASE_URL}/api${path}`;
+// Note: API function is already declared in auth.js
 
 class PasswordPolicyManager {
   constructor() {

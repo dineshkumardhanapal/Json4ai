@@ -137,6 +137,7 @@ app.use('/api/prompt', require('./routes/prompt'));
 app.use('/api/payment', require('./routes/payment'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/admin', require('./routes/admin-monitoring'));
+app.use('/api', require('./routes/admin-auth'));
 
 // Start subscription renewal jobs (disabled by default for one-time plans)
 // const subscriptionJobs = require('./legacy/subscriptionRenewal');

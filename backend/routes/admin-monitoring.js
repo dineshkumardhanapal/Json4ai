@@ -2,25 +2,11 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const auth = require('../middleware/auth');
+const { adminSecurityMiddleware } = require('../middleware/adminSecurity');
 const mongoose = require('mongoose');
 
-// Super Admin middleware
-const superAdminAuth = async (req, res, next) => {
-  try {
-    if (req.user.role !== 'super_admin') {
-      return res.status(403).json({ 
-        success: false, 
-        message: 'Access denied. Super Admin privileges required.' 
-      });
-    }
-    next();
-  } catch (error) {
-    res.status(401).json({ success: false, message: 'Authentication failed' });
-  }
-};
-
 // Authentication & Access Monitoring
-router.get('/security/auth-metrics', auth, superAdminAuth, async (req, res) => {
+router.get('/security/auth-metrics', auth, adminSecurityMiddleware, async (req, res) => {
   try {
     const now = new Date();
     const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -94,7 +80,7 @@ router.get('/security/auth-metrics', auth, superAdminAuth, async (req, res) => {
 });
 
 // User Activity Monitoring
-router.get('/activity/user-activity', auth, superAdminAuth, async (req, res) => {
+router.get('/activity/user-activity', auth, adminSecurityMiddleware, async (req, res) => {
   try {
     const now = new Date();
     const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -161,7 +147,7 @@ router.get('/activity/user-activity', auth, superAdminAuth, async (req, res) => 
 });
 
 // System Health Monitoring
-router.get('/system/health-metrics', auth, superAdminAuth, async (req, res) => {
+router.get('/system/health-metrics', auth, adminSecurityMiddleware, async (req, res) => {
   try {
     const os = require('os');
     const now = new Date();
@@ -234,7 +220,7 @@ router.get('/system/health-metrics', auth, superAdminAuth, async (req, res) => {
 });
 
 // Network & Threat Monitoring
-router.get('/security/threat-metrics', auth, superAdminAuth, async (req, res) => {
+router.get('/security/threat-metrics', auth, adminSecurityMiddleware, async (req, res) => {
   try {
     const now = new Date();
     const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -295,7 +281,7 @@ router.get('/security/threat-metrics', auth, superAdminAuth, async (req, res) =>
 });
 
 // Business Intelligence & Revenue Analytics
-router.get('/analytics/revenue-metrics', auth, superAdminAuth, async (req, res) => {
+router.get('/analytics/revenue-metrics', auth, adminSecurityMiddleware, async (req, res) => {
   try {
     const now = new Date();
     const last30d = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -382,7 +368,7 @@ router.get('/analytics/revenue-metrics', auth, superAdminAuth, async (req, res) 
 });
 
 // User Engagement Analytics
-router.get('/analytics/engagement-metrics', auth, superAdminAuth, async (req, res) => {
+router.get('/analytics/engagement-metrics', auth, adminSecurityMiddleware, async (req, res) => {
   try {
     const now = new Date();
     const last7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -456,7 +442,7 @@ router.get('/analytics/engagement-metrics', auth, superAdminAuth, async (req, re
 });
 
 // Real-time alerts and notifications
-router.get('/alerts/active-alerts', auth, superAdminAuth, async (req, res) => {
+router.get('/alerts/active-alerts', auth, adminSecurityMiddleware, async (req, res) => {
   try {
     const now = new Date();
     const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);

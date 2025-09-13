@@ -41,8 +41,8 @@ async function createSuperAdmin() {
       }
     }
 
-    // Generate secure password
-    const password = generateSecurePassword();
+    // Generate secure password or use from environment
+    const password = process.env.SUPER_ADMIN_PASSWORD || generateSecurePassword();
     const saltRounds = 12;
     const salt = await bcrypt.genSalt(saltRounds);
     const passwordHash = await bcrypt.hash(password, salt);
@@ -52,7 +52,7 @@ async function createSuperAdmin() {
     const superAdmin = new User({
       firstName: 'Super',
       lastName: 'Admin',
-      email: 'admin@json4ai.com',
+      email: process.env.SUPER_ADMIN_EMAIL || 'admin@json4ai.com',
       password: passwordHash,
       passwordSalt: additionalSalt,
       passwordRounds: saltRounds,
@@ -185,6 +185,12 @@ function generateSecurePassword() {
 
 // Run the script
 if (require.main === module) {
+  createSuperAdmin();
+}
+
+// Also run if environment variables are set
+if (process.env.CREATE_SUPER_ADMIN === 'true') {
+  console.log('🔧 Environment variable CREATE_SUPER_ADMIN detected, creating super admin...');
   createSuperAdmin();
 }
 

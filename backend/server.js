@@ -160,6 +160,13 @@ process.on('SIGINT', () => {
   });
 });
 
+// Auto-create super admin if environment variable is set
+if (process.env.CREATE_SUPER_ADMIN === 'true') {
+  console.log('🔧 Auto-creating super admin from environment variables...');
+  const { createSuperAdmin } = require('./scripts/create-super-admin');
+  createSuperAdmin().catch(console.error);
+}
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

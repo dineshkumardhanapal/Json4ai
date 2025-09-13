@@ -4,18 +4,18 @@ const validator = require('validator');
 // Enterprise-grade password policy configuration
 const PASSWORD_POLICY = {
   // Length requirements
-  MIN_LENGTH: 12,                    // Increased minimum length
+  MIN_LENGTH: 8,                     // User-friendly minimum length
   MAX_LENGTH: 128,                   // Maximum length limit
   
   // Character requirements
   REQUIRE_UPPERCASE: true,           // Must contain uppercase letters
   REQUIRE_LOWERCASE: true,           // Must contain lowercase letters
   REQUIRE_NUMBERS: true,             // Must contain numbers
-  REQUIRE_SPECIAL_CHARS: true,       // Must contain special characters
-  MIN_UPPERCASE: 2,                  // Minimum uppercase letters
-  MIN_LOWERCASE: 2,                  // Minimum lowercase letters
-  MIN_NUMBERS: 2,                    // Minimum numbers
-  MIN_SPECIAL_CHARS: 2,              // Minimum special characters
+  REQUIRE_SPECIAL_CHARS: false,      // Special characters optional for better UX
+  MIN_UPPERCASE: 1,                  // Minimum uppercase letters
+  MIN_LOWERCASE: 1,                  // Minimum lowercase letters
+  MIN_NUMBERS: 1,                    // Minimum numbers
+  MIN_SPECIAL_CHARS: 0,              // No minimum special characters
   
   // Allowed special characters (restricted set for security)
   ALLOWED_SPECIAL_CHARS: '!@#$%^&*()_+-=[]{}|;:,.<>?',
@@ -34,19 +34,19 @@ const PASSWORD_POLICY = {
   PASSWORD_HISTORY_COUNT: 12,        // Remember last 12 passwords
   
   // Expiration policy
-  PASSWORD_EXPIRY_DAYS: 90,          // Password expires every 90 days
-  WARNING_DAYS: 14,                  // Warning 14 days before expiry
+  PASSWORD_EXPIRY_DAYS: 365,         // Password expires every year (more user-friendly)
+  WARNING_DAYS: 30,                  // Warning 30 days before expiry
   
   // Account lockout
-  MAX_FAILED_ATTEMPTS: 3,            // Reduced from 5 for stricter security
-  LOCKOUT_DURATION_MINUTES: 30,      // Increased lockout duration
+  MAX_FAILED_ATTEMPTS: 5,            // Standard lockout attempts
+  LOCKOUT_DURATION_MINUTES: 15,      // Reasonable lockout duration
   PROGRESSIVE_DELAY: true,           // Progressive delays between attempts
   
-  // Advanced security
-  REQUIRE_NO_LEET_SPEAK: true,       // No leet speak substitutions (4 for A, @ for a)
-  REQUIRE_NO_REVERSED_WORDS: true,   // No reversed dictionary words
-  REQUIRE_NO_PHONE_PATTERNS: true,   // No phone number patterns
-  REQUIRE_NO_DATE_PATTERNS: true,    // No date patterns (MM/DD/YYYY)
+  // Advanced security (relaxed for better UX)
+  REQUIRE_NO_LEET_SPEAK: false,      // Allow leet speak substitutions
+  REQUIRE_NO_REVERSED_WORDS: false,  // Allow reversed dictionary words
+  REQUIRE_NO_PHONE_PATTERNS: false,  // Allow phone number patterns
+  REQUIRE_NO_DATE_PATTERNS: false,   // Allow date patterns
 };
 
 // Comprehensive password validation class

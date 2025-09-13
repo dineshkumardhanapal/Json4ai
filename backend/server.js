@@ -57,7 +57,7 @@ app.use('/api/payment', paymentLimiter);
 const corsOrigins = process.env.NODE_ENV === 'production' 
   ? [
       process.env.FRONTEND_URL, 
-      'https://json4ai.netlify.app',
+      process.env.FRONTEND_URL,
       'https://json4ai.onrender.com',
       'https://rainbow-squirrel-4fcfd6.netlify.app',
       'https://*.netlify.app',

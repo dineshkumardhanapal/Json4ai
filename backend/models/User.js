@@ -4,7 +4,9 @@ const userSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
   lastName:  { type: String, required: true },
   email:     { type: String, required: true, unique: true, lowercase: true },
-  password:  { type: String, required: true, minlength: 8 },
+  password:  { type: String, required: false, minlength: 8 }, // Made optional for Google OAuth
+  googleId:  { type: String, unique: true, sparse: true }, // Google OAuth ID
+  profilePicture: { type: String }, // Profile picture from Google
   passwordSalt: { type: String }, // Additional salt for enhanced security
   passwordRounds: { type: Number, default: 12 }, // bcrypt rounds used
   passwordCreatedAt: { type: Date, default: Date.now },

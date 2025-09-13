@@ -12,6 +12,9 @@ const { PasswordPolicyEnforcer } = require('../middleware/passwordPolicy');
 const { AccessControlManager } = require('../middleware/accessControl');
 const { ZeroTrustManager } = require('../middleware/zeroTrust');
 
+// Google OAuth Verification
+const { OAuth2Client } = require('google-auth-library');
+
 // POST /api/register
 router.post('/register', validateRegistration, async (req, res) => {
   try {
@@ -242,8 +245,8 @@ router.get('/verify/:token', async (req, res) => {
           </div>
           <h1>Email Verified!</h1>
           <p>Your account has been successfully verified. You can now log in to access your dashboard.</p>
-          <a href="https://json4ai.netlify.app/login.html" class="btn btn-primary">Continue to Login</a>
-          <a href="https://json4ai.netlify.app/index.html" class="btn btn-secondary">Back to Home</a>
+          <a href="${process.env.FRONTEND_URL}/login.html" class="btn btn-primary">Continue to Login</a>
+          <a href="${process.env.FRONTEND_URL}/index.html" class="btn btn-secondary">Back to Home</a>
         </div>
       </body>
       </html>
@@ -901,6 +904,105 @@ router.get('/password-policy', async (req, res) => {
   } catch (error) {
     console.error('Password policy retrieval error:', error);
     res.status(500).json({ message: 'Failed to retrieve password policy' });
+  }
+});
+
+// POST /api/auth/google - Google OAuth Login
+router.post('/auth/google', async (req, res) => {
+  try {
+    const { token } = req.body;
+    
+    if (!token) {
+      return res.status(400).json({ message: 'Google token is required' });
+    }
+
+    // Initialize Google OAuth client
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    
+    // Verify the Google ID token
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture } = payload;
+    
+    if (!email) {
+      return res.status(400).json({ message: 'Email not provided by Google' });
+    }
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+    
+    if (user) {
+      // User exists, update Google ID if not set
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.profilePicture = picture;
+        await user.save();
+      }
+    } else {
+      // Create new user
+      const nameParts = name.split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+      
+      user = new User({
+        firstName,
+        lastName,
+        email,
+        googleId,
+        profilePicture: picture,
+        isEmailVerified: true, // Google emails are pre-verified
+        role: 'user',
+        plan: 'free',
+        credits: 3
+      });
+      
+      await user.save();
+    }
+
+    // Generate JWT tokens
+    const { accessToken, refreshToken } = JWTSecurity.generateTokens(user._id, user.email);
+    user.refreshToken = await JWTSecurity.hashRefreshToken(refreshToken);
+    await user.save();
+
+    // Log successful Google login
+    console.log(`✅ Google OAuth login successful for user: ${email}`);
+
+    res.json({
+      success: true,
+      message: 'Google login successful',
+      accessToken,
+      refreshToken,
+      user: {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        plan: user.plan,
+        credits: user.credits,
+        profilePicture: user.profilePicture
+      }
+    });
+
+  } catch (error) {
+    console.error('Google OAuth error:', error);
+    
+    if (error.message.includes('Token used too late')) {
+      return res.status(400).json({ message: 'Google token has expired. Please try again.' });
+    }
+    
+    if (error.message.includes('Invalid token signature')) {
+      return res.status(400).json({ message: 'Invalid Google token. Please try again.' });
+    }
+    
+    res.status(500).json({ 
+      message: 'Google authentication failed',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
   }
 });
 

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Pricing – JSON4AI</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css"/>
+  <link rel="stylesheet" href="css/gradient-glass.css"/>
+  <link rel="stylesheet" href="css/responsive.css"/>
+  <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="js/notifications.js" defer></script>
+  <script src="js/session-manager.js" defer></script>
+  <script src="js/pricing.js" defer></script>
+
+</head>
+<body>
+<header class="navbar">
+  <div class="container flex-between">
+    <a href="index.html" class="logo">Json4<span>Ai</span></a>
+    <nav class="nav-links" id="nav-links">
+      <a href="index.html">Home</a>
+      <a href="login.html" id="login-link">Login</a>
+      <a href="dashboard.html" id="dashboard-link" style="display: none;">Dashboard</a>
+      <a href="#" id="logout-link" style="display: none;">Logout</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Notification Container -->
+<div id="notification-container" class="notification-container"></div>
+
+<main>
+  <div class="container">
+    <div class="pricing-header text-center">
+      <h1>Choose Your Quality Tier</h1>
+      <p>Select the perfect plan based on your JSON output quality requirements</p>
+    </div>
+    
+    <div class="pricing-grid">
+      <div class="plan-card">
+        <div class="plan-header">
+          <h3>Free</h3>
+          <div class="quality-badge quality-free">Basic Quality</div>
+        </div>
+        <div class="price">₹0<span>/always free</span></div>
+        <ul class="plan-features">
+          <li>3 prompts per day</li>
+          <li>Simple JSON structure</li>
+          <li>Essential information only</li>
+          <li>Basic NLP processing</li>
+          <li>100-150 word output</li>
+          <li>Standard accuracy</li>
+          <li>Basic prompt templates</li>
+          <li>Community support</li>
+        </ul>
+        <button class="btn-primary" data-plan="free" disabled>Current Plan</button>
+      </div>
+      
+      <div class="plan-card featured">
+        <div class="plan-badge">Recommended</div>
+        <div class="plan-header">
+          <h3>Starter</h3>
+          <div class="quality-badge quality-standard">Standard Quality</div>
+        </div>
+        <div class="price">₹299<span>/month</span></div>
+        <ul class="plan-features">
+          <li>30 prompts per day</li>
+          <li>Valid for 1 month</li>
+          <li>Enhanced JSON structure</li>
+          <li>Moderate detail and depth</li>
+          <li>Improved NLP sophistication</li>
+          <li>150-200 word output</li>
+          <li>Enhanced accuracy</li>
+          <li>Advanced prompt templates</li>
+          <li>Priority support</li>
+          <li>Export functionality</li>
+        </ul>
+        <button class="btn-primary" data-plan="starter">Buy Now</button>
+      </div>
+      
+      <div class="plan-card">
+        <div class="plan-header">
+          <h3>Premium</h3>
+          <div class="quality-badge quality-premium">Premium Quality</div>
+        </div>
+        <div class="price">₹999<span>/month</span></div>
+        <ul class="plan-features">
+          <li>100 prompts per day</li>
+          <li>Valid for 1 month</li>
+          <li>Maximum JSON detail</li>
+          <li>Advanced NLP techniques</li>
+          <li>Comprehensive content</li>
+          <li>200+ word output</li>
+          <li>Maximum accuracy</li>
+          <li>All Starter features</li>
+          <li>Custom prompt templates</li>
+          <li>API access</li>
+          <li>White-label options</li>
+          <li>24/7 priority support</li>
+        </ul>
+        <button class="btn-primary" data-plan="premium">Buy Now</button>
+      </div>
+    </div>
+    
+    <div class="pricing-faq text-center">
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h4>What's the difference between quality tiers?</h4>
+          <p>Free tier provides basic JSON structure, Starter offers enhanced detail with moderate NLP, and Premium delivers maximum detail with advanced NLP techniques for comprehensive content generation.</p>
+        </div>
+        <div class="faq-item">
+          <h4>How long do paid plans last?</h4>
+          <p>Each paid plan (Starter/Premium) lasts for exactly 1 month from the date of purchase. After expiry, you'll return to the free plan.</p>
+        </div>
+        <div class="faq-item">
+          <h4>What happens if I exceed my daily limit?</h4>
+          <p>You'll need to wait until the next day for your limit to reset, or purchase a plan with higher daily limits.</p>
+        </div>
+        <div class="faq-item">
+          <h4>Is there a free plan?</h4>
+          <p>Yes, the Free plan comes with 3 prompts per day, forever. No credit card required to start.</p>
+        </div>
+        <div class="faq-item">
+          <h4>How does payment work?</h4>
+          <p>All plans are one-time payments processed securely through Razorpay. No recurring charges - you only pay when you want to extend your access.</p>
+        </div>
+        <div class="faq-item">
+          <h4>Can I upgrade my plan later?</h4>
+          <p>Yes, you can upgrade to a higher tier at any time. The new plan will start immediately and last for 1 month from the purchase date.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <p class="copyright">© 2025 JSON4AI. All rights reserved.</p>
+  </div>
+</footer>
+</body>
+</html>

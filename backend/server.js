@@ -162,11 +162,19 @@ process.on('SIGINT', () => {
 });
 
 // Auto-create super admin if environment variable is set
-if (process.env.CREATE_SUPER_ADMIN === 'true') {
-  console.log('🔧 Auto-creating super admin from environment variables...');
-  const { createSuperAdmin } = require('./scripts/create-super-admin');
-  createSuperAdmin().catch(console.error);
-}
+// Wait for MongoDB connection before creating super admin
+mongoose.connection.once('open', async () => {
+  if (process.env.CREATE_SUPER_ADMIN === 'true') {
+    console.log('🔧 Auto-creating super admin from environment variables...');
+    const { createSuperAdmin } = require('./scripts/create-super-admin');
+    try {
+      await createSuperAdmin();
+      console.log('✅ Super admin creation completed');
+    } catch (error) {
+      console.error('❌ Error creating Super Admin:', error);
+    }
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

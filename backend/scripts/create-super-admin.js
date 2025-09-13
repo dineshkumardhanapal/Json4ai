@@ -15,15 +15,19 @@ const User = require('../models/User');
 
 async function createSuperAdmin() {
   try {
-    // Connect to MongoDB
-    await mongoose.connect(process.env.MONGO_URI, {
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-      bufferCommands: false
-    });
-    
-    console.log('✅ Connected to MongoDB');
+    // Connect to MongoDB only if not already connected
+    if (mongoose.connection.readyState !== 1) {
+      console.log('🔌 Connecting to MongoDB...');
+      await mongoose.connect(process.env.MONGO_URI, {
+        maxPoolSize: 10,
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
+        bufferCommands: false
+      });
+      console.log('✅ Connected to MongoDB');
+    } else {
+      console.log('✅ Using existing MongoDB connection');
+    }
 
     // Check if super admin already exists
     const existingAdmin = await User.findOne({ role: 'super_admin' });
@@ -150,11 +154,18 @@ async function createSuperAdmin() {
     
   } catch (error) {
     console.error('❌ Error creating Super Admin:', error);
-    process.exit(1);
+    // Only exit if running as standalone script
+    if (require.main === module) {
+      process.exit(1);
+    } else {
+      throw error; // Re-throw if called from server
+    }
   } finally {
-    // Close MongoDB connection
-    await mongoose.connection.close();
-    console.log('\n🔌 MongoDB connection closed');
+    // Only close MongoDB connection if we created it (standalone mode)
+    if (require.main === module && mongoose.connection.readyState === 1) {
+      await mongoose.connection.close();
+      console.log('\n🔌 MongoDB connection closed');
+    }
   }
 }
 
@@ -183,15 +194,9 @@ function generateSecurePassword() {
   return password.split('').sort(() => Math.random() - 0.5).join('');
 }
 
-// Run the script
+// Run the script if called directly
 if (require.main === module) {
-  createSuperAdmin();
-}
-
-// Also run if environment variables are set
-if (process.env.CREATE_SUPER_ADMIN === 'true') {
-  console.log('🔧 Environment variable CREATE_SUPER_ADMIN detected, creating super admin...');
-  createSuperAdmin();
+  createSuperAdmin().catch(console.error);
 }
 
 module.exports = { createSuperAdmin };

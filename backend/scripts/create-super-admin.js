@@ -32,16 +32,22 @@ async function createSuperAdmin() {
     // Check if super admin already exists
     const existingAdmin = await User.findOne({ role: 'super_admin' });
     if (existingAdmin) {
-      console.log('⚠️  Super Admin already exists:');
+      console.log('✅ Super Admin already exists:');
       console.log(`   Email: ${existingAdmin.email}`);
       console.log(`   Name: ${existingAdmin.firstName} ${existingAdmin.lastName}`);
       console.log(`   Role: ${existingAdmin.role}`);
       console.log(`   Created: ${existingAdmin.createdAt}`);
       
-      const shouldContinue = process.argv.includes('--force');
-      if (!shouldContinue) {
-        console.log('\n💡 To create a new super admin, use --force flag');
-        process.exit(0);
+      // If running as standalone script, check for --force flag
+      if (require.main === module) {
+        const shouldContinue = process.argv.includes('--force');
+        if (!shouldContinue) {
+          console.log('\n💡 To create a new super admin, use --force flag');
+          return { success: true, message: 'Super admin already exists', user: existingAdmin };
+        }
+      } else {
+        // If running from server, just return success
+        return { success: true, message: 'Super admin already exists', user: existingAdmin };
       }
     }
 

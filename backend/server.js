@@ -168,8 +168,10 @@ mongoose.connection.once('open', async () => {
     console.log('🔧 Auto-creating super admin from environment variables...');
     const { createSuperAdmin } = require('./scripts/create-super-admin');
     try {
-      await createSuperAdmin();
-      console.log('✅ Super admin creation completed');
+      const result = await createSuperAdmin();
+      if (result.success) {
+        console.log('✅ Super admin creation completed:', result.message);
+      }
     } catch (error) {
       console.error('❌ Error creating Super Admin:', error);
     }

@@ -5,7 +5,8 @@ const registerForm = document.getElementById('register-form');
 const API = path => `https://json4ai.onrender.com/api${path}`;
 
 // Google OAuth Configuration
-const GOOGLE_CLIENT_ID = 'your-google-client-id.googleusercontent.com'; // TODO: Replace with actual client ID from Google Console
+// Google OAuth Configuration - Update this with your actual Client ID
+const GOOGLE_CLIENT_ID = '733569001730-13r9etrbf22uf2nmrjj1upqp5o4nm1uu.apps.googleusercontent.com'; // Replace with your actual Google Client ID
 
 // Initialize Google Sign-In
 function initializeGoogleAuth() {

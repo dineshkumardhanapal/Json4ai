@@ -14,7 +14,7 @@ class AdminAuth {
     // Admin Login with Enhanced Security
     async adminLogin(email, password) {
         try {
-            const response = await fetch('/api/admin-login', {
+            const response = await fetch('/api/admin/admin-login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -107,7 +107,7 @@ class AdminAuth {
         // Check session status every 5 minutes
         this.sessionTimeout = setInterval(async () => {
             try {
-                const response = await fetch('/api/admin-session-status', {
+                const response = await fetch('/api/admin/admin-session-status', {
                     headers: {
                         'Authorization': `Bearer ${this.adminToken}`,
                         'X-Admin-Session-Id': this.adminSessionId
@@ -130,7 +130,7 @@ class AdminAuth {
         // Send heartbeat every 10 minutes to keep session alive
         this.heartbeatInterval = setInterval(async () => {
             try {
-                const response = await fetch('/api/admin-session-status', {
+                const response = await fetch('/api/admin/admin-session-status', {
                     headers: {
                         'Authorization': `Bearer ${this.adminToken}`,
                         'X-Admin-Session-Id': this.adminSessionId
@@ -152,7 +152,7 @@ class AdminAuth {
     async adminLogout() {
         try {
             if (this.adminSessionId) {
-                await fetch('/api/admin-logout', {
+                await fetch('/api/admin/admin-logout', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${this.adminToken}`,
@@ -271,7 +271,7 @@ class AdminAuth {
     // Get Admin Activity Log
     async getAdminActivityLog(limit = 100) {
         try {
-            const response = await this.makeAdminRequest(`/api/admin-activity-log?limit=${limit}`);
+            const response = await this.makeAdminRequest(`/api/admin/admin-activity-log?limit=${limit}`);
             const data = await response.json();
 
             if (response.ok && data.success) {

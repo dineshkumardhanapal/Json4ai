@@ -636,8 +636,29 @@ class ZeroTrustManager {
 const zeroTrustMiddleware = async (req, res, next) => {
   try {
     // Skip Zero Trust for certain endpoints
-    const skipEndpoints = ['/api/health', '/api/status'];
-    if (skipEndpoints.some(endpoint => req.path.startsWith(endpoint))) {
+    const skipEndpoints = [
+      '/api/health', 
+      '/api/status',
+      '/api/register',
+      '/api/login',
+      '/api/forgot-password',
+      '/api/reset-password',
+      '/api/verify-email',
+      '/api/resend-verification',
+      '/api/check-password-strength',
+      '/api/generate-secure-password',
+      '/api/password-policy',
+      '/api/auth/google'
+    ];
+    
+    // Check if current path matches any skip endpoint
+    const shouldSkip = skipEndpoints.some(endpoint => {
+      // Exact match or starts with endpoint
+      return req.path === endpoint || req.path.startsWith(endpoint + '/');
+    });
+    
+    if (shouldSkip) {
+      console.log(`Zero Trust: Skipping authentication for ${req.path}`);
       return next();
     }
     

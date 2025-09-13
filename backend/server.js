@@ -45,10 +45,10 @@ app.use(generalLimiter);
 app.options('*', cors());
 
 // Apply specific rate limiting to different route types
-app.use('/api/auth/login', authLimiter);
-app.use('/api/auth/register', authLimiter);
-app.use('/api/auth/resend-verification', authLimiter);
-app.use('/api/auth/forgot-password', authLimiter);
+app.use('/api/login', authLimiter);
+app.use('/api/register', authLimiter);
+app.use('/api/resend-verification', authLimiter);
+app.use('/api/forgot-password', authLimiter);
 
 app.use('/api/prompt/generate', promptLimiter);
 app.use('/api/payment', paymentLimiter);

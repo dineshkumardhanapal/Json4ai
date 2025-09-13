@@ -7,6 +7,7 @@ class SessionManager {
   constructor() {
     this.accessToken = localStorage.getItem('accessToken');
     this.refreshToken = localStorage.getItem('refreshToken');
+    this.userData = localStorage.getItem('userData');
     this.sessionTimeout = 15 * 60 * 1000; // 15 minutes in milliseconds
     this.warningTime = 2 * 60 * 1000; // 2 minutes warning before logout
     this.activityTimeout = null;
@@ -232,11 +233,13 @@ class SessionManager {
     if (this.activityTimeout) clearTimeout(this.activityTimeout);
     if (this.warningTimeout) clearTimeout(this.warningTimeout);
 
-    // Clear tokens
+    // Clear tokens and user data
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('userData');
     this.accessToken = null;
     this.refreshToken = null;
+    this.userData = null;
 
     // Update UI
     this.updateNavigationUI();
@@ -418,6 +421,19 @@ class SessionManager {
   // Check if user is logged in
   isLoggedIn() {
     return !!(this.accessToken && this.refreshToken);
+  }
+
+  // Get user data
+  getUserData() {
+    if (this.userData) {
+      try {
+        return JSON.parse(this.userData);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        return null;
+      }
+    }
+    return null;
   }
 
   // Manual logout

@@ -31,6 +31,7 @@ async function handleGoogleSignIn(response) {
     if (res.ok) {
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem('userData', JSON.stringify(data.user));
       
       // Update navigation UI if available
       if (window.sessionManager) {
@@ -66,6 +67,7 @@ if (loginForm) {
               if (res.ok) {
           localStorage.setItem('accessToken', data.accessToken);
           localStorage.setItem('refreshToken', data.refreshToken);
+          localStorage.setItem('userData', JSON.stringify(data.user));
           
           // Update navigation UI if available
           if (window.sessionManager) {

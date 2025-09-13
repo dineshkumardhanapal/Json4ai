@@ -35,24 +35,19 @@ class EnhancedAdminDashboard {
     }
 
     checkAuthentication() {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-            window.location.href = '/login.html';
-            return false;
-        }
-
-        // Verify user role
-        try {
-            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-            if (userData.role !== 'super_admin') {
+        // Check if admin authentication is available
+        if (window.adminAuth && window.adminAuth.isAdminAuthenticated()) {
+            const adminUserData = window.adminAuth.getAdminUserData();
+            if (adminUserData && adminUserData.role === 'super_admin') {
+                return true;
+            } else {
                 this.showError('Access denied. Super Admin privileges required.');
-                setTimeout(() => window.location.href = '/dashboard.html', 3000);
+                setTimeout(() => window.location.href = '/admin-login.html', 3000);
                 return false;
             }
-            return true;
-        } catch (error) {
-            console.error('Authentication check failed:', error);
-            window.location.href = '/login.html';
+        } else {
+            // Redirect to admin login
+            window.location.href = '/admin-login.html';
             return false;
         }
     }

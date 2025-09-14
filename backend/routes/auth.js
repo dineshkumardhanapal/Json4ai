@@ -664,20 +664,13 @@ router.post('/login', validateLogin, async (req, res) => {
       }
     });
     
-    // Log successful login with Zero Trust evaluation
-    console.log(`Successful login with Zero Trust: ${email}, IP: ${req.ip}, Risk Score: ${zeroTrustEvaluation.riskScore}`);
+    // Log successful login
+    console.log(`Successful login: ${email}, IP: ${req.ip}`);
     
     res.json({ 
       message: 'Login successful!', 
       accessToken, 
       refreshToken,
-      zeroTrustEvaluation: {
-        riskScore: zeroTrustEvaluation.riskScore,
-        factors: zeroTrustEvaluation.factors.map(f => ({
-          factor: f.factor,
-          message: f.message
-        }))
-      },
       user: { 
         id: user._id, 
         firstName: user.firstName, 

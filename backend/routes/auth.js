@@ -72,53 +72,55 @@ router.post('/register', validateRegistration, async (req, res) => {
     const verifyLink = `${process.env.BACKEND_URL || 'https://json4ai.onrender.com'}/api/verify/${token}`;
     
     try {
-      await transporter.sendMail({
-        from: '"JSON4AI" <json4ai@gmail.com>',
-        to: email,
-        subject: 'Verify your JSON4AI account',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #8b5cf6; margin: 0; font-size: 28px;">JSON4AI</h1>
-            <p style="color: #6b7280; margin: 10px 0 0 0;">Account Verification Required</p>
-          </div>
-          
-          <div style="background-color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-            <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Welcome to JSON4AI!</h2>
-            
-            <p style="color: #4b5563; line-height: 1.6; margin-bottom: 25px;">
-              Thank you for creating your account! To complete your registration and start using JSON4AI, 
-              please verify your email address by clicking the button below.
-            </p>
-            
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${verifyLink}" 
-                 style="background-color: #8b5cf6; color: white; padding: 14px 28px; text-decoration: none; 
-                        border-radius: 8px; font-weight: 600; font-size: 16px; display: inline-block;">
-                Verify Email Address
-              </a>
+      const { sendEmail } = require('../mailer');
+      
+      await sendEmail(
+        email,
+        'Verify your JSON4AI account',
+        `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="color: #8b5cf6; margin: 0; font-size: 28px;">JSON4AI</h1>
+              <p style="color: #6b7280; margin: 10px 0 0 0;">Account Verification Required</p>
             </div>
             
-            <p style="color: #6b7280; font-size: 14px; margin: 25px 0 0 0; text-align: center;">
-              If the button doesn't work, you can also copy and paste this link into your browser:<br>
-              <a href="${verifyLink}" style="color: #8b5cf6; word-break: break-all;">${verifyLink}</a>
-            </p>
+            <div style="background-color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+              <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Welcome to JSON4AI!</h2>
+              
+              <p style="color: #4b5563; line-height: 1.6; margin-bottom: 25px;">
+                Thank you for creating your account! To complete your registration and start using JSON4AI, 
+                please verify your email address by clicking the button below.
+              </p>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${verifyLink}" 
+                   style="background-color: #8b5cf6; color: white; padding: 14px 28px; text-decoration: none; 
+                          border-radius: 8px; font-weight: 600; font-size: 16px; display: inline-block;">
+                  Verify Email Address
+                </a>
+              </div>
+              
+              <p style="color: #6b7280; font-size: 14px; margin: 25px 0 0 0; text-align: center;">
+                If the button doesn't work, you can also copy and paste this link into your browser:<br>
+                <a href="${verifyLink}" style="color: #8b5cf6; word-break: break-all;">${verifyLink}</a>
+              </p>
+              
+              <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 25px 0;">
+              
+              <p style="color: #6b7280; font-size: 12px; margin: 0; text-align: center;">
+                This verification link will expire in 24 hours. If you didn't create this account, 
+                you can safely ignore this email.
+              </p>
+            </div>
             
-            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 25px 0;">
-            
-            <p style="color: #6b7280; font-size: 12px; margin: 0; text-align: center;">
-              This verification link will expire in 24 hours. If you didn't create this account, 
-              you can safely ignore this email.
-            </p>
+            <div style="text-align: center; margin-top: 20px;">
+              <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+                © 2025 JSON4AI. All rights reserved.
+              </p>
+            </div>
           </div>
-          
-          <div style="text-align: center; margin-top: 20px;">
-            <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-              © 2025 JSON4AI. All rights reserved.
-            </p>
-          </div>
-        </div>
-      `});
+        `
+      );
       
       console.log(`Verification email sent to ${email}`);
     } catch (emailError) {
@@ -313,11 +315,13 @@ router.post('/resend-verification', async (req, res) => {
     await user.save();
     
     const verifyLink = `${process.env.BACKEND_URL || 'https://json4ai.onrender.com'}/api/verify/${token}`;
-    await transporter.sendMail({
-      from: '"JSON4AI" <json4ai@gmail.com>',
-      to: email,
-      subject: 'Verify your JSON4AI account',
-      html: `
+    
+    const { sendEmail } = require('../mailer');
+    
+    await sendEmail(
+      email,
+      'Verify your JSON4AI account',
+      `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
           <div style="text-align: center; margin-bottom: 30px;">
             <h1 style="color: #8b5cf6; margin: 0; font-size: 28px;">JSON4AI</h1>
@@ -360,7 +364,7 @@ router.post('/resend-verification', async (req, res) => {
           </div>
         </div>
       `
-    });
+    );
     
     res.json({ message: 'Verification email sent successfully. Please check your inbox.' });
   } catch (err) {
@@ -538,14 +542,15 @@ router.post('/forgot-password', async (req, res) => {
     user.resetTokenExpiry = resetTokenExpiry;
     await user.save();
     
-    // Send reset email
+    // Send reset email using the mailer module
     const resetLink = `${process.env.FRONTEND_URL || 'https://json4ai.com'}/reset-password.html?token=${resetToken}`;
     
-    await transporter.sendMail({
-      from: '"JSON4AI" <json4ai@gmail.com>',
-      to: email,
-      subject: 'Reset your JSON4AI password',
-      html: `
+    const { sendEmail } = require('../mailer');
+    
+    await sendEmail(
+      email,
+      'Reset your JSON4AI password',
+      `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
           <div style="text-align: center; margin-bottom: 30px;">
             <h1 style="color: #8b5cf6; margin: 0; font-size: 28px;">JSON4AI</h1>
@@ -588,7 +593,7 @@ router.post('/forgot-password', async (req, res) => {
           </div>
         </div>
       `
-    });
+    );
     
     res.json({ message: 'Password reset email sent successfully!' });
   } catch (err) {

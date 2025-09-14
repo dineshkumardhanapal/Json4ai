@@ -136,7 +136,8 @@ class ZeroTrustManager {
       factor: 'device_verification',
       riskScore: 0,
       message: 'Device verification passed',
-      deviceFingerprint
+      deviceFingerprint,
+      requirements: []
     };
     
     // Check if device is known
@@ -172,7 +173,8 @@ class ZeroTrustManager {
     const result = {
       factor: 'location_verification',
       riskScore: 0,
-      message: 'Location verification passed'
+      message: 'Location verification passed',
+      requirements: []
     };
     
     if (!ZERO_TRUST_CONFIG.REQUIRE_LOCATION_VERIFICATION) {
@@ -208,7 +210,8 @@ class ZeroTrustManager {
     const result = {
       factor: 'session_verification',
       riskScore: 0,
-      message: 'Session verification passed'
+      message: 'Session verification passed',
+      requirements: []
     };
     
     const sessionToken = req.headers.authorization?.replace('Bearer ', '');
@@ -263,7 +266,8 @@ class ZeroTrustManager {
     const result = {
       factor: 'permission_verification',
       riskScore: 0,
-      message: 'Permission verification passed'
+      message: 'Permission verification passed',
+      requirements: []
     };
     
     // Get user permissions
@@ -308,7 +312,8 @@ class ZeroTrustManager {
     const result = {
       factor: 'risk_assessment',
       riskScore: 0,
-      message: 'Risk assessment passed'
+      message: 'Risk assessment passed',
+      requirements: []
     };
     
     let riskScore = 0;
@@ -351,7 +356,8 @@ class ZeroTrustManager {
     const result = {
       factor: 'time_access_control',
       riskScore: 0,
-      message: 'Time access control passed'
+      message: 'Time access control passed',
+      requirements: []
     };
     
     if (!ZERO_TRUST_CONFIG.WORKING_HOURS_ONLY) {
@@ -380,7 +386,8 @@ class ZeroTrustManager {
     const result = {
       factor: 'network_security',
       riskScore: 0,
-      message: 'Network security verification passed'
+      message: 'Network security verification passed',
+      requirements: []
     };
     
     // Check for secure connection
@@ -420,7 +427,8 @@ class ZeroTrustManager {
     const result = {
       factor: 'behavioral_analysis',
       riskScore: 0,
-      message: 'Behavioral analysis passed'
+      message: 'Behavioral analysis passed',
+      requirements: []
     };
     
     // Analyze user behavior patterns

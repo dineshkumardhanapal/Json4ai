@@ -252,13 +252,13 @@ class JWTSecurity {
     
     // Generate tokens
     const accessToken = jwt.sign(accessPayload, process.env.JWT_SECRET, {
-      algorithm: 'HS256',
-      expiresIn: '7d'
+      algorithm: 'HS256'
+      // Don't use expiresIn when payload already has exp property
     });
     
     const refreshToken = jwt.sign(refreshPayload, process.env.JWT_SECRET, {
-      algorithm: 'HS256',
-      expiresIn: '30d'
+      algorithm: 'HS256'
+      // Don't use expiresIn when payload already has exp property
     });
     
     return { accessToken, refreshToken };

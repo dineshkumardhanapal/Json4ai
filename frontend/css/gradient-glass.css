@@ -672,10 +672,19 @@ code, pre, .code-block {
 
 /* Buttons */
 .btn-primary, .btn-secondary, .btn-outline {
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: 0.8rem 1.6rem; border-radius: var(--radius-md);
-  font-weight: 600; text-decoration: none; cursor: pointer; position: relative;
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center;
+  padding: 0.875rem 1.5rem; 
+  border-radius: var(--radius-md);
+  font-weight: 600; 
+  text-decoration: none; 
+  cursor: pointer; 
+  position: relative;
   transition: var(--transition);
+  min-height: 48px; /* Consistent button height */
+  font-size: 1rem;
+  gap: 0.5rem;
 }
 .btn-primary { background: var(--accent-gradient); color: white; box-shadow: var(--glass-shadow-sm); border: 0; }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--glass-shadow-lg); }
@@ -3782,7 +3791,7 @@ footer { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border-
   color: var(--text-muted);
 }
 
-.register-form .form-group { margin-bottom: 1rem; }
+.register-form .form-group { margin-bottom: 1.5rem; }
 
 .register-form label { 
   display: block; 
@@ -4127,7 +4136,7 @@ footer { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border-
   }
   
   .register-form .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
   }
   
   .register-form input {

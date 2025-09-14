@@ -159,8 +159,19 @@ if (registerForm) {
       return;
     }
     
-    if (password.length < 6) {
-      showError('Password must be at least 6 characters long.');
+    if (password.length < 8) {
+      showError('Password must be at least 8 characters long.');
+      return;
+    }
+    
+    // Check password complexity
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[@$!%*?&\-_+=()\[\]{}|\\:;"'<>,.\/`~]/.test(password);
+    
+    if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
+      showError('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
       return;
     }
     
@@ -262,8 +273,18 @@ if (registerForm) {
           }, 3000);
         }
       } else {
-        console.error('Registration failed:', data.message);
-        showError(data.message || 'Registration failed');
+        console.error('Registration failed:', data);
+        
+        // Handle validation errors with detailed messages
+        if (data.errors && Array.isArray(data.errors)) {
+          const errorMessages = data.errors.map(err => `${err.field}: ${err.message}`).join('\n');
+          showError(`Validation failed:\n${errorMessages}`);
+        } else if (data.message) {
+          showError(data.message);
+        } else {
+          showError('Registration failed. Please check your information and try again.');
+        }
+        
         // Reset button state
         submitBtn.disabled = false;
         submitBtn.textContent = 'Create Account';

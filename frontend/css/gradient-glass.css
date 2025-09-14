@@ -4279,13 +4279,82 @@ footer { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border-
 ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--aurora-blue), var(--aurora-cyan), var(--aurora-green)); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { filter: brightness(1.1); }
 
-/* Password Generation Styles */
-.password-generation-section {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.03);
+/* Password Requirements Guide Styles */
+.password-requirements-guide {
+  margin: 1rem 0;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
+  backdrop-filter: blur(10px);
+}
+
+.requirements-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.requirements-header svg {
+  color: var(--aurora-cyan);
+}
+
+.requirements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.requirement-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.requirement-item svg {
+  color: var(--aurora-green);
+  flex-shrink: 0;
+}
+
+.password-tips {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+.password-tips h5 {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.password-tips ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.password-tips li {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.password-tips li::before {
+  content: "•";
+  color: var(--aurora-cyan);
+  position: absolute;
+  left: 0;
 }
 
 .generate-password-btn {

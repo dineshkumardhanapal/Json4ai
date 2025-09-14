@@ -1,8 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const Prompt = require('../models/Prompt');
 const auth = require('../middleware/auth');
 const { adminSecurityMiddleware } = require('../middleware/adminSecurity');
+const { 
+  getPromptCleanupStats, 
+  performManualCleanup, 
+  generateCleanupReport,
+  runCleanupMonitoring 
+} = require('../jobs/promptCleanup');
 const mongoose = require('mongoose');
 
 // Authentication & Access Monitoring
@@ -515,6 +522,81 @@ router.get('/alerts/active-alerts', auth, adminSecurityMiddleware, async (req, r
   } catch (error) {
     console.error('Alerts error:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch alerts' });
+  }
+});
+
+// Prompt Cleanup Monitoring Endpoints
+
+// GET /api/admin/prompt-cleanup/stats
+router.get('/prompt-cleanup/stats', auth, adminSecurityMiddleware, async (req, res) => {
+  try {
+    const stats = await getPromptCleanupStats();
+    
+    res.json({
+      success: true,
+      data: stats
+    });
+  } catch (error) {
+    console.error('Prompt cleanup stats error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to fetch prompt cleanup statistics' 
+    });
+  }
+});
+
+// GET /api/admin/prompt-cleanup/report
+router.get('/prompt-cleanup/report', auth, adminSecurityMiddleware, async (req, res) => {
+  try {
+    const report = await generateCleanupReport();
+    
+    res.json({
+      success: true,
+      data: report
+    });
+  } catch (error) {
+    console.error('Prompt cleanup report error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to generate prompt cleanup report' 
+    });
+  }
+});
+
+// POST /api/admin/prompt-cleanup/manual
+router.post('/prompt-cleanup/manual', auth, adminSecurityMiddleware, async (req, res) => {
+  try {
+    const result = await performManualCleanup();
+    
+    res.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('Manual prompt cleanup error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to perform manual prompt cleanup' 
+    });
+  }
+});
+
+// POST /api/admin/prompt-cleanup/monitor
+router.post('/prompt-cleanup/monitor', auth, adminSecurityMiddleware, async (req, res) => {
+  try {
+    const stats = await runCleanupMonitoring();
+    
+    res.json({
+      success: true,
+      data: stats,
+      message: 'Cleanup monitoring completed successfully'
+    });
+  } catch (error) {
+    console.error('Prompt cleanup monitoring error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to run prompt cleanup monitoring' 
+    });
   }
 });
 

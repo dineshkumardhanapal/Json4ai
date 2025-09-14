@@ -74,7 +74,7 @@ router.post('/register', validateRegistration, async (req, res) => {
     try {
       const { sendEmail } = require('../mailer');
       
-      await sendEmail(
+      const emailResult = await sendEmail(
         email,
         'Verify your JSON4AI account',
         `
@@ -122,7 +122,7 @@ router.post('/register', validateRegistration, async (req, res) => {
         `
       );
       
-      console.log(`Verification email sent to ${email}`);
+      console.log(`Verification email result:`, emailResult);
     } catch (emailError) {
       console.error('Failed to send verification email:', emailError);
       // Don't fail registration if email fails - user can resend later

@@ -307,6 +307,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (password.length > 0) {
       updatePasswordStrength(password);
       strengthIndicator.style.display = 'block';
+      
+      // Real-time password validation
+      validatePasswordRealTime(password);
     } else {
       strengthIndicator.style.display = 'none';
     }
@@ -384,6 +387,105 @@ function calculatePasswordStrength(password) {
     text: texts[levelIndex],
     feedback: feedback
   };
+}
+
+// Real-time password validation
+function validatePasswordRealTime(password) {
+  const validation = {
+    isValid: true,
+    errors: [],
+    warnings: []
+  };
+  
+  // Check minimum length
+  if (password.length < 8) {
+    validation.isValid = false;
+    validation.errors.push('Password must be at least 8 characters long');
+  }
+  
+  // Check for lowercase letters
+  if (!/[a-z]/.test(password)) {
+    validation.errors.push('Password must contain at least one lowercase letter');
+  }
+  
+  // Check for uppercase letters
+  if (!/[A-Z]/.test(password)) {
+    validation.errors.push('Password must contain at least one uppercase letter');
+  }
+  
+  // Check for numbers
+  if (!/[0-9]/.test(password)) {
+    validation.errors.push('Password must contain at least one number');
+  }
+  
+  // Check for special characters
+  if (!/[^A-Za-z0-9]/.test(password)) {
+    validation.errors.push('Password must contain at least one special character');
+  }
+  
+  // Check for common patterns
+  if (password.length > 0) {
+    if (/(.)\1{2,}/.test(password)) {
+      validation.warnings.push('Avoid repeating characters');
+    }
+    
+    if (/123|abc|qwe/i.test(password)) {
+      validation.warnings.push('Avoid common sequences');
+    }
+  }
+  
+  // Update validation display
+  updatePasswordValidationDisplay(validation);
+  
+  return validation;
+}
+
+// Update password validation display
+function updatePasswordValidationDisplay(validation) {
+  // Remove existing validation messages
+  const existingMessages = document.querySelectorAll('.password-validation-message');
+  existingMessages.forEach(msg => msg.remove());
+  
+  if (validation.errors.length > 0 || validation.warnings.length > 0) {
+    const validationContainer = document.createElement('div');
+    validationContainer.className = 'password-validation-message';
+    validationContainer.style.cssText = `
+      margin-top: 0.5rem;
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+    `;
+    
+    let html = '';
+    
+    if (validation.errors.length > 0) {
+      html += '<div style="color: var(--aurora-red); margin-bottom: 0.5rem;">';
+      html += '<strong>❌ Requirements:</strong><br>';
+      validation.errors.forEach(error => {
+        html += `• ${error}<br>`;
+      });
+      html += '</div>';
+    }
+    
+    if (validation.warnings.length > 0) {
+      html += '<div style="color: var(--aurora-orange);">';
+      html += '<strong>⚠️ Recommendations:</strong><br>';
+      validation.warnings.forEach(warning => {
+        html += `• ${warning}<br>`;
+      });
+      html += '</div>';
+    }
+    
+    validationContainer.innerHTML = html;
+    
+    // Insert after password strength indicator
+    const strengthIndicator = document.getElementById('password-strength-indicator');
+    if (strengthIndicator) {
+      strengthIndicator.parentNode.insertBefore(validationContainer, strengthIndicator.nextSibling);
+    }
+  }
 }
 </script>
 
@@ -502,7 +604,7 @@ function calculatePasswordStrength(password) {
   </div>
 </footer>
 
-<!-- Password Policy Script -->
-<script src="js/passwordPolicy.js" defer></script>
+<!-- Password Policy Script - Disabled to prevent duplicate password generation -->
+<!-- <script src="js/passwordPolicy.js" defer></script> -->
 </body>
 </html>

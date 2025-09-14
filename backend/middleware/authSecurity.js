@@ -234,7 +234,7 @@ class JWTSecurity {
     
     // Access token payload
     const accessPayload = {
-      userId,
+      id: userId,
       email: userEmail,
       type: 'access',
       iat: now,
@@ -243,7 +243,7 @@ class JWTSecurity {
     
     // Refresh token payload
     const refreshPayload = {
-      userId,
+      id: userId,
       email: userEmail,
       type: 'refresh',
       iat: now,

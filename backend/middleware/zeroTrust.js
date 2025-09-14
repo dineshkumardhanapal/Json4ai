@@ -644,6 +644,7 @@ const zeroTrustMiddleware = async (req, res, next) => {
       '/api/forgot-password',
       '/api/reset-password',
       '/api/verify-email',
+      '/api/verify',  // Add this to skip /api/verify/:token
       '/api/resend-verification',
       '/api/check-password-strength',
       '/api/generate-secure-password',

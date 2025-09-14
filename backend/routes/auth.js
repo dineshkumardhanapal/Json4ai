@@ -18,7 +18,25 @@ const { OAuth2Client } = require('google-auth-library');
 // POST /api/register
 router.post('/register', validateRegistration, async (req, res) => {
   try {
+    console.log('Registration request body:', JSON.stringify(req.body, null, 2));
+    console.log('Registration request keys:', Object.keys(req.body || {}));
+    
     const { firstName, lastName, email, password } = req.body;
+    
+    // Validate required fields
+    if (!firstName || !lastName || !email || !password) {
+      console.log('Missing required fields:', { firstName: !!firstName, lastName: !!lastName, email: !!email, password: !!password });
+      return res.status(400).json({ 
+        message: 'Missing required fields',
+        errors: [
+          { field: 'firstName', message: firstName ? 'Valid' : 'First name is required' },
+          { field: 'lastName', message: lastName ? 'Valid' : 'Last name is required' },
+          { field: 'email', message: email ? 'Valid' : 'Email is required' },
+          { field: 'password', message: password ? 'Valid' : 'Password is required' }
+        ].filter(err => err.message !== 'Valid')
+      });
+    }
+    
     if (await User.findOne({ email })) return res.status(400).json({ message: 'Email already registered' });
 
     // Enhanced password policy validation
@@ -130,7 +148,13 @@ router.post('/register', validateRegistration, async (req, res) => {
 
     res.json({ message: 'Registration successful! Please check your email to verify your account before logging in.' });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Registration error:', err);
+    console.error('Error stack:', err.stack);
+    res.status(500).json({ 
+      message: 'Registration failed due to server error',
+      error: err.message,
+      details: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   }
 });
 
@@ -138,8 +162,95 @@ router.post('/register', validateRegistration, async (req, res) => {
 router.get('/verify/:token', async (req, res) => {
   try {
     const user = await User.findOne({ verifyToken: req.params.token });
-    if (!user) return res.status(400).send('Invalid or expired token');
+    if (!user) {
+      return res.status(400).send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8"/>
+          <title>Verification Failed – JSON4AI</title>
+          <meta name="viewport" content="width=device-width,initial-scale=1"/>
+          <style>
+            body { font-family: Arial, sans-serif; text-align: center; padding: 2rem; background: #0a0a0a; color: white; }
+            .error-icon { color: #ef4444; font-size: 3rem; margin-bottom: 1rem; }
+            h1 { color: #ef4444; margin-bottom: 1rem; }
+            p { color: #e5e7eb; margin-bottom: 2rem; }
+            .btn { display: inline-block; padding: 0.75rem 1.5rem; background: #8b5cf6; color: white; text-decoration: none; border-radius: 0.5rem; }
+          </style>
+        </head>
+        <body>
+          <div class="error-icon">❌</div>
+          <h1>Verification Failed</h1>
+          <p>This verification link is invalid or has expired.</p>
+          <a href="${process.env.FRONTEND_URL || 'https://json4ai.netlify.app'}/register" class="btn">Register Again</a>
+        </body>
+        </html>
+      `);
+    }
 
+    // Check if token is expired (24 hours)
+    const tokenAge = Date.now() - user.createdAt.getTime();
+    const twentyFourHours = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    
+    if (tokenAge > twentyFourHours) {
+      // Clear the expired token
+      user.verifyToken = undefined;
+      await user.save();
+      
+      return res.status(400).send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8"/>
+          <title>Verification Expired – JSON4AI</title>
+          <meta name="viewport" content="width=device-width,initial-scale=1"/>
+          <style>
+            body { font-family: Arial, sans-serif; text-align: center; padding: 2rem; background: #0a0a0a; color: white; }
+            .warning-icon { color: #f59e0b; font-size: 3rem; margin-bottom: 1rem; }
+            h1 { color: #f59e0b; margin-bottom: 1rem; }
+            p { color: #e5e7eb; margin-bottom: 2rem; }
+            .btn { display: inline-block; padding: 0.75rem 1.5rem; background: #8b5cf6; color: white; text-decoration: none; border-radius: 0.5rem; margin: 0.5rem; }
+          </style>
+        </head>
+        <body>
+          <div class="warning-icon">⏰</div>
+          <h1>Verification Link Expired</h1>
+          <p>This verification link has expired (24 hours). Please request a new verification email.</p>
+          <a href="${process.env.FRONTEND_URL || 'https://json4ai.netlify.app'}/login" class="btn">Login</a>
+          <a href="${process.env.FRONTEND_URL || 'https://json4ai.netlify.app'}/register" class="btn">Register Again</a>
+        </body>
+        </html>
+      `);
+    }
+
+    // Check if already verified
+    if (user.verified) {
+      return res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8"/>
+          <title>Already Verified – JSON4AI</title>
+          <meta name="viewport" content="width=device-width,initial-scale=1"/>
+          <style>
+            body { font-family: Arial, sans-serif; text-align: center; padding: 2rem; background: #0a0a0a; color: white; }
+            .info-icon { color: #3b82f6; font-size: 3rem; margin-bottom: 1rem; }
+            h1 { color: #3b82f6; margin-bottom: 1rem; }
+            p { color: #e5e7eb; margin-bottom: 2rem; }
+            .btn { display: inline-block; padding: 0.75rem 1.5rem; background: #8b5cf6; color: white; text-decoration: none; border-radius: 0.5rem; }
+          </style>
+        </head>
+        <body>
+          <div class="info-icon">ℹ️</div>
+          <h1>Already Verified</h1>
+          <p>Your email has already been verified. You can now log in to your account.</p>
+          <a href="${process.env.FRONTEND_URL || 'https://json4ai.netlify.app'}/login" class="btn">Login</a>
+        </body>
+        </html>
+      `);
+    }
+
+    // Verify the user
     user.verified = true;
     user.verifyToken = undefined;
     await user.save();
@@ -255,6 +366,92 @@ router.get('/verify/:token', async (req, res) => {
     `);
   } catch (err) {
     res.status(500).send('Verification failed. Please try again.');
+  }
+});
+
+// POST /api/resend-verification
+router.post('/resend-verification', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    if (user.verified) {
+      return res.status(400).json({ message: 'Email is already verified' });
+    }
+    
+    // Generate new verification token
+    const token = crypto.randomBytes(32).toString('hex');
+    user.verifyToken = token;
+    await user.save();
+    
+    const verifyLink = `${process.env.BACKEND_URL || 'https://json4ai.onrender.com'}/api/verify/${token}`;
+    
+    try {
+      const { sendEmail } = require('../mailer');
+      
+      await sendEmail(
+        email,
+        'Verify your JSON4AI account',
+        `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="color: #8b5cf6; margin: 0; font-size: 28px;">JSON4AI</h1>
+              <p style="color: #6b7280; margin: 10px 0 0 0;">Account Verification Required</p>
+            </div>
+            
+            <div style="background-color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+              <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Verify Your Email</h2>
+              
+              <p style="color: #4b5563; line-height: 1.6; margin-bottom: 25px;">
+                You requested a new verification email. Click the button below to verify your email address.
+              </p>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${verifyLink}" 
+                   style="background-color: #8b5cf6; color: white; padding: 14px 28px; text-decoration: none; 
+                          border-radius: 8px; font-weight: 600; font-size: 16px; display: inline-block;">
+                  Verify Email Address
+                </a>
+              </div>
+              
+              <p style="color: #6b7280; font-size: 14px; margin: 25px 0 0 0; text-align: center;">
+                If the button doesn't work, you can also copy and paste this link into your browser:<br>
+                <a href="${verifyLink}" style="color: #8b5cf6; word-break: break-all;">${verifyLink}</a>
+              </p>
+              
+              <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 25px 0;">
+              
+              <p style="color: #6b7280; font-size: 12px; margin: 0; text-align: center;">
+                This verification link will expire in 24 hours. If you didn't request this email, 
+                you can safely ignore it.
+              </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+              <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+                © 2025 JSON4AI. All rights reserved.
+              </p>
+            </div>
+          </div>
+        `
+      );
+      
+      res.json({ message: 'Verification email sent successfully' });
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+      res.status(500).json({ message: 'Failed to send verification email. Please try again.' });
+    }
+  } catch (err) {
+    console.error('Resend verification error:', err);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 

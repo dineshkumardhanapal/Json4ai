@@ -19,7 +19,7 @@ const PASSWORD_CONFIG = {
   REQUIRE_SPECIAL_CHARS: true,
   
   // Special characters allowed
-  ALLOWED_SPECIAL_CHARS: '@$!%*?&',
+  ALLOWED_SPECIAL_CHARS: '@$!%*?&\-_+=()[]{}|\\:;"\'<>,./`~',
   
   // Common weak passwords to reject
   COMMON_PASSWORDS: [
@@ -62,7 +62,7 @@ class PasswordSecurity {
       errors.push('Password must contain at least one number');
     }
     
-    if (PASSWORD_CONFIG.REQUIRE_SPECIAL_CHARS && !/[@$!%*?&]/.test(password)) {
+    if (PASSWORD_CONFIG.REQUIRE_SPECIAL_CHARS && !/[@$!%*?&\-_+=()\[\]{}|\\:;"'<>,.\/`~]/.test(password)) {
       errors.push(`Password must contain at least one special character (${PASSWORD_CONFIG.ALLOWED_SPECIAL_CHARS})`);
     }
     

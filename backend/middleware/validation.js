@@ -110,13 +110,15 @@ const validateRegistration = [
   body('password')
     .isLength({ min: 8, max: 128 })
     .withMessage('Password must be between 8 and 128 characters')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/)
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\-_+=()\[\]{}|\\:;"'<>,.\/`~])[A-Za-z\d@$!%*?&\-_+=()\[\]{}|\\:;"'<>,.\/`~]+$/)
     .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
   
   // Error handling middleware
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Registration validation errors:', errors.array());
+      console.log('Registration request body:', req.body);
       return res.status(400).json({ 
         message: 'Validation failed',
         errors: errors.array().map(err => ({
@@ -125,6 +127,7 @@ const validateRegistration = [
         }))
       });
     }
+    console.log('Registration validation passed');
     next();
   }
 ];
@@ -298,7 +301,7 @@ const validatePasswordUpdate = [
   body('newPassword')
     .isLength({ min: 8, max: 128 })
     .withMessage('New password must be between 8 and 128 characters')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/)
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\-_+=()\[\]{}|\\:;"'<>,.\/`~])[A-Za-z\d@$!%*?&\-_+=()\[\]{}|\\:;"'<>,.\/`~]+$/)
     .withMessage('New password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
   
   // Error handling middleware

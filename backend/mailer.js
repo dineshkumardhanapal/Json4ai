@@ -1,11 +1,27 @@
 // backend/mailer.js
 const nodemailer = require('nodemailer');
 
+// Validate email configuration
+if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  console.warn('⚠️ Email configuration missing. Email functionality will be disabled.');
+  console.warn('Please set EMAIL_USER and EMAIL_PASS environment variables.');
+}
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+// Test transporter configuration
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('❌ Email transporter verification failed:', error.message);
+    console.error('Please check your email configuration in environment variables.');
+  } else {
+    console.log('✅ Email transporter verified successfully');
   }
 });
 
@@ -246,19 +262,26 @@ const emailTemplates = {
 
 // Email sending functions
 const sendEmail = async (to, subject, html) => {
+  // Check if email configuration is available
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    const error = new Error('Email configuration not available');
+    console.error('❌ Cannot send email:', error.message);
+    throw error;
+  }
+
   try {
     const mailOptions = {
-      from: '"JSON4AI" <json4ai@gmail.com>',
+      from: `"JSON4AI" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       html
     };
     
     const result = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully:', result.messageId);
+    console.log('✅ Email sent successfully:', result.messageId);
     return result;
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('❌ Error sending email:', error.message);
     throw error;
   }
 };

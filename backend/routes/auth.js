@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const transporter = require('../mailer');
+const { transporter } = require('../mailer');
 const auth = require('../middleware/auth');
 const { validateRegistration, validateLogin, validatePasswordUpdate } = require('../middleware/validation');
 const { PasswordSecurity, JWTSecurity } = require('../middleware/authSecurity');
@@ -1002,6 +1002,61 @@ router.post('/auth/google', async (req, res) => {
     res.status(500).json({ 
       message: 'Google authentication failed',
       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+});
+
+// Test email endpoint for debugging
+router.post('/test-email', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    
+    // Test email sending using the mailer module
+    const { sendEmail } = require('../mailer');
+    
+    await sendEmail(
+      email,
+      'JSON4AI Email Test',
+      `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
+          <div style="background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="margin: 0; font-size: 2rem;">🎉 JSON4AI Email Test</h1>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">Email system verification</p>
+          </div>
+          
+          <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <h2 style="color: #8b5cf6; margin-top: 0;">✅ Email System Working!</h2>
+            <p>This is a test email to verify that the email system is working correctly.</p>
+            <p>If you received this email, the email configuration is working properly.</p>
+            
+            <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
+              <p style="margin: 0; color: #065f46;"><strong>✓ Email Configuration:</strong> Working</p>
+              <p style="margin: 5px 0 0 0; color: #065f46;"><strong>✓ SMTP Connection:</strong> Successful</p>
+              <p style="margin: 5px 0 0 0; color: #065f46;"><strong>✓ Email Delivery:</strong> Confirmed</p>
+            </div>
+            
+            <p style="color: #666; font-size: 14px; margin-top: 30px; text-align: center;">
+              Sent at: ${new Date().toLocaleString()} (${new Date().toISOString()})
+            </p>
+          </div>
+        </div>
+      `
+    );
+    
+    res.json({ 
+      message: 'Test email sent successfully',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Email test error:', error);
+    res.status(500).json({ 
+      message: 'Failed to send test email',
+      error: error.message,
+      details: 'Please check your email configuration (EMAIL_USER and EMAIL_PASS environment variables)'
     });
   }
 });

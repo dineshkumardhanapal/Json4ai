@@ -195,6 +195,64 @@ if (registerForm) {
           successMessage.style.display = 'block';
           // Scroll to top to show the success message
           window.scrollTo({ top: 0, behavior: 'smooth' });
+          
+          // Add a note about email delivery
+          const emailNote = document.createElement('div');
+          emailNote.style.cssText = `
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+          `;
+          emailNote.innerHTML = `
+            <strong>📧 Email Delivery Note:</strong><br>
+            If you don't receive the verification email within 5 minutes, please check your spam folder or contact support.
+          `;
+          successMessage.appendChild(emailNote);
+          
+          // Add resend email functionality
+          const resendBtn = document.getElementById('resend-verification-btn');
+          if (resendBtn) {
+            resendBtn.addEventListener('click', async () => {
+              try {
+                resendBtn.disabled = true;
+                resendBtn.innerHTML = `
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 0.5rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                  Sending...
+                `;
+                
+                const res = await fetch(API('/resend-verification'), {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email: email })
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                  showSuccess('Verification email sent! Please check your inbox.');
+                } else {
+                  showError(data.message || 'Failed to resend verification email');
+                }
+              } catch (error) {
+                console.error('Resend error:', error);
+                showError('Network error. Please try again.');
+              } finally {
+                resendBtn.disabled = false;
+                resendBtn.innerHTML = `
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 0.5rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                  Resend Email
+                `;
+              }
+            });
+          }
         } else {
           console.error('Success message element not found, using fallback');
           // Fallback if success message element not found

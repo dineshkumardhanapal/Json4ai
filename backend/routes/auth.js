@@ -636,24 +636,8 @@ router.post('/login', validateLogin, async (req, res) => {
     user.refreshToken = hashedRefreshToken;
     await user.save();
     
-    // Zero Trust evaluation for login
-    const zeroTrustEvaluation = await ZeroTrustManager.evaluateAccess(req, user, 'login', 'user_profile');
-    
-    if (!zeroTrustEvaluation.allowed) {
-      console.warn('Zero Trust login denied:', {
-        userId: user._id,
-        email,
-        riskScore: zeroTrustEvaluation.riskScore,
-        factors: zeroTrustEvaluation.factors
-      });
-      
-      return res.status(403).json({
-        message: 'Login denied by security policy',
-        code: 'ZERO_TRUST_DENIED',
-        riskScore: zeroTrustEvaluation.riskScore,
-        requirements: zeroTrustEvaluation.requirements
-      });
-    }
+    // Zero Trust evaluation is handled by middleware for protected routes
+    // Login endpoint is excluded from Zero Trust evaluation
     
     // Update user's last known location and device info
     const deviceFingerprint = ZeroTrustManager.generateDeviceFingerprint(req);

@@ -269,19 +269,34 @@ class SessionManager {
 
   // Refresh tokens from localStorage (useful after login)
   refreshTokensFromStorage() {
-    this.accessToken = localStorage.getItem('accessToken');
-    this.refreshToken = localStorage.getItem('refreshToken');
-    this.userData = localStorage.getItem('userData');
+    const newAccessToken = localStorage.getItem('accessToken');
+    const newRefreshToken = localStorage.getItem('refreshToken');
+    const newUserData = localStorage.getItem('userData');
     
-    console.log('SessionManager tokens refreshed from localStorage:', {
-      hasAccessToken: !!this.accessToken,
-      hasRefreshToken: !!this.refreshToken,
-      isLoggedIn: this.isLoggedIn()
-    });
-    
-    // Re-initialize if we now have tokens
-    if (this.accessToken && this.refreshToken) {
-      this.init();
+    // Only update if tokens actually changed
+    if (newAccessToken !== this.accessToken || newRefreshToken !== this.refreshToken) {
+      this.accessToken = newAccessToken;
+      this.refreshToken = newRefreshToken;
+      this.userData = newUserData;
+      
+      console.log('SessionManager tokens refreshed from localStorage:', {
+        hasAccessToken: !!this.accessToken,
+        hasRefreshToken: !!this.refreshToken,
+        isLoggedIn: this.isLoggedIn(),
+        tokenChanged: true
+      });
+      
+      // Re-initialize if we now have tokens
+      if (this.accessToken && this.refreshToken) {
+        this.init();
+      }
+    } else {
+      console.log('SessionManager tokens already up to date:', {
+        hasAccessToken: !!this.accessToken,
+        hasRefreshToken: !!this.refreshToken,
+        isLoggedIn: this.isLoggedIn(),
+        tokenChanged: false
+      });
     }
   }
 

@@ -37,6 +37,8 @@ async function handleGoogleSignIn(response) {
       // Update session manager with new tokens
       if (window.sessionManager) {
         window.sessionManager.refreshTokensFromStorage();
+        // Wait a moment for the session manager to update
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
       
       location.href = 'dashboard.html';
@@ -116,6 +118,8 @@ if (loginForm) {
           // Update session manager with new tokens
           if (window.sessionManager) {
             window.sessionManager.refreshTokensFromStorage();
+            // Wait a moment for the session manager to update
+            await new Promise(resolve => setTimeout(resolve, 100));
           }
           
           location.href = 'dashboard.html';

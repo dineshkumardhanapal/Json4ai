@@ -38,10 +38,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       
-      // If tokens exist but session manager says not logged in, there might be an issue
-      console.warn('Tokens exist but session manager reports not logged in - proceeding anyway');
+      // If tokens exist but session manager says not logged in, refresh the session manager
+      console.warn('Tokens exist but session manager reports not logged in - refreshing session manager');
+      window.sessionManager.refreshTokensFromStorage();
+      
+      // Wait a moment for the session manager to update
+      setTimeout(() => {
+        if (!window.sessionManager.isLoggedIn()) {
+          console.error('Session manager still not logged in after refresh, redirecting to login');
+          location.href = 'login.html';
+          return;
+        }
+        proceedWithDashboard();
+      }, 200);
+      return;
     }
     
+    proceedWithDashboard();
+  };
+  
+  const proceedWithDashboard = () => {
     // Show content and initialize if authenticated
     document.body.style.display = 'block';
     const authLoading = document.getElementById('auth-loading');

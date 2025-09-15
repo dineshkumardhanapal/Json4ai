@@ -833,7 +833,7 @@ router.post('/refresh', async (req, res) => {
     }
 
     // Find user and verify refresh token hash
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.userId || decoded.id);
     if (!user || !user.refreshToken) {
       return res.status(401).json({ message: 'Invalid refresh token' });
     }
@@ -846,12 +846,15 @@ router.post('/refresh', async (req, res) => {
     // Generate new access token
     const newAccessToken = jwt.sign(
       { 
-        userId: user._id, 
+        userId: user._id,
+        id: user._id, // Keep both for compatibility
+        email: user.email,
         type: 'access',
-        iat: Math.floor(Date.now() / 1000)
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7 days
       }, 
       process.env.JWT_SECRET, 
-      { expiresIn: '7d' }
+      { algorithm: 'HS256' }
     );
 
     res.json({ 

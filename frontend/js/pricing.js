@@ -205,27 +205,28 @@ function initializePricingToggle() {
 function updatePricingDisplay(isYearly) {
   console.log('Updating pricing display for:', isYearly ? 'Yearly' : 'Monthly');
   
-  // Get all price containers
-  const priceContainers = document.querySelectorAll('.price');
+  // Get all plan cards
+  const planCards = document.querySelectorAll('.plan-card');
   
-  priceContainers.forEach((container) => {
-    const monthlyPrice = container.querySelector('.amount:not(.yearly-price .amount)');
-    const yearlyPrice = container.querySelector('.yearly-price');
+  planCards.forEach((card) => {
+    const priceContainer = card.querySelector('.price');
+    const yearlyPrice = priceContainer?.querySelector('.yearly-price');
     
-    if (monthlyPrice && yearlyPrice) {
+    if (yearlyPrice) {
+      // This plan has yearly pricing (Starter and Premium)
       if (isYearly) {
-        // Show yearly pricing
-        monthlyPrice.style.display = 'none';
-        yearlyPrice.style.display = 'flex';
-        yearlyPrice.style.visibility = 'visible';
-        yearlyPrice.style.opacity = '1';
+        // Add yearly-pricing class to enable CSS rules
+        card.classList.add('yearly-pricing');
+        console.log('Added yearly-pricing class to:', card.querySelector('h3')?.textContent);
       } else {
-        // Show monthly pricing
-        monthlyPrice.style.display = 'inline';
-        yearlyPrice.style.display = 'none';
-        yearlyPrice.style.visibility = 'hidden';
-        yearlyPrice.style.opacity = '0';
+        // Remove yearly-pricing class to show monthly pricing
+        card.classList.remove('yearly-pricing');
+        console.log('Removed yearly-pricing class from:', card.querySelector('h3')?.textContent);
       }
+    } else {
+      // This plan doesn't have yearly pricing (Free plan)
+      // Ensure it doesn't have yearly-pricing class
+      card.classList.remove('yearly-pricing');
     }
   });
   

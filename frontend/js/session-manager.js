@@ -267,6 +267,24 @@ class SessionManager {
     }
   }
 
+  // Refresh tokens from localStorage (useful after login)
+  refreshTokensFromStorage() {
+    this.accessToken = localStorage.getItem('accessToken');
+    this.refreshToken = localStorage.getItem('refreshToken');
+    this.userData = localStorage.getItem('userData');
+    
+    console.log('SessionManager tokens refreshed from localStorage:', {
+      hasAccessToken: !!this.accessToken,
+      hasRefreshToken: !!this.refreshToken,
+      isLoggedIn: this.isLoggedIn()
+    });
+    
+    // Re-initialize if we now have tokens
+    if (this.accessToken && this.refreshToken) {
+      this.init();
+    }
+  }
+
   // Check if token is expired
   checkTokenExpiration() {
     if (!this.accessToken) return;

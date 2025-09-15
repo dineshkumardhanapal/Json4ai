@@ -34,9 +34,9 @@ async function handleGoogleSignIn(response) {
       localStorage.setItem('refreshToken', data.refreshToken);
       localStorage.setItem('userData', JSON.stringify(data.user));
       
-      // Update navigation UI if available
+      // Update session manager with new tokens
       if (window.sessionManager) {
-        window.sessionManager.updateNavigationUI();
+        window.sessionManager.refreshTokensFromStorage();
       }
       
       location.href = 'dashboard.html';
@@ -113,9 +113,9 @@ if (loginForm) {
           localStorage.setItem('refreshToken', data.refreshToken);
           localStorage.setItem('userData', JSON.stringify(data.user));
           
-          // Update navigation UI if available
+          // Update session manager with new tokens
           if (window.sessionManager) {
-            window.sessionManager.updateNavigationUI();
+            window.sessionManager.refreshTokensFromStorage();
           }
           
           location.href = 'dashboard.html';

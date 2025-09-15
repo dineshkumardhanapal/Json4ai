@@ -49,6 +49,49 @@ async function handleGoogleSignIn(response) {
   }
 }
 
+// Initialize Google OAuth when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  // Wait for Google API to load
+  const initGoogleAuth = () => {
+    if (typeof google !== 'undefined' && google.accounts) {
+      initializeGoogleAuth();
+      setupGoogleButton();
+    } else {
+      // Retry after a short delay
+      setTimeout(initGoogleAuth, 100);
+    }
+  };
+  
+  initGoogleAuth();
+});
+
+// Setup Google Sign-In/Sign-Up buttons
+function setupGoogleButton() {
+  // Handle login page button
+  const googleSignInBtn = document.getElementById('google-signin');
+  if (googleSignInBtn) {
+    googleSignInBtn.addEventListener('click', function() {
+      if (typeof google !== 'undefined' && google.accounts) {
+        google.accounts.id.prompt();
+      } else {
+        showError('Google Sign-In is not available. Please try again.');
+      }
+    });
+  }
+  
+  // Handle register page button
+  const googleSignUpBtn = document.getElementById('google-signup');
+  if (googleSignUpBtn) {
+    googleSignUpBtn.addEventListener('click', function() {
+      if (typeof google !== 'undefined' && google.accounts) {
+        google.accounts.id.prompt();
+      } else {
+        showError('Google Sign-Up is not available. Please try again.');
+      }
+    });
+  }
+}
+
 // Auth.js loaded
 
 if (loginForm) {

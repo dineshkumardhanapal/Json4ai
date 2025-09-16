@@ -555,6 +555,7 @@ router.post('/login', validateLogin, async (req, res) => {
     // Generate secure tokens using enhanced JWT security
     const { accessToken, refreshToken } = JWTSecurity.generateTokens(user._id, user.email);
     
+    
     // Hash and store refresh token securely
     const hashedRefreshToken = await JWTSecurity.hashRefreshToken(refreshToken);
     user.refreshToken = hashedRefreshToken;

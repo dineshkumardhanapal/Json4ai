@@ -13,8 +13,10 @@ module.exports = async function (req, res, next) {
   }
 
   try {
-    // Verify token and check expiration
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Verify token and check expiration with correct algorithm
+    const decoded = jwt.verify(token, process.env.JWT_SECRET, {
+      algorithms: ['HS256']
+    });
     
     // Check if token has expired
     const currentTime = Math.floor(Date.now() / 1000);
@@ -22,6 +24,14 @@ module.exports = async function (req, res, next) {
       return res.status(401).json({ 
         message: 'Token has expired',
         code: 'TOKEN_EXPIRED'
+      });
+    }
+    
+    // Verify token type (should be access token)
+    if (decoded.type && decoded.type !== 'access') {
+      return res.status(401).json({ 
+        message: 'Invalid token type',
+        code: 'INVALID_TOKEN_TYPE'
       });
     }
     

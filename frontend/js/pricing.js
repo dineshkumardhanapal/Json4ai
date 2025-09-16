@@ -351,26 +351,19 @@ function updatePlanButtons(currentPlan) {
     const planType = btn.dataset.plan;
     
     if (planType === currentPlan) {
-      // This is the user's current plan
-      btn.textContent = 'Current Plan';
+      // This is the user's current plan - keep original text but style differently
       btn.disabled = true;
       btn.classList.add('btn-secondary');
       btn.classList.remove('btn-primary');
+      btn.style.opacity = '0.7';
+      btn.style.cursor = 'not-allowed';
     } else {
-      // This is not the user's current plan
-      if (planType === 'free') {
-        // Free plan - show as available option
-        btn.textContent = 'Downgrade to Free';
-        btn.disabled = false;
-        btn.classList.add('btn-secondary');
-        btn.classList.remove('btn-primary');
-      } else {
-        // Paid plans - show as upgrade options
-      btn.textContent = 'Upgrade';
+      // This is not the user's current plan - keep original button text
       btn.disabled = false;
       btn.classList.add('btn-primary');
       btn.classList.remove('btn-secondary');
-      }
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
     }
   });
 }
@@ -384,6 +377,9 @@ function attachPlanButtonListeners() {
 
 async function handleUpgrade(e) {
   const plan = e.target.dataset.plan;
+  
+  // Store original button text for restoration
+  const originalText = e.target.textContent;
   
   // Handle free plan downgrade
   if (plan === 'free') {
@@ -465,20 +461,20 @@ async function handleUpgrade(e) {
           ondismiss: function() {
             // Payment modal dismissed
             e.target.disabled = false;
-            e.target.textContent = 'Buy Now';
+            e.target.textContent = originalText;
           }
         },
         onClose: function() {
           // Payment modal closed
           e.target.disabled = false;
-          e.target.textContent = 'Buy Now';
+          e.target.textContent = originalText;
         }
       };
       
       if (typeof Razorpay === 'undefined') {
         showError('Payment gateway not available. Please refresh the page and try again.');
         e.target.disabled = false;
-        e.target.textContent = 'Buy Now';
+        e.target.textContent = originalText;
         return;
       }
       
@@ -515,7 +511,7 @@ async function handleUpgrade(e) {
       }
     } finally {
       e.target.disabled = false;
-      e.target.textContent = 'Buy Now';
+      e.target.textContent = originalText;
     }
 }
 
@@ -851,30 +847,49 @@ function setupMobileOptimizations() {
     toggleSwitch.style.minWidth = '44px';
   }
   
-  // Ensure plan cards are touch-friendly
+  // Ensure plan cards are not clickable (only buttons should be)
   const planCards = document.querySelectorAll('.plan-card');
   planCards.forEach(card => {
-    card.style.cursor = 'pointer';
+    card.style.cursor = 'default';
+    // Remove any potential click handlers
+    card.onclick = null;
     
-    // Add touch feedback
-    card.addEventListener('touchstart', () => {
-      card.style.transform = 'scale(0.98)';
-    });
-    
-    card.addEventListener('touchend', () => {
-      card.style.transform = '';
+    // Prevent any accidental clicks on the card itself
+    card.addEventListener('click', (e) => {
+      // Only allow clicks on buttons, not on the card itself
+      if (e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
     });
   });
   
   // Optimize pricing toggle for mobile
   const pricingToggle = document.getElementById('pricing-toggle');
   if (pricingToggle) {
+    // Ensure toggle is touch-friendly
+    pricingToggle.style.minHeight = '44px';
+    pricingToggle.style.minWidth = '44px';
+    
     pricingToggle.addEventListener('change', () => {
       // Add haptic feedback on supported devices
       if (navigator.vibrate) {
         navigator.vibrate(50);
       }
     });
+    
+    // Add touch feedback for toggle switch
+    const toggleSwitch = pricingToggle.closest('.toggle-switch');
+    if (toggleSwitch) {
+      toggleSwitch.addEventListener('touchstart', () => {
+        toggleSwitch.style.transform = 'scale(0.95)';
+      });
+      
+      toggleSwitch.addEventListener('touchend', () => {
+        toggleSwitch.style.transform = '';
+      });
+    }
   }
   
   // Handle orientation change

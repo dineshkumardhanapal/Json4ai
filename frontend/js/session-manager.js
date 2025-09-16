@@ -273,30 +273,30 @@ class SessionManager {
     const newRefreshToken = localStorage.getItem('refreshToken');
     const newUserData = localStorage.getItem('userData');
     
-    // Only update if tokens actually changed
-    if (newAccessToken !== this.accessToken || newRefreshToken !== this.refreshToken) {
-      this.accessToken = newAccessToken;
-      this.refreshToken = newRefreshToken;
-      this.userData = newUserData;
-      
-      console.log('SessionManager tokens refreshed from localStorage:', {
-        hasAccessToken: !!this.accessToken,
-        hasRefreshToken: !!this.refreshToken,
-        isLoggedIn: this.isLoggedIn(),
-        tokenChanged: true
-      });
-      
-      // Re-initialize if we now have tokens
-      if (this.accessToken && this.refreshToken) {
-        this.init();
-      }
-    } else {
-      console.log('SessionManager tokens already up to date:', {
-        hasAccessToken: !!this.accessToken,
-        hasRefreshToken: !!this.refreshToken,
-        isLoggedIn: this.isLoggedIn(),
-        tokenChanged: false
-      });
+    console.log('SessionManager refreshing tokens from localStorage:', {
+      hasNewAccessToken: !!newAccessToken,
+      hasNewRefreshToken: !!newRefreshToken,
+      hasNewUserData: !!newUserData,
+      currentAccessToken: !!this.accessToken,
+      currentRefreshToken: !!this.refreshToken
+    });
+    
+    // Always update tokens from localStorage (even if they're the same)
+    this.accessToken = newAccessToken;
+    this.refreshToken = newRefreshToken;
+    this.userData = newUserData;
+    
+    console.log('SessionManager tokens updated:', {
+      hasAccessToken: !!this.accessToken,
+      hasRefreshToken: !!this.refreshToken,
+      isLoggedIn: this.isLoggedIn(),
+      accessTokenLength: this.accessToken ? this.accessToken.length : 0
+    });
+    
+    // Re-initialize if we now have tokens
+    if (this.accessToken && this.refreshToken) {
+      console.log('SessionManager re-initializing with new tokens');
+      this.init();
     }
   }
 

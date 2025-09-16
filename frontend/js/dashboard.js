@@ -49,8 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
           location.href = 'login.html';
           return;
         }
+        console.log('Session manager refreshed successfully, proceeding with dashboard');
         proceedWithDashboard();
-      }, 200);
+      }, 500); // Increased timeout to ensure session manager is fully initialized
       return;
     }
     
@@ -110,6 +111,12 @@ const loadProfile = async () => {
       location.href = 'login.html';
       return;
     }
+    
+    console.log('Making API requests with token:', {
+      tokenLength: accessToken ? accessToken.length : 0,
+      tokenPreview: accessToken ? accessToken.substring(0, 50) + '...' : 'none',
+      sessionManagerLoggedIn: window.sessionManager ? window.sessionManager.isLoggedIn() : 'N/A'
+    });
     
     const [profileRes, usageRes] = await Promise.all([
       fetch('https://json4ai.onrender.com/api/user/profile', {

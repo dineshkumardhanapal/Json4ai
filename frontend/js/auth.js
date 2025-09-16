@@ -111,15 +111,25 @@ if (loginForm) {
       const res = await fetch(API('/login'), { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
       const data = await res.json();
               if (res.ok) {
+          console.log('Login successful, storing tokens and updating session manager');
           localStorage.setItem('accessToken', data.accessToken);
           localStorage.setItem('refreshToken', data.refreshToken);
           localStorage.setItem('userData', JSON.stringify(data.user));
           
           // Update session manager with new tokens
           if (window.sessionManager) {
+            console.log('Updating session manager with new tokens');
             window.sessionManager.refreshTokensFromStorage();
-            // Wait a moment for the session manager to update
-            await new Promise(resolve => setTimeout(resolve, 100));
+            // Wait longer for the session manager to fully update
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
+            // Verify session manager is properly updated
+            if (!window.sessionManager.isLoggedIn()) {
+              console.error('Session manager not properly updated after login');
+              showError('Authentication system error. Please try again.');
+              return;
+            }
+            console.log('Session manager successfully updated, redirecting to dashboard');
           }
           
           location.href = 'dashboard.html';

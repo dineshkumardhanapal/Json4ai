@@ -48,6 +48,23 @@ const API = path => `https://json4ai.onrender.com${path}`;
 
 // Initialize page when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('Initializing pricing page...');
+  
+  // Debug: Check if plan cards exist
+  const planCards = document.querySelectorAll('.plan-card');
+  console.log('Plan cards found:', planCards.length);
+  
+  planCards.forEach((card, index) => {
+    console.log(`Plan card ${index}:`, {
+      element: card,
+      display: getComputedStyle(card).display,
+      visibility: getComputedStyle(card).visibility,
+      opacity: getComputedStyle(card).opacity,
+      height: getComputedStyle(card).height,
+      width: getComputedStyle(card).width,
+      backgroundColor: getComputedStyle(card).backgroundColor
+    });
+  });
   
   // Force immediate visibility
   forcePricingVisibility();
@@ -66,6 +83,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     forcePricingVisibility();
   }, 500);
+  
+  // Update navigation based on authentication state
+  updateNavigation();
+  setupLogout();
   
   // Continuous monitoring to prevent content from disappearing
   setInterval(() => {
@@ -750,4 +771,130 @@ function showNotification(message, type = 'info') {
     // Ultimate fallback
     alert(`${type.toUpperCase()}: ${message}`);
   }
+}
+
+// Update navigation based on authentication state
+function updateNavigation() {
+  const loginLink = document.getElementById('login-link');
+  const dashboardLink = document.getElementById('dashboard-link');
+  const logoutLink = document.getElementById('logout-link');
+  
+  if (!loginLink || !dashboardLink || !logoutLink) {
+    console.log('Navigation elements not found');
+    return;
+  }
+  
+  // Check if user is logged in
+  const isLoggedIn = window.sessionManager && window.sessionManager.isLoggedIn();
+  
+  if (isLoggedIn) {
+    console.log('User is logged in, showing dashboard and logout links');
+    loginLink.style.display = 'none';
+    dashboardLink.style.display = 'block';
+    logoutLink.style.display = 'block';
+  } else {
+    console.log('User is not logged in, showing login link');
+    loginLink.style.display = 'block';
+    dashboardLink.style.display = 'none';
+    logoutLink.style.display = 'none';
+  }
+}
+
+// Add logout functionality
+function setupLogout() {
+  const logoutLink = document.getElementById('logout-link');
+  if (logoutLink) {
+    logoutLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (window.sessionManager) {
+        window.sessionManager.logout();
+        updateNavigation();
+        // Redirect to home page after logout
+        window.location.href = 'index.html';
+      }
+    });
+  }
+}
+
+// Initialize navigation when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  // Wait for session manager to be available
+  const checkSessionManager = () => {
+    if (window.sessionManager) {
+      updateNavigation();
+      setupLogout();
+    } else {
+      // Retry after a short delay
+      setTimeout(checkSessionManager, 100);
+    }
+  };
+  
+  checkSessionManager();
+  
+  // Mobile-specific optimizations
+  setupMobileOptimizations();
+});
+
+// Mobile optimizations for pricing page
+function setupMobileOptimizations() {
+  // Ensure touch targets are large enough
+  const buttons = document.querySelectorAll('.btn-primary, .btn-secondary');
+  buttons.forEach(button => {
+    button.style.minHeight = '44px'; // iOS minimum touch target
+    button.style.minWidth = '44px';
+  });
+  
+  // Optimize toggle switch for mobile
+  const toggleSwitch = document.querySelector('.toggle-switch');
+  if (toggleSwitch) {
+    toggleSwitch.style.minHeight = '44px';
+    toggleSwitch.style.minWidth = '44px';
+  }
+  
+  // Ensure plan cards are touch-friendly
+  const planCards = document.querySelectorAll('.plan-card');
+  planCards.forEach(card => {
+    card.style.cursor = 'pointer';
+    
+    // Add touch feedback
+    card.addEventListener('touchstart', () => {
+      card.style.transform = 'scale(0.98)';
+    });
+    
+    card.addEventListener('touchend', () => {
+      card.style.transform = '';
+    });
+  });
+  
+  // Optimize pricing toggle for mobile
+  const pricingToggle = document.getElementById('pricing-toggle');
+  if (pricingToggle) {
+    pricingToggle.addEventListener('change', () => {
+      // Add haptic feedback on supported devices
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+    });
+  }
+  
+  // Handle orientation change
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      // Recalculate layout after orientation change
+      const planCards = document.querySelectorAll('.plan-card');
+      planCards.forEach(card => {
+        card.style.height = 'auto';
+      });
+    }, 100);
+  });
+  
+  // Prevent zoom on input focus (iOS)
+  const inputs = document.querySelectorAll('input, textarea, select');
+  inputs.forEach(input => {
+    input.addEventListener('focus', () => {
+      if (window.innerWidth <= 768) {
+        input.style.fontSize = '16px';
+      }
+    });
+  });
 }

@@ -38,6 +38,9 @@
   --glass-glow: rgba(99, 179, 237, 0.4);
   --glass-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   
+  /* Border color variable */
+  --border-color: var(--glass-border);
+  
   /* Border radius and spacing */
   --radius-sm: 8px;
   --radius-md: 16px;

@@ -851,18 +851,25 @@ function setupMobileOptimizations() {
   const planCards = document.querySelectorAll('.plan-card');
   planCards.forEach(card => {
     card.style.cursor = 'default';
-    // Remove any potential click handlers
+    // Remove any potential click handlers that might cause redirects
     card.onclick = null;
     
-    // Prevent any accidental clicks on the card itself
-    card.addEventListener('click', (e) => {
-      // Only allow clicks on buttons, not on the card itself
-      if (e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-    });
+    // Ensure scrolling works properly by not preventing any events
+    // Only buttons should have click handlers, not the cards themselves
+  });
+  
+  // Ensure page scrolling is always enabled
+  document.body.style.overflow = 'auto';
+  document.documentElement.style.overflow = 'auto';
+  
+  // Add event listener to restore scrolling if it gets disabled
+  document.addEventListener('click', () => {
+    if (document.body.style.overflow === 'hidden') {
+      document.body.style.overflow = 'auto';
+    }
+    if (document.documentElement.style.overflow === 'hidden') {
+      document.documentElement.style.overflow = 'auto';
+    }
   });
   
   // Optimize pricing toggle for mobile

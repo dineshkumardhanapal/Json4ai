@@ -380,6 +380,9 @@ body {
   min-height: 100vh;
   line-height: 1.6;
   overflow-x: hidden;
+  overflow-y: auto;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -1649,7 +1652,7 @@ input:checked + .toggle-slider:before {
   flex-direction: column !important; 
   transition: all 0.3s ease; 
   cursor: default; 
-  overflow: hidden;
+  overflow: visible;
   justify-content: space-between;
   align-items: stretch;
   width: 100%;
@@ -1657,6 +1660,8 @@ input:checked + .toggle-slider:before {
   visibility: visible !important;
   opacity: 1 !important;
   z-index: 1;
+  touch-action: auto;
+  pointer-events: auto;
 }
 
 .plan-card:hover {

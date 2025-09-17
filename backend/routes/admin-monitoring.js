@@ -206,7 +206,7 @@ router.get('/system/health-metrics', auth, adminSecurityMiddleware, async (req, 
     // Third-party service status (mock data)
     const serviceStatus = {
       mongodb: mongoose.connection.readyState === 1 ? 'healthy' : 'error',
-      stripe: 'healthy',
+      razorpay: 'healthy',
       email: 'healthy',
       redis: 'healthy'
     };

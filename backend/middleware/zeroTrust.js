@@ -661,9 +661,7 @@ const zeroTrustMiddleware = async (req, res, next) => {
       '/api/user',    // Skip Zero Trust for user routes (they have their own auth middleware)
       '/api/admin',   // Skip Zero Trust for admin routes (they have their own auth middleware)
       '/api/prompt',  // Skip Zero Trust for prompt routes (they have their own auth middleware)
-      '/api/payment', // Skip Zero Trust for payment routes (they have their own auth middleware)
-      '/api/stripe',  // Skip Zero Trust for stripe routes (they have their own auth middleware)
-      '/api/paypal'   // Skip Zero Trust for paypal routes (they have their own auth middleware)
+      '/api/payment'  // Skip Zero Trust for payment routes (they have their own auth middleware)
     ];
     
     // Check if current path matches any skip endpoint

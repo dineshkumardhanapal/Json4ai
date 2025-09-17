@@ -1,3 +1,36 @@
 User-agent: *
 Allow: /
+Allow: /css/
+Allow: /js/
+Allow: /assets/
+
+# Disallow private/user-specific pages
+Disallow: /dashboard.html
+Disallow: /prompt-generator.html
+Disallow: /login.html
+Disallow: /forgot-password.html
+Disallow: /reset-password.html
+Disallow: /email-verified.html
+Disallow: /admin-login.html
+Disallow: /admin-dashboard-enhanced.html
+
+# Allow important pages for SEO
+Allow: /pricing.html
+Allow: /register.html
+Allow: /ai-tools-comparison.html
+Allow: /prompt-engineering-guide.html
+Allow: /ai-tools-directory.html
+Allow: /privacy.html
+Allow: /terms.html
+Allow: /gdpr.html
+Allow: /cookies.html
+
+# Crawl delay for respectful crawling
+Crawl-delay: 1
+
+# Sitemap location
 Sitemap: https://json4ai.com/sitemap.xml
+
+# Additional directives for better SEO
+# Host directive (if needed)
+# Host: json4ai.com

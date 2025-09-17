@@ -2,9 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <title>Register – JSON4AI</title>
-  <meta name="description" content="Create your JSON4AI account."/>
+  <title>Sign Up for JSON4AI | Free AI Prompt Generator Account</title>
+  <meta name="description" content="Create your free JSON4AI account and start generating professional AI prompts for ChatGPT, Gemini, Claude, and 50+ AI models. Get 10 free prompts monthly. No credit card required."/>
+  <meta name="keywords" content="JSON4AI signup, AI prompt generator free account, ChatGPT prompt tool registration, AI workflow signup, prompt engineering tool free trial"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="robots" content="index, follow"/>
+  <link rel="canonical" href="https://json4ai.com/register"/>
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://json4ai.com/register"/>
+  <meta property="og:title" content="Sign Up for JSON4AI | Free AI Prompt Generator Account"/>
+  <meta property="og:description" content="Create your free JSON4AI account and start generating professional AI prompts for ChatGPT, Gemini, Claude, and 50+ AI models. Get 10 free prompts monthly."/>
+  <meta property="og:image" content="https://json4ai.com/assets/register-og-image.png"/>
+  <meta property="og:site_name" content="JSON4AI"/>
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:url" content="https://json4ai.com/register"/>
+  <meta name="twitter:title" content="Sign Up for JSON4AI | Free AI Prompt Generator Account"/>
+  <meta name="twitter:description" content="Create your free JSON4AI account and start generating professional AI prompts for ChatGPT, Gemini, Claude, and 50+ AI models. Get 10 free prompts monthly."/>
+  <meta name="twitter:image" content="https://json4ai.com/assets/register-og-image.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -134,7 +152,7 @@
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
                 </svg>
-                <span>At least 8 characters long</span>
+                <span>At least 8 characters long (max 128)</span>
               </div>
               <div class="requirement-item">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,7 +176,25 @@
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
                 </svg>
-                <span>One special character (!@#$%^&*()_+-=[]{}|;':",./<>?)</span>
+                <span>At least 8 unique characters</span>
+              </div>
+              <div class="requirement-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
+                </svg>
+                <span>No more than 2 consecutive repeated characters</span>
+              </div>
+              <div class="requirement-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
+                </svg>
+                <span>No sequential characters (abc, 123)</span>
+              </div>
+              <div class="requirement-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
+                </svg>
+                <span>No common words or keyboard patterns</span>
               </div>
             </div>
             
@@ -167,8 +203,11 @@
               <ul>
                 <li>Use a combination of words, numbers, and symbols</li>
                 <li>Avoid personal information (name, birthday, etc.)</li>
-                <li>Don't use common words or patterns</li>
+                <li>Don't use common words or keyboard patterns</li>
+                <li>Avoid repeating characters (like "aaa" or "111")</li>
+                <li>Avoid sequential characters (like "abc" or "123")</li>
                 <li>Consider using a passphrase: "MyDog@2024!"</li>
+                <li>Use at least 12-16 characters for better security</li>
               </ul>
             </div>
           </div>
@@ -179,6 +218,22 @@
               <div class="strength-fill" id="strength-fill"></div>
             </div>
             <div class="strength-text" id="strength-text">Password strength</div>
+          </div>
+          
+          <!-- Test Password Button (for demonstration) -->
+          <div style="margin-top: 0.5rem;">
+            <button type="button" id="test-password-btn" style="
+              background: rgba(255, 255, 255, 0.08);
+              border: 1px solid var(--glass-border);
+              color: var(--text-secondary);
+              padding: 0.5rem 1rem;
+              border-radius: var(--radius-sm);
+              font-size: 0.8rem;
+              cursor: pointer;
+              transition: all 0.3s ease;
+            " onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+              🧪 Test with "DKdinu@555" (shows validation errors)
+            </button>
           </div>
         </div>
         
@@ -340,6 +395,26 @@ document.addEventListener('DOMContentLoaded', function() {
       strengthIndicator.style.display = 'none';
     }
   });
+
+  // Test password button functionality
+  const testBtn = document.getElementById('test-password-btn');
+  if (testBtn) {
+    testBtn.addEventListener('click', function() {
+      const testPassword = 'DKdinu@555';
+      passwordInput.value = testPassword;
+      passwordInput.type = 'password'; // Ensure it's password type
+      
+      // Update password strength
+      updatePasswordStrength(testPassword);
+      strengthIndicator.style.display = 'block';
+      
+      // Trigger real-time validation
+      validatePasswordRealTime(testPassword);
+      
+      // Focus on the password field
+      passwordInput.focus();
+    });
+  }
 });
 
 // Generate secure password locally
@@ -415,12 +490,13 @@ function calculatePasswordStrength(password) {
   };
 }
 
-// Real-time password validation
+// Real-time password validation - matches backend requirements exactly
 function validatePasswordRealTime(password) {
   const validation = {
     isValid: true,
     errors: [],
-    warnings: []
+    warnings: [],
+    recommendations: []
   };
   
   // Check minimum length
@@ -429,34 +505,80 @@ function validatePasswordRealTime(password) {
     validation.errors.push('Password must be at least 8 characters long');
   }
   
+  // Check maximum length
+  if (password.length > 128) {
+    validation.isValid = false;
+    validation.errors.push('Password cannot exceed 128 characters');
+  }
+  
   // Check for lowercase letters
   if (!/[a-z]/.test(password)) {
+    validation.isValid = false;
     validation.errors.push('Password must contain at least one lowercase letter');
   }
   
   // Check for uppercase letters
   if (!/[A-Z]/.test(password)) {
+    validation.isValid = false;
     validation.errors.push('Password must contain at least one uppercase letter');
   }
   
   // Check for numbers
   if (!/[0-9]/.test(password)) {
+    validation.isValid = false;
     validation.errors.push('Password must contain at least one number');
   }
   
-  // Check for special characters
-  if (!/[^A-Za-z0-9]/.test(password)) {
-    validation.errors.push('Password must contain at least one special character');
+  // Check for consecutive repeated characters (max 2)
+  if (/(.)\1{2,}/.test(password)) {
+    validation.isValid = false;
+    validation.errors.push('Password cannot contain more than 2 consecutive repeated characters');
   }
   
-  // Check for common patterns
-  if (password.length > 0) {
-    if (/(.)\1{2,}/.test(password)) {
-      validation.warnings.push('Avoid repeating characters');
+  // Check for sequential characters (max 3)
+  if (/123|234|345|456|567|678|789|012|abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz|qwe|wer|ert|rty|tyu|yui|uio|iop|asd|sdf|dfg|fgh|ghj|hjk|jkl|zxc|xcv|cvb|vbn|bnm/i.test(password)) {
+    validation.isValid = false;
+    validation.errors.push('Password cannot contain sequential characters (like abc, 123)');
+  }
+  
+  // Check for common words
+  const commonWords = ['password', 'admin', 'user', 'login', 'welcome', 'hello', 'test', 'demo', 'sample', 'guest', 'public', 'private', 'secret', 'key', 'code', 'name', 'email', 'phone', 'address'];
+  const lowerPassword = password.toLowerCase();
+  for (const word of commonWords) {
+    if (lowerPassword.includes(word)) {
+      validation.isValid = false;
+      validation.errors.push(`Password cannot contain common words like "${word}"`);
+      break;
     }
-    
-    if (/123|abc|qwe/i.test(password)) {
-      validation.warnings.push('Avoid common sequences');
+  }
+  
+  // Check for keyboard patterns
+  const keyboardPatterns = ['qwerty', 'asdf', 'zxcv', 'qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+  for (const pattern of keyboardPatterns) {
+    if (lowerPassword.includes(pattern)) {
+      validation.isValid = false;
+      validation.errors.push(`Password cannot contain keyboard patterns like "${pattern}"`);
+      break;
+    }
+  }
+  
+  // Check minimum unique characters (8)
+  const uniqueChars = new Set(password).size;
+  if (uniqueChars < 8) {
+    validation.isValid = false;
+    validation.errors.push('Password must contain at least 8 unique characters');
+  }
+  
+  // Generate recommendations for stronger passwords
+  if (password.length >= 8 && validation.isValid) {
+    if (password.length < 12) {
+      validation.recommendations.push('Use a longer password (12+ characters) for better strength');
+    }
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      validation.recommendations.push('Consider adding special characters for extra security');
+    }
+    if (password.length < 16) {
+      validation.recommendations.push('Use a longer password (16+ characters) for better strength');
     }
   }
   
@@ -472,34 +594,38 @@ function updatePasswordValidationDisplay(validation) {
   const existingMessages = document.querySelectorAll('.password-validation-message');
   existingMessages.forEach(msg => msg.remove());
   
-  if (validation.errors.length > 0 || validation.warnings.length > 0) {
+  if (validation.errors.length > 0 || validation.recommendations.length > 0) {
     const validationContainer = document.createElement('div');
     validationContainer.className = 'password-validation-message';
     validationContainer.style.cssText = `
       margin-top: 0.5rem;
       padding: 0.75rem;
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius-sm);
       font-size: 0.85rem;
+      max-height: 200px;
+      overflow-y: auto;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(8px);
     `;
     
     let html = '';
     
     if (validation.errors.length > 0) {
       html += '<div style="color: var(--aurora-red); margin-bottom: 0.5rem;">';
-      html += '<strong>❌ Requirements:</strong><br>';
+      html += '<strong>❌ Password Requirements Not Met:</strong><br>';
       validation.errors.forEach(error => {
         html += `• ${error}<br>`;
       });
       html += '</div>';
     }
     
-    if (validation.warnings.length > 0) {
-      html += '<div style="color: var(--aurora-orange);">';
-      html += '<strong>⚠️ Recommendations:</strong><br>';
-      validation.warnings.forEach(warning => {
-        html += `• ${warning}<br>`;
+    if (validation.recommendations.length > 0) {
+      html += '<div style="color: var(--aurora-cyan);">';
+      html += '<strong>💡 Recommendations:</strong><br>';
+      validation.recommendations.forEach(recommendation => {
+        html += `• ${recommendation}<br>`;
       });
       html += '</div>';
     }

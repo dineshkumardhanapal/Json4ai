@@ -25,7 +25,7 @@ class PasswordPolicyManager {
       const response = await fetch(API('/password-policy'));
       if (response.ok) {
         this.policy = await response.json();
-        console.log('Password policy loaded:', this.policy);
+        // Password policy loaded
       } else {
         console.warn('Failed to load password policy, using defaults');
         this.setDefaultPolicy();

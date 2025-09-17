@@ -23,17 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     
-    console.log('Session manager available, checking login status...');
-    
     // Check if user is logged in
     if (!window.sessionManager.isLoggedIn()) {
-      console.log('User not logged in, checking localStorage...');
       // Fallback check using localStorage directly
       const accessToken = localStorage.getItem('accessToken');
       const refreshToken = localStorage.getItem('refreshToken');
       
       if (!accessToken || !refreshToken) {
-        console.log('No tokens found in localStorage, redirecting to login');
         location.href = 'login.html';
         return;
       }
@@ -49,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
           location.href = 'login.html';
           return;
         }
-        console.log('Session manager refreshed successfully, proceeding with dashboard');
         proceedWithDashboard();
       }, 500); // Increased timeout to ensure session manager is fully initialized
       return;
@@ -112,11 +107,7 @@ const loadProfile = async () => {
       return;
     }
     
-    console.log('Making API requests with token:', {
-      tokenLength: accessToken ? accessToken.length : 0,
-      tokenPreview: accessToken ? accessToken.substring(0, 50) + '...' : 'none',
-      sessionManagerLoggedIn: window.sessionManager ? window.sessionManager.isLoggedIn() : 'N/A'
-    });
+    // Making API requests with token
     
     const [profileRes, usageRes] = await Promise.all([
       fetch('https://json4ai.onrender.com/api/user/profile', {
@@ -131,12 +122,7 @@ const loadProfile = async () => {
     
     clearTimeout(timeoutId);
     
-    console.log('API Response Status:', {
-      profileStatus: profileRes.status,
-      usageStatus: usageRes.status,
-      profileOk: profileRes.ok,
-      usageOk: usageRes.ok
-    });
+    // API Response Status
     
     if (!profileRes.ok || !usageRes.ok) {
       if (profileRes.status === 401 || usageRes.status === 401) {

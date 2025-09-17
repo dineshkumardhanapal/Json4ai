@@ -23,17 +23,13 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
     
-    console.log('Session manager available, checking login status...');
-    
     // Check if user is logged in
     if (!window.sessionManager.isLoggedIn()) {
-      console.log('User not logged in, checking localStorage...');
       // Fallback check using localStorage directly
       const accessToken = localStorage.getItem('accessToken');
       const refreshToken = localStorage.getItem('refreshToken');
       
       if (!accessToken || !refreshToken) {
-        console.log('No tokens found in localStorage, redirecting to login');
         location.href = 'login.html';
         return;
       }
@@ -135,9 +131,7 @@ const validateToken = async () => {
       headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
-    console.log('Token validation response:', {
-      status: res.status,
-      statusText: res.statusText,
+    // Token validation response
       url: res.url
     });
     
@@ -206,9 +200,7 @@ const loadUsageStatus = async () => {
       headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
-    console.log('Usage check response:', {
-      status: res.status,
-      statusText: res.statusText,
+    // Usage check response
       url: res.url
     });
     

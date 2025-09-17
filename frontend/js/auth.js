@@ -45,9 +45,8 @@ async function handleGoogleSignIn(response) {
     } else {
       showError(data.message || 'Google authentication failed');
     }
-  } catch (error) {
-    console.error('Google auth error:', error);
-    showError('Network error during Google authentication');
+    } catch (error) {
+      showError('Network error during Google authentication');
   }
 }
 
@@ -94,6 +93,88 @@ function setupGoogleButton() {
   }
 }
 
+// Password validation function for form submission
+function validatePasswordForSubmission(password) {
+  const validation = {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    recommendations: []
+  };
+  
+  // Check minimum length
+  if (password.length < 8) {
+    validation.isValid = false;
+    validation.errors.push('Password must be at least 8 characters long');
+  }
+  
+  // Check maximum length
+  if (password.length > 128) {
+    validation.isValid = false;
+    validation.errors.push('Password cannot exceed 128 characters');
+  }
+  
+  // Check for lowercase letters
+  if (!/[a-z]/.test(password)) {
+    validation.isValid = false;
+    validation.errors.push('Password must contain at least one lowercase letter');
+  }
+  
+  // Check for uppercase letters
+  if (!/[A-Z]/.test(password)) {
+    validation.isValid = false;
+    validation.errors.push('Password must contain at least one uppercase letter');
+  }
+  
+  // Check for numbers
+  if (!/[0-9]/.test(password)) {
+    validation.isValid = false;
+    validation.errors.push('Password must contain at least one number');
+  }
+  
+  // Check for consecutive repeated characters (max 2)
+  if (/(.)\1{2,}/.test(password)) {
+    validation.isValid = false;
+    validation.errors.push('Password cannot contain more than 2 consecutive repeated characters');
+  }
+  
+  // Check for sequential characters (max 3)
+  if (/123|234|345|456|567|678|789|012|abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz|qwe|wer|ert|rty|tyu|yui|uio|iop|asd|sdf|dfg|fgh|ghj|hjk|jkl|zxc|xcv|cvb|vbn|bnm/i.test(password)) {
+    validation.isValid = false;
+    validation.errors.push('Password cannot contain sequential characters (like abc, 123)');
+  }
+  
+  // Check for common words
+  const commonWords = ['password', 'admin', 'user', 'login', 'welcome', 'hello', 'test', 'demo', 'sample', 'guest', 'public', 'private', 'secret', 'key', 'code', 'name', 'email', 'phone', 'address'];
+  const lowerPassword = password.toLowerCase();
+  for (const word of commonWords) {
+    if (lowerPassword.includes(word)) {
+      validation.isValid = false;
+      validation.errors.push(`Password cannot contain common words like "${word}"`);
+      break;
+    }
+  }
+  
+  // Check for keyboard patterns
+  const keyboardPatterns = ['qwerty', 'asdf', 'zxcv', 'qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+  for (const pattern of keyboardPatterns) {
+    if (lowerPassword.includes(pattern)) {
+      validation.isValid = false;
+      validation.errors.push(`Password cannot contain keyboard patterns like "${pattern}"`);
+      break;
+    }
+  }
+  
+  // Check minimum unique characters (8)
+  const uniqueChars = new Set(password).size;
+  if (uniqueChars < 8) {
+    validation.isValid = false;
+    validation.errors.push('Password must contain at least 8 unique characters');
+  }
+  
+  return validation;
+}
+
 // Auth.js loaded
 
 if (loginForm) {
@@ -111,25 +192,21 @@ if (loginForm) {
       const res = await fetch(API('/login'), { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
       const data = await res.json();
               if (res.ok) {
-          console.log('Login successful, storing tokens and updating session manager');
           localStorage.setItem('accessToken', data.accessToken);
           localStorage.setItem('refreshToken', data.refreshToken);
           localStorage.setItem('userData', JSON.stringify(data.user));
           
           // Update session manager with new tokens
           if (window.sessionManager) {
-            console.log('Updating session manager with new tokens');
             window.sessionManager.refreshTokensFromStorage();
             // Wait longer for the session manager to fully update
             await new Promise(resolve => setTimeout(resolve, 300));
             
             // Verify session manager is properly updated
             if (!window.sessionManager.isLoggedIn()) {
-              console.error('Session manager not properly updated after login');
               showError('Authentication system error. Please try again.');
               return;
             }
-            console.log('Session manager successfully updated, redirecting to dashboard');
           }
           
           location.href = 'dashboard.html';
@@ -216,19 +293,10 @@ if (registerForm) {
       return;
     }
     
-    if (password.length < 8) {
-      showError('Password must be at least 8 characters long.');
-      return;
-    }
-    
-    // Check password complexity
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumbers = /\d/.test(password);
-    const hasSpecialChar = /[@$!%*?&\-_+=()\[\]{}|\\:;"'<>,.\/`~]/.test(password);
-    
-    if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
-      showError('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
+    // Comprehensive password validation using the same logic as the real-time validator
+    const passwordValidation = validatePasswordForSubmission(password);
+    if (!passwordValidation.isValid) {
+      showError(`Password validation failed: ${passwordValidation.errors.join(', ')}`);
       return;
     }
     
@@ -308,7 +376,6 @@ if (registerForm) {
                   showError(data.message || 'Failed to resend verification email');
                 }
               } catch (error) {
-                console.error('Resend error:', error);
                 showError('Network error. Please try again.');
               } finally {
                 resendBtn.disabled = false;
@@ -322,7 +389,6 @@ if (registerForm) {
             });
           }
         } else {
-          console.error('Success message element not found, using fallback');
           // Fallback if success message element not found
           showSuccess(data.message);
           setTimeout(() => {
@@ -330,8 +396,6 @@ if (registerForm) {
           }, 3000);
         }
       } else {
-        console.error('Registration failed:', data);
-        
         // Handle validation errors with detailed messages
         if (data.errors && Array.isArray(data.errors)) {
           const errorMessages = data.errors.map(err => `${err.field}: ${err.message}`).join('\n');
@@ -347,7 +411,6 @@ if (registerForm) {
         submitBtn.textContent = 'Create Account';
       }
     } catch (error) {
-      console.error('Registration error:', error);
       showError('Network error. Please try again.');
       // Reset button state
       submitBtn.disabled = false;
@@ -363,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
     try {
       initializeGoogleAuth();
     } catch (error) {
-      console.warn('Google Auth initialization failed:', error);
+      // Google Auth initialization failed silently
     }
   }, 1000); // Delay to ensure Google SDK is loaded
   

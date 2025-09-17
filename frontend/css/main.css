@@ -66,10 +66,24 @@ svg {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
+  color: #8A2BE2; /* Fallback color */
   background: linear-gradient(135deg, #8A2BE2, #FF1493, #FFD700);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Enhanced fallback for compatibility header */
+.compatibility-header h2 {
+  /* Ensure text is always visible */
+  color: #8A2BE2 !important;
+}
+
+.compatibility-header h2:not([style*="background-clip"]) {
+  /* If background-clip doesn't work, ensure text is visible */
+  background: none !important;
+  -webkit-text-fill-color: initial !important;
+  color: #8A2BE2 !important;
 }
 
 .compatibility-header p {

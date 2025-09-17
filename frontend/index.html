@@ -94,6 +94,7 @@
   <link rel="stylesheet" href="css/main.css"/>
   <link rel="stylesheet" href="css/gradient-glass.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
+  <link rel="stylesheet" href="css/seo-pages.css"/>
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js" defer></script>
   <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
   <script src="js/notifications.js" defer></script>
@@ -151,6 +152,8 @@
       </div>
     </div>
     
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator"></div>
   </section>
   
   <section class="features">
@@ -195,7 +198,7 @@
   <section class="compatibility">
     <div class="container">
       <div class="compatibility-header text-center">
-        <h2>JSON4AI works well with</h2>
+        <h2 class="ai-gradient-text">JSON4AI works well with</h2>
         <p>Seamlessly integrate with all major AI platforms and models</p>
       </div>
       
@@ -325,7 +328,7 @@
     <div class="container">
       <div class="content-header text-center">
         <h2>How JSON4AI Transforms Your AI Workflow</h2>
-        <p>Discover the power of structured prompt generation in just three simple steps</p>
+        <p class="ai-gradient-text">Discover the power of structured prompt generation in just three simple steps</p>
       </div>
       
       <div class="steps-grid">
@@ -370,7 +373,7 @@
     <div class="container">
       <div class="content-header text-center">
         <h2>Perfect for Every AI Use Case</h2>
-        <p>From content creation to technical analysis, JSON4AI adapts to your needs</p>
+        <p class="ai-gradient-text">From content creation to technical analysis, JSON4AI adapts to your needs</p>
       </div>
       
       <div class="use-cases-grid">
@@ -380,7 +383,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a3.76 3.76 0 01-7.52 0V5.882a3.76 3.76 0 017.52 0zM15 5.882V19.24a3.76 3.76 0 01-7.52 0V5.882a3.76 3.76 0 017.52 0zM19 5.882V19.24a3.76 3.76 0 01-7.52 0V5.882a3.76 3.76 0 017.52 0z"></path>
             </svg>
           </div>
-          <h3>Content Marketing</h3>
+          <h3 class="ai-gradient-text">Content Marketing</h3>
           <p>Generate blog posts, social media content, email campaigns, and marketing copy with consistent tone and messaging across all platforms.</p>
           <ul>
             <li>Blog article outlines</li>
@@ -396,7 +399,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
             </svg>
           </div>
-          <h3>Technical Analysis</h3>
+          <h3 class="ai-gradient-text">Technical Analysis</h3>
           <p>Create detailed technical documentation, code explanations, and system analysis prompts for developers and technical teams.</p>
           <ul>
             <li>Code documentation</li>
@@ -412,7 +415,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
             </svg>
           </div>
-          <h3>Educational Content</h3>
+          <h3 class="ai-gradient-text">Educational Content</h3>
           <p>Develop comprehensive learning materials, course content, and educational resources with structured, easy-to-follow formats.</p>
           <ul>
             <li>Course outlines</li>
@@ -428,13 +431,45 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
             </svg>
           </div>
-          <h3>Business Intelligence</h3>
+          <h3 class="ai-gradient-text">Business Intelligence</h3>
           <p>Generate data analysis prompts, business reports, and strategic planning documents with consistent structure and professional formatting.</p>
           <ul>
             <li>Market analysis</li>
             <li>Financial reports</li>
             <li>Strategic planning</li>
             <li>Performance metrics</li>
+          </ul>
+        </div>
+        
+        <div class="use-case-card">
+          <div class="use-case-icon">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5z"></path>
+            </svg>
+          </div>
+          <h3 class="ai-gradient-text">Customer Support</h3>
+          <p>Create comprehensive support documentation, FAQ responses, and troubleshooting guides to enhance customer experience and reduce support tickets.</p>
+          <ul>
+            <li>FAQ responses</li>
+            <li>Troubleshooting guides</li>
+            <li>Support documentation</li>
+            <li>Knowledge base articles</li>
+          </ul>
+        </div>
+        
+        <div class="use-case-card">
+          <div class="use-case-icon">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m0 0V3a1 1 0 011 1v16a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1V2m0 0h10M9 8h6m-6 4h6m-6 4h6"></path>
+            </svg>
+          </div>
+          <h3 class="ai-gradient-text">Creative Writing</h3>
+          <p>Develop engaging stories, scripts, poetry, and creative content with structured prompts that inspire imagination and maintain narrative consistency.</p>
+          <ul>
+            <li>Story outlines</li>
+            <li>Character development</li>
+            <li>Dialogue writing</li>
+            <li>Creative scripts</li>
           </ul>
         </div>
       </div>
@@ -775,5 +810,58 @@
 </div>
 
 <script src="js/cookie-consent.js"></script>
+
+<!-- Heading Visibility Fix Script -->
+<script>
+// Ensure all gradient text headings are visible
+document.addEventListener('DOMContentLoaded', function() {
+  // Function to check if text is visible
+  function isTextVisible(element) {
+    const computedStyle = window.getComputedStyle(element);
+    const textFillColor = computedStyle.getPropertyValue('-webkit-text-fill-color');
+    const color = computedStyle.getPropertyValue('color');
+    const opacity = computedStyle.getPropertyValue('opacity');
+    
+    // If text-fill-color is transparent and color is also transparent/inherit, text might be invisible
+    if (textFillColor === 'transparent' && (color === 'transparent' || color === 'inherit')) {
+      return false;
+    }
+    
+    // Check if element has actual visible content
+    return element.offsetHeight > 0 && element.offsetWidth > 0 && parseFloat(opacity) > 0;
+  }
+  
+  // Function to fix invisible headings
+  function fixInvisibleHeadings() {
+    const gradientElements = document.querySelectorAll('.text-gradient, .features-header h2, .compatibility-header h2, .benefits-text h2, .content-header h1, .content-header h2, .cta-content h2');
+    
+    gradientElements.forEach(element => {
+      if (!isTextVisible(element)) {
+        // Force visibility by removing gradient and setting solid color
+        element.style.background = 'none';
+        element.style.webkitBackgroundClip = 'initial';
+        element.style.webkitTextFillColor = 'initial';
+        element.style.color = 'var(--aurora-cyan)';
+        
+        // Add a fallback color if CSS variable doesn't work
+        if (getComputedStyle(element).color === 'rgba(0, 0, 0, 0)' || getComputedStyle(element).color === 'transparent') {
+          element.style.color = '#22d3ee'; // Aurora cyan fallback
+        }
+        
+        console.log('Fixed invisible heading:', element.textContent.trim());
+      }
+    });
+  }
+  
+  // Run the fix immediately
+  fixInvisibleHeadings();
+  
+  // Run again after a short delay to catch any dynamically loaded content
+  setTimeout(fixInvisibleHeadings, 1000);
+  
+  // Also run on window load
+  window.addEventListener('load', fixInvisibleHeadings);
+});
+</script>
 </body>
 </html>

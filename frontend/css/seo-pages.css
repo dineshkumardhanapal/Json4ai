@@ -1,0 +1,693 @@
+/* 
+ * SEO Pages Styling - Comprehensive responsive design for new content pages
+ * Applies consistent aurora theme colors and responsive layout
+ * Last Updated: 2025-01-27
+ */
+
+/* ========================================
+   CONTENT PAGES LAYOUT & RESPONSIVENESS
+   ======================================== */
+
+/* Hero sections for content pages */
+.content-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  padding: 2rem 0;
+}
+
+.content-header h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.content-header p {
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  color: var(--text-secondary);
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  line-height: 1.6;
+}
+
+/* Hero stats for content pages */
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: 3rem;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(16px);
+  min-width: 120px;
+}
+
+.stat-number {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--aurora-purple);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ========================================
+   COMPARISON PAGE STYLES
+   ======================================== */
+
+.comparison-overview {
+  padding: 5rem 0;
+  background: radial-gradient(800px 400px at 50% 0%, rgba(138, 43, 226, 0.08), transparent 60%);
+}
+
+.comparison-intro {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.comparison-intro h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+.comparison-intro p {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+.comparison-benefits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(16px);
+  transition: var(--transition);
+}
+
+.benefit-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--glass-shadow-lg);
+  border-color: var(--aurora-purple);
+}
+
+.benefit-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--aurora-purple), var(--aurora-pink));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.benefit-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.benefit-content p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ========================================
+   GUIDE PAGE STYLES
+   ======================================== */
+
+.guide-overview {
+  padding: 5rem 0;
+  background: radial-gradient(800px 400px at 50% 0%, rgba(255, 20, 147, 0.08), transparent 60%);
+}
+
+.overview-content {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.overview-content h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+.overview-content p {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  max-width: 800px;
+  margin: 0 auto 3rem;
+  line-height: 1.7;
+}
+
+.overview-benefits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.benefit-card {
+  padding: 2rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(16px);
+  text-align: center;
+  transition: var(--transition);
+}
+
+.benefit-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--glass-shadow-lg);
+  border-color: var(--aurora-pink);
+}
+
+.benefit-card .benefit-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, var(--aurora-pink), var(--aurora-gold));
+}
+
+.benefit-card h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.benefit-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Prompt fundamentals section */
+.prompt-fundamentals {
+  padding: 5rem 0;
+}
+
+.prompt-fundamentals h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 3rem;
+  color: var(--text-primary);
+}
+
+.fundamentals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.fundamental-card {
+  padding: 2rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(16px);
+  transition: var(--transition);
+}
+
+.fundamental-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--glass-shadow-lg);
+  border-color: var(--aurora-gold);
+}
+
+.fundamental-number {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--aurora-gold), var(--aurora-purple));
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.fundamental-card h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.fundamental-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.example-box {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  border-left: 4px solid var(--aurora-purple);
+}
+
+.example-bad {
+  color: #ef4444;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.example-good {
+  color: #10b981;
+  font-size: 0.9rem;
+}
+
+/* ========================================
+   DIRECTORY PAGE STYLES
+   ======================================== */
+
+.directory-overview {
+  padding: 5rem 0;
+  background: radial-gradient(800px 400px at 50% 0%, rgba(255, 215, 0, 0.08), transparent 60%);
+}
+
+.overview-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(16px);
+  transition: var(--transition);
+}
+
+.feature-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--glass-shadow-lg);
+  border-color: var(--aurora-gold);
+}
+
+.feature-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--aurora-gold), var(--aurora-purple));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.feature-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.feature-content p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Categories section */
+.categories-section {
+  padding: 5rem 0;
+}
+
+.categories-section h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 3rem;
+  color: var(--text-primary);
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.category-card {
+  padding: 2rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(16px);
+  text-align: center;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.category-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s;
+}
+
+.category-card:hover::before {
+  left: 100%;
+}
+
+.category-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--glass-shadow-lg);
+  border-color: var(--aurora-purple);
+}
+
+.category-icon {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, var(--aurora-purple), var(--aurora-pink));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin: 0 auto 1.5rem;
+}
+
+.category-card h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.category-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.category-count {
+  font-size: 0.9rem;
+  color: var(--aurora-purple);
+  font-weight: 600;
+  background: rgba(138, 43, 226, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 1024px) {
+  .hero-stats {
+    gap: 2rem;
+  }
+  
+  .stat-item {
+    min-width: 100px;
+    padding: 1rem;
+  }
+  
+  .stat-number {
+    font-size: 2rem;
+  }
+  
+  .comparison-benefits,
+  .overview-benefits,
+  .overview-features {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .fundamentals-grid,
+  .categories-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .content-header {
+    margin-bottom: 2rem;
+    padding: 1rem 0;
+  }
+  
+  .hero-stats {
+    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .stat-item {
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .comparison-overview,
+  .guide-overview,
+  .directory-overview,
+  .prompt-fundamentals,
+  .categories-section {
+    padding: 3rem 0;
+  }
+  
+  .comparison-intro,
+  .overview-content {
+    margin-bottom: 2rem;
+  }
+  
+  .comparison-benefits,
+  .overview-benefits,
+  .overview-features,
+  .fundamentals-grid,
+  .categories-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .benefit-item,
+  .feature-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .benefit-icon,
+  .feature-icon {
+    margin: 0 auto;
+  }
+  
+  .benefit-card,
+  .fundamental-card,
+  .category-card {
+    padding: 1.5rem;
+  }
+  
+  .fundamental-number {
+    margin: 0 auto 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-header h1 {
+    font-size: 2rem;
+  }
+  
+  .content-header p {
+    font-size: 1rem;
+  }
+  
+  .stat-item {
+    padding: 1rem;
+  }
+  
+  .stat-number {
+    font-size: 1.8rem;
+  }
+  
+  .stat-label {
+    font-size: 0.8rem;
+  }
+  
+  .comparison-intro h2,
+  .overview-content h2,
+  .prompt-fundamentals h2,
+  .categories-section h2 {
+    font-size: 1.8rem;
+  }
+  
+  .comparison-intro p,
+  .overview-content p {
+    font-size: 1rem;
+  }
+  
+  .benefit-card h3,
+  .fundamental-card h3,
+  .category-card h3 {
+    font-size: 1.25rem;
+  }
+  
+  .benefit-content h3,
+  .feature-content h3 {
+    font-size: 1.1rem;
+  }
+  
+  .benefit-card,
+  .fundamental-card,
+  .category-card {
+    padding: 1rem;
+  }
+  
+  .benefit-icon,
+  .feature-icon,
+  .category-icon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .fundamental-number {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY IMPROVEMENTS
+   ======================================== */
+
+/* Focus states for interactive elements */
+.benefit-item:focus,
+.feature-item:focus,
+.benefit-card:focus,
+.fundamental-card:focus,
+.category-card:focus {
+  outline: 2px solid var(--aurora-purple);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .benefit-item,
+  .feature-item,
+  .benefit-card,
+  .fundamental-card,
+  .category-card {
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .benefit-icon,
+  .feature-icon,
+  .category-icon,
+  .fundamental-number {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .benefit-item,
+  .feature-item,
+  .benefit-card,
+  .fundamental-card,
+  .category-card {
+    transition: none;
+  }
+  
+  .benefit-item:hover,
+  .feature-item:hover,
+  .benefit-card:hover,
+  .fundamental-card:hover,
+  .category-card:hover {
+    transform: none;
+  }
+  
+  .category-card::before {
+    display: none;
+  }
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+  .content-header,
+  .comparison-overview,
+  .guide-overview,
+  .directory-overview,
+  .prompt-fundamentals,
+  .categories-section {
+    background: none !important;
+    color: black !important;
+  }
+  
+  .benefit-item,
+  .feature-item,
+  .benefit-card,
+  .fundamental-card,
+  .category-card {
+    background: white !important;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+  }
+  
+  .benefit-icon,
+  .feature-icon,
+  .category-icon,
+  .fundamental-number {
+    background: #333 !important;
+    color: white !important;
+  }
+}

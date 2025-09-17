@@ -3,18 +3,35 @@
   .container {
     width: 95%;
     max-width: 1000px;
+    padding: 0 1.5rem;
   }
   
   .hero h1 {
     font-size: clamp(2.5rem, 4vw, 3.5rem);
+    text-align: center;
   }
   
   .hero p {
     font-size: clamp(1.1rem, 2vw, 1.3rem);
+    text-align: center;
   }
   
   .hero .container {
     gap: 2rem;
+    text-align: center;
+  }
+  
+  /* Better text alignment for content sections */
+  .content-header {
+    text-align: center;
+  }
+  
+  .content-header h1 {
+    text-align: center;
+  }
+  
+  .content-header p {
+    text-align: center;
   }
 }
 
@@ -22,6 +39,18 @@
   .container {
     width: 95%;
     padding: 0 1rem;
+    margin: 0 auto;
+  }
+  
+  /* Ensure all text is properly aligned on mobile */
+  .text-center {
+    text-align: center !important;
+  }
+  
+  .content-header,
+  .content-header h1,
+  .content-header p {
+    text-align: center !important;
   }
   
   /* Improved mobile button sizing */

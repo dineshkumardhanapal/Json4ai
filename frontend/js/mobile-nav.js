@@ -75,6 +75,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Prevent menu from hiding on scroll (mobile)
     let lastScrollTop = 0;
+    let scrollTimeout;
+    
     window.addEventListener('scroll', function() {
       if (window.innerWidth <= 768) {
         const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -85,7 +87,11 @@ document.addEventListener('DOMContentLoaded', function() {
           return;
         }
         
-        lastScrollTop = currentScrollTop;
+        // Debounce scroll events for better performance
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          lastScrollTop = currentScrollTop;
+        }, 10);
       }
     });
     

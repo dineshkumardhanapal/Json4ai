@@ -22,10 +22,10 @@
   --text-light: #a0aec0;           /* Very light blue-gray */
   
   /* Accent colors - image gradient combination */
-  --accent-primary: #8A2BE2;       /* Deep Purple */
-  --accent-secondary: #FF1493;     /* Bright Pink */
-  --accent-tertiary: #FFD700;      /* Warm Yellow */
-  --accent-gradient: linear-gradient(to right, #8A2BE2, #FF1493, #FFD700);
+  --accent-primary: #3b82f6;       /* Medium Blue */
+  --accent-secondary: #7c3aed;     /* Purple */
+  --accent-tertiary: #ec4899;      /* Magenta */
+  --accent-gradient: linear-gradient(to right, #3b82f6, #7c3aed, #ec4899);
   
   /* Glass effect variables */
   --glass-bg: rgba(255, 255, 255, 0.15);

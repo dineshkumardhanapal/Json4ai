@@ -79,11 +79,25 @@ document.addEventListener('DOMContentLoaded', () => {
   if (toggle) {
     toggle.addEventListener('change', function() {
       const isYearly = this.checked;
+      console.log('Pricing toggle changed to:', isYearly ? 'Yearly' : 'Monthly');
       updatePricingDisplay(isYearly);
+      
+      // Force update after a short delay to ensure CSS is applied
+      setTimeout(() => {
+        updatePricingDisplay(isYearly);
+      }, 100);
     });
     
     // Initialize with monthly pricing
+    console.log('Initializing pricing display with monthly pricing');
     updatePricingDisplay(false);
+    
+    // Force initial state after DOM is fully loaded
+    setTimeout(() => {
+      updatePricingDisplay(false);
+    }, 500);
+  } else {
+    console.error('Pricing toggle element not found!');
   }
 
   // Initialize payment buttons
@@ -91,44 +105,120 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Update navigation based on login status
   updateNavigation();
+  
+  // Add global test function for debugging
+  window.testYearlyPricing = function() {
+    console.log('Testing yearly pricing...');
+    const toggle = document.getElementById('pricing-toggle');
+    if (toggle) {
+      toggle.checked = true;
+      updatePricingDisplay(true);
+      console.log('Yearly pricing should now be visible');
+    } else {
+      console.error('Toggle not found');
+    }
+  };
+  
+  window.testMonthlyPricing = function() {
+    console.log('Testing monthly pricing...');
+    const toggle = document.getElementById('pricing-toggle');
+    if (toggle) {
+      toggle.checked = false;
+      updatePricingDisplay(false);
+      console.log('Monthly pricing should now be visible');
+    } else {
+      console.error('Toggle not found');
+    }
+  };
 });
 
 function updatePricingDisplay(isYearly) {
+  console.log('updatePricingDisplay called with isYearly:', isYearly);
+  
   // Get all plan cards
   const planCards = document.querySelectorAll('.plan-card');
+  console.log('Found plan cards:', planCards.length);
   
-  planCards.forEach(card => {
-    const planName = card.querySelector('h3')?.textContent?.toLowerCase();
+  planCards.forEach((card, index) => {
     const yearlyPrice = card.querySelector('.yearly-price');
+    const yearlyBillingInfo = card.querySelector('.yearly-billing-info');
+    const planName = card.querySelector('h3')?.textContent;
+    
+    console.log(`Plan ${index + 1} (${planName}):`, {
+      hasYearlyPrice: !!yearlyPrice,
+      hasYearlyBillingInfo: !!yearlyBillingInfo,
+      yearlyPriceElement: yearlyPrice
+    });
     
     if (yearlyPrice) {
       if (isYearly) {
         // Add yearly-pricing class to enable CSS rules
         card.classList.add('yearly-pricing');
+        // Force show yearly price elements
+        yearlyPrice.style.display = 'flex';
+        yearlyPrice.style.visibility = 'visible';
+        yearlyPrice.style.opacity = '1';
+        yearlyPrice.style.flexDirection = 'row';
+        yearlyPrice.style.alignItems = 'center';
+        yearlyPrice.style.justifyContent = 'center';
+        yearlyPrice.style.flexWrap = 'nowrap';
+        yearlyPrice.style.whiteSpace = 'nowrap';
+        
+        // Show billing info
+        if (yearlyBillingInfo) {
+          yearlyBillingInfo.style.display = 'flex';
+          yearlyBillingInfo.style.visibility = 'visible';
+          yearlyBillingInfo.style.opacity = '1';
+        }
+        
+        // Hide monthly price elements
+        const monthlyCurrency = card.querySelector('.price > .currency');
+        const monthlyAmount = card.querySelector('.price > .amount');
+        const monthlyPeriod = card.querySelector('.price > .period');
+        
+        if (monthlyCurrency) monthlyCurrency.style.display = 'none';
+        if (monthlyAmount) monthlyAmount.style.display = 'none';
+        if (monthlyPeriod) monthlyPeriod.style.display = 'none';
+        
+        console.log(`Showing yearly price for ${planName}`);
       } else {
         // Remove yearly-pricing class to show monthly pricing
         card.classList.remove('yearly-pricing');
+        // Hide yearly price elements
+        yearlyPrice.style.display = 'none';
+        yearlyPrice.style.visibility = 'hidden';
+        yearlyPrice.style.opacity = '0';
+        
+        // Hide billing info
+        if (yearlyBillingInfo) {
+          yearlyBillingInfo.style.display = 'none';
+          yearlyBillingInfo.style.visibility = 'hidden';
+          yearlyBillingInfo.style.opacity = '0';
+        }
+        
+        // Show monthly price elements
+        const monthlyCurrency = card.querySelector('.price > .currency');
+        const monthlyAmount = card.querySelector('.price > .amount');
+        const monthlyPeriod = card.querySelector('.price > .period');
+        
+        if (monthlyCurrency) monthlyCurrency.style.display = 'inline';
+        if (monthlyAmount) monthlyAmount.style.display = 'inline';
+        if (monthlyPeriod) monthlyPeriod.style.display = 'inline';
+        
+        console.log(`Showing monthly price for ${planName}`);
       }
     } else {
-      // Fallback: manually toggle visibility
-      const monthlyPrice = card.querySelector('.price:not(.yearly-price)');
-      if (monthlyPrice && yearlyPrice) {
-        if (isYearly) {
-          monthlyPrice.style.display = 'none';
-          yearlyPrice.style.display = 'block';
-        } else {
-          monthlyPrice.style.display = 'block';
-          yearlyPrice.style.display = 'none';
-        }
-      }
+      console.log(`No yearly price found for ${planName}`);
     }
   });
   
   // Update toggle label
-  const toggleLabel = document.querySelector('.toggle-label');
-  if (toggleLabel) {
-    toggleLabel.textContent = isYearly ? 'Yearly' : 'Monthly';
-  }
+  const toggleLabels = document.querySelectorAll('.toggle-label');
+  toggleLabels.forEach(label => {
+    if (!label.querySelector('.savings-badge')) {
+      label.textContent = isYearly ? 'Yearly' : 'Monthly';
+    }
+  });
 }
 
 // Initialize the pricing page
@@ -276,6 +366,7 @@ function initializePaymentButtons() {
     const button = card.querySelector('.btn-primary');
     if (button) {
       button.addEventListener('click', function(e) {
+        e.preventDefault();
         e.stopPropagation();
         
         const planName = card.querySelector('h3')?.textContent?.toLowerCase();

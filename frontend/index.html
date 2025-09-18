@@ -29,8 +29,8 @@
   <meta name="twitter:image" content="https://json4ai.com/assets/og-image.png"/>
   
   <!-- Additional SEO Meta Tags -->
-  <meta name="theme-color" content="#22d3ee"/>
-  <meta name="msapplication-TileColor" content="#22d3ee"/>
+  <meta name="theme-color" content="#3b82f6"/>
+  <meta name="msapplication-TileColor" content="#3b82f6"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   
@@ -48,7 +48,7 @@
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "USD",
-      "description": "Free tier with 10 prompts per month"
+      "description": "Free tier with 3 prompts per day"
     },
     "aggregateRating": {
       "@type": "AggregateRating",
@@ -95,7 +95,7 @@
   <link rel="stylesheet" href="css/gradient-glass.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
   <link rel="stylesheet" href="css/seo-pages.css"/>
-  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js" defer></script>
+  <!-- Removed Lottie player script -->
   <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js"></script>
   <script src="js/notifications.js" defer></script>
   <script src="js/utils.js" defer></script>
@@ -133,22 +133,74 @@
     <div class="container">
       <div class="hero-content">
         <h1 class="text-gradient">Generate your accurate prompt with <span class="highlight">JSON4AI</span></h1>
-        <p>Turn any Search Query into a precise Json AI prompt in seconds. Our advanced AI-powered system ensures accuracy and consistency in every generated prompt.</p>
-        <div class="hero-buttons">
-          <a href="register.html" class="btn-primary">Get Started Free</a>
+      </div>
+      <div class="workflow-container">
+        <!-- Step 1: Input -->
+        <div class="workflow-step step-input">
+          <div class="step-label">1. Input</div>
+          <div class="input-container">
+            <div class="input-text">
+              <span class="typing-text">Write a blog post about AI</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Arrow 1 -->
+        <div class="workflow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-head">→</div>
+        </div>
+        
+        <!-- Step 2: JSON4AI Processing -->
+        <div class="workflow-step step-processing">
+          <div class="step-label">2. JSON4AI</div>
+          <div class="processing-container">
+            <div class="processing-circle">
+              <div class="processing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div class="json-output">
+              <div class="json-line">{</div>
+              <div class="json-line">  "task": "blog_writing",</div>
+              <div class="json-line">  "topic": "AI",</div>
+              <div class="json-line">  "style": "informative",</div>
+              <div class="json-line">  "length": "1000_words",</div>
+              <div class="json-line">  "tone": "professional"</div>
+              <div class="json-line">}</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Arrow 2 -->
+        <div class="workflow-arrow">
+          <div class="arrow-line"></div>
+          <div class="arrow-head">→</div>
+        </div>
+        
+        <!-- Step 3: LLM Result -->
+        <div class="workflow-step step-result">
+          <div class="step-label">3. LLM Result</div>
+          <div class="result-container">
+            <div class="result-text">
+              <div class="result-line">Here's a comprehensive blog post about AI...</div>
+              <div class="result-line">Artificial Intelligence (AI) has revolutionized...</div>
+              <div class="result-line">From machine learning to deep learning...</div>
+              <div class="result-line">The future of AI looks promising...</div>
+            </div>
+            <div class="success-icon">✓</div>
+          </div>
         </div>
       </div>
-      <div class="hero-visual">
-        <lottie-player 
-          src="https://lottie.host/644ba663-09d2-4e7d-a961-965a763a4e52/Inn1bQEMCr.json" 
-          background="transparent" 
-          speed="1" 
-          style="width: 400px; height: 400px;" 
-          loop 
-          autoplay 
-          role="img" 
-          aria-label="AI prompt generation animation showing data processing and JSON structure creation">
-        </lottie-player>
+      
+      <!-- Description and CTA below workflow -->
+      <div class="animation-description">
+        <p>Turn any Search Query into a precise Json AI prompt in seconds. Our advanced AI-powered system ensures accuracy and consistency in every generated prompt.</p>
+        <div class="animation-cta">
+          <a href="register.html" class="btn-primary">Get Started Free</a>
+        </div>
       </div>
     </div>
     
@@ -568,7 +620,7 @@
   <section class="faq-section">
     <div class="container">
       <div class="content-header text-center">
-        <h2>Frequently Asked Questions</h2>
+        <h2 class="ai-gradient-text">Frequently Asked Questions</h2>
         <p>Everything you need to know about JSON4AI</p>
       </div>
       
@@ -590,7 +642,7 @@
         
         <div class="faq-item">
           <h3>Is there a free trial available?</h3>
-          <p>Yes! We offer a free tier that allows you to generate up to 10 prompts per month. This gives you a perfect opportunity to experience the power of JSON4AI before upgrading to our premium plans.</p>
+          <p>Yes! We offer a free tier that allows you to generate up to 3 prompts per day. This gives you a perfect opportunity to experience the power of JSON4AI before upgrading to our premium plans.</p>
         </div>
         
         <div class="faq-item">
@@ -686,7 +738,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
             </svg>
-            <span>10 free prompts monthly</span>
+            <span>3 free prompts daily</span>
           </div>
           <div class="cta-feature">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -845,7 +897,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add a fallback color if CSS variable doesn't work
         if (getComputedStyle(element).color === 'rgba(0, 0, 0, 0)' || getComputedStyle(element).color === 'transparent') {
-          element.style.color = '#22d3ee'; // Aurora cyan fallback
+          element.style.color = '#3b82f6'; // Medium blue fallback
         }
         
         console.log('Fixed invisible heading:', element.textContent.trim());
@@ -861,6 +913,62 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Also run on window load
   window.addEventListener('load', fixInvisibleHeadings);
+});
+
+// Custom Prompt Generation Animation Controller
+document.addEventListener('DOMContentLoaded', function() {
+  const workflowSteps = document.querySelectorAll('.workflow-step');
+  let currentStep = 0;
+  
+  function showStep(stepIndex) {
+    workflowSteps.forEach((step, index) => {
+      if (index <= stepIndex) {
+        step.classList.add('active');
+      } else {
+        step.classList.remove('active');
+      }
+    });
+  }
+  
+  function nextStep() {
+    currentStep = (currentStep + 1) % workflowSteps.length;
+    showStep(currentStep);
+  }
+  
+  function resetAnimation() {
+    currentStep = 0;
+    showStep(0);
+  }
+  
+  // Start with first step
+  showStep(0);
+  
+  // Auto-cycle through steps
+  setInterval(nextStep, 4000); // Change step every 4 seconds
+  
+  // Reset animation after completing all steps
+  setInterval(resetAnimation, 12000); // Reset every 12 seconds
+  
+  // Add typing animation to JSON lines when step 2 becomes active
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+        const target = mutation.target;
+        if (target.classList.contains('step-processing') && target.classList.contains('active')) {
+          const jsonLines = target.querySelectorAll('.json-line');
+          jsonLines.forEach((line, index) => {
+            setTimeout(() => {
+              line.style.animation = 'typeJson 0.5s ease-in-out forwards';
+            }, index * 200);
+          });
+        }
+      }
+    });
+  });
+  
+  workflowSteps.forEach(step => {
+    observer.observe(step, { attributes: true });
+  });
 });
 </script>
 </body>

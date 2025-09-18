@@ -32,12 +32,12 @@
   /* Glass effect variables */
   --glass-bg: rgba(255, 255, 255, 0.06);
   --glass-border: rgba(255, 255, 255, 0.12);
-  --glass-shadow: 0 8px 32px rgba(34, 211, 238, 0.18);
+  --glass-shadow: 0 8px 32px rgba(59, 130, 246, 0.18);
   --glass-shadow-sm: 0 4px 16px rgba(96, 165, 250, 0.15);
   --glass-shadow-md: 0 8px 32px rgba(34, 197, 94, 0.25);
-  --glass-shadow-lg: 0 16px 64px rgba(34, 211, 238, 0.35);
+  --glass-shadow-lg: 0 16px 64px rgba(59, 130, 246, 0.35);
   --glass-highlight: rgba(255, 255, 255, 0.35);
-  --glass-glow: rgba(34, 211, 238, 0.5);
+  --glass-glow: rgba(59, 130, 246, 0.5);
   --glass-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Radii */
@@ -60,7 +60,7 @@
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: radial-gradient(1200px 600px at 10% 10%, rgba(96, 165, 250, 0.15), transparent 60%),
-              radial-gradient(900px 500px at 90% 15%, rgba(34, 211, 238, 0.12), transparent 60%),
+              radial-gradient(900px 500px at 90% 15%, rgba(59, 130, 246, 0.12), transparent 60%),
               radial-gradient(1000px 700px at 50% 90%, rgba(34, 197, 94, 0.12), transparent 60%),
               linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-middle), var(--bg-gradient-end));
   background-attachment: fixed;
@@ -493,7 +493,7 @@ body {
 .form-group select:focus {
   outline: none;
   border-color: var(--aurora-cyan);
-  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.2);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .form-group input:disabled,
@@ -727,18 +727,18 @@ body {
 
 .plan-card.selected {
   border-color: var(--aurora-cyan);
-  box-shadow: 0 0 30px rgba(34, 211, 238, 0.3), var(--shadow-strong);
-  background: rgba(34, 211, 238, 0.05);
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.3), var(--shadow-strong);
+  background: rgba(59, 130, 246, 0.05);
   animation: planGlow 2s ease-in-out infinite alternate;
 }
 
 @keyframes planGlow {
   0% {
-    box-shadow: 0 0 20px rgba(34, 211, 238, 0.2), var(--shadow-strong);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2), var(--shadow-strong);
     border-color: var(--aurora-cyan);
   }
   100% {
-    box-shadow: 0 0 40px rgba(34, 211, 238, 0.4), var(--shadow-strong);
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.4), var(--shadow-strong);
     border-color: var(--aurora-blue);
   }
 }
@@ -1351,10 +1351,13 @@ body.cookie-modal-active {
   font-weight: 800;
   color: var(--text-light);
   margin-bottom: 1rem;
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: linear-gradient(90deg, #7c3aed 0%, #7c3aed 50%, #ec4899 50%, #ec4899 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  background-size: 200% 100% !important;
+  animation: gradientShift 8s ease-in-out infinite !important;
+  text-shadow: 0 0 25px rgba(124, 58, 237, 0.5) !important;
   letter-spacing: -0.02em;
 }
 
@@ -1464,7 +1467,7 @@ body.cookie-modal-active {
 .content-body blockquote {
   margin: 2rem 0;
   padding: 1.5rem 2rem;
-  background: rgba(34, 211, 238, 0.05);
+  background: rgba(59, 130, 246, 0.05);
   border-left: 4px solid var(--aurora-cyan);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   font-style: italic;
@@ -1472,7 +1475,7 @@ body.cookie-modal-active {
 }
 
 .content-body code {
-  background: rgba(34, 211, 238, 0.1);
+  background: rgba(59, 130, 246, 0.1);
   color: var(--aurora-cyan);
   padding: 0.2rem 0.4rem;
   border-radius: var(--radius-sm);
@@ -1521,8 +1524,8 @@ body.cookie-modal-active {
   position: relative;
   transition: all 0.3s ease;
   background: linear-gradient(135deg, var(--aurora-cyan), var(--aurora-blue));
-  box-shadow: 0 4px 20px rgba(34, 211, 238, 0.3);
-  border: 2px solid rgba(34, 211, 238, 0.2);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+  border: 2px solid rgba(59, 130, 246, 0.2);
 }
 
 .plan-card .icon svg {
@@ -1536,7 +1539,7 @@ body.cookie-modal-active {
 
 .plan-card:hover .icon {
   transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 8px 30px rgba(34, 211, 238, 0.4);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
   background: linear-gradient(135deg, var(--aurora-blue), var(--aurora-purple));
 }
 
@@ -1595,7 +1598,7 @@ body.cookie-modal-active {
   transform: translateY(-2px);
   box-shadow: var(--glass-shadow-lg);
 }
-.plan-card.featured { outline: 2px solid rgba(34, 211, 238, 0.35); box-shadow: var(--glass-shadow); }
+.plan-card.featured { outline: 2px solid rgba(59, 130, 246, 0.35); box-shadow: var(--glass-shadow); }
 .plan-card .plan-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent-gradient); color: #0b1220; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
 .quality-badge { display: inline-flex; gap: 0.4rem; align-items: center; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); padding: 0.25rem 0.5rem; border-radius: 999px; color: var(--text-secondary); font-size: 0.85rem; }
 .pricing-faq { margin-top: 3rem; }
@@ -1657,7 +1660,7 @@ body.cookie-modal-active {
 }
 
 /* Back-compat for legacy class names used in other pages */
-.pricing-card.featured { outline: 2px solid rgba(34, 211, 238, 0.35); transform: scale(1.02); }
+.pricing-card.featured { outline: 2px solid rgba(59, 130, 246, 0.35); transform: scale(1.02); }
 .pricing-card.featured::after { content: 'Most Popular'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent-gradient); color: #0b1220; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
 .pricing-price { font-size: 3rem; font-weight: 800; }
 
@@ -1669,7 +1672,7 @@ body.cookie-modal-active {
   background: rgba(255,255,255,0.06); color: var(--text-primary);
   border: 1px solid var(--glass-border); transition: var(--transition);
 }
-.form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: var(--text-light); box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.2); }
+.form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: var(--text-light); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
 .form-input::placeholder, .form-textarea::placeholder { color: var(--text-muted); }
 
 /* Prompt Output */
@@ -2994,7 +2997,7 @@ footer { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border-
   background: var(--accent-gradient);
   border-color: var(--aurora-cyan);
   color: white;
-  box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
   transform: scale(1.1);
 }
 
@@ -3187,7 +3190,7 @@ footer { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border-
 .prompt-form textarea:focus {
   outline: none;
   border-color: var(--aurora-cyan);
-  box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
   background: rgba(255, 255, 255, 0.05);
 }
 
@@ -3319,8 +3322,8 @@ footer { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border-
 }
 
 .quality-standard {
-  background: rgba(34, 211, 238, 0.1);
-  border: 1px solid rgba(34, 211, 238, 0.3);
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
   color: var(--aurora-cyan);
 }
 

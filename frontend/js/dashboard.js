@@ -543,6 +543,7 @@ window.toggleDebug = () => {
 // Update profile
 document.getElementById('profile-form')?.addEventListener('submit', async e => {
   e.preventDefault();
+  e.stopPropagation();
   
   const submitBtn = e.target.querySelector('button[type="submit"]');
   const originalText = submitBtn.textContent;

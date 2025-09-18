@@ -184,6 +184,7 @@ if (loginForm) {
   
   loginForm.addEventListener('submit', async e => {
     e.preventDefault();
+    e.stopPropagation();
     const fd = new FormData(loginForm);
     const body = { email: fd.get('email'), password: fd.get('password') };
     currentEmail = fd.get('email');
@@ -273,6 +274,7 @@ if (registerForm) {
   
   registerForm.addEventListener('submit', async e => {
     e.preventDefault();
+    e.stopPropagation();
     
     // Check if terms are accepted
     if (!termsCheckbox.checked) {

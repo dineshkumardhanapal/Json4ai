@@ -134,26 +134,30 @@ document.addEventListener('DOMContentLoaded', function() {
     let isDragging = false;
     
     logoSlider.addEventListener('touchstart', (e) => {
+      e.preventDefault(); // Prevent default touch behavior
       startX = e.touches[0].clientX;
       isDragging = true;
       logoTrack.style.animationPlayState = 'paused';
-    });
+    }, { passive: false });
     
     logoSlider.addEventListener('touchmove', (e) => {
       if (!isDragging) return;
+      e.preventDefault(); // Prevent default scroll behavior
       currentX = e.touches[0].clientX;
       const diff = startX - currentX;
       logoTrack.style.transform = `translateX(-${diff}px)`;
-    });
+    }, { passive: false });
     
-    logoSlider.addEventListener('touchend', () => {
+    logoSlider.addEventListener('touchend', (e) => {
+      e.preventDefault();
       isDragging = false;
       logoTrack.style.transform = '';
       logoTrack.style.animationPlayState = 'running';
-    });
+    }, { passive: false });
     
     // Add mouse drag support for desktop
     logoSlider.addEventListener('mousedown', (e) => {
+      e.preventDefault(); // Prevent text selection
       startX = e.clientX;
       isDragging = true;
       logoTrack.style.animationPlayState = 'paused';
@@ -162,12 +166,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     logoSlider.addEventListener('mousemove', (e) => {
       if (!isDragging) return;
+      e.preventDefault(); // Prevent default behavior
       currentX = e.clientX;
       const diff = startX - currentX;
       logoTrack.style.transform = `translateX(-${diff}px)`;
     });
     
-    logoSlider.addEventListener('mouseup', () => {
+    logoSlider.addEventListener('mouseup', (e) => {
+      e.preventDefault();
       isDragging = false;
       logoTrack.style.transform = '';
       logoTrack.style.animationPlayState = 'running';

@@ -48,6 +48,145 @@ svg {
   vertical-align: middle;
 }
 
+/* ========================================
+   FOCUS STATES - USER-FRIENDLY & ACCESSIBLE
+   ======================================== */
+
+/* Remove default browser focus outlines */
+*:focus {
+  outline: none !important;
+}
+
+/* Custom focus states for better UX */
+button:focus,
+.btn-primary:focus,
+.btn-secondary:focus,
+.btn-outline:focus,
+.btn-large:focus,
+.btn-small:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3) !important;
+  border-color: var(--aurora-purple) !important;
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+/* Link focus states */
+a:focus,
+.nav-links a:focus,
+.logo:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.4) !important;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+/* Form input focus states */
+input:focus,
+textarea:focus,
+select:focus,
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus,
+.prompt-form textarea:focus {
+  outline: none !important;
+  border-color: var(--aurora-purple) !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2) !important;
+  transition: all 0.2s ease;
+}
+
+/* Card focus states */
+.card:focus,
+.feature-card:focus,
+.benefit-card:focus,
+.fundamental-card:focus,
+.category-card:focus,
+.tool-analysis-card:focus,
+.recommendation-card:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3) !important;
+  transform: translateY(-2px);
+  transition: all 0.2s ease;
+}
+
+/* Navigation focus states */
+.hamburger:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.4) !important;
+  border-radius: 4px;
+}
+
+/* Toggle switch focus */
+.toggle-switch input:focus + .toggle-slider {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3) !important;
+}
+
+/* Skip navigation focus (accessibility) */
+.skip-nav:focus {
+  outline: 2px solid var(--aurora-purple) !important;
+  outline-offset: 2px;
+  background: var(--aurora-purple);
+  color: white;
+}
+
+/* Remove focus from non-interactive elements */
+img:focus,
+svg:focus,
+h1:focus,
+h2:focus,
+h3:focus,
+h4:focus,
+h5:focus,
+h6:focus,
+p:focus,
+span:focus,
+div:focus {
+  outline: none !important;
+}
+
+/* Focus visible for keyboard navigation */
+@media (prefers-reduced-motion: no-preference) {
+  *:focus-visible {
+    outline: none !important;
+  }
+  
+  button:focus-visible,
+  .btn-primary:focus-visible,
+  .btn-secondary:focus-visible,
+  .btn-outline:focus-visible {
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.4) !important;
+  }
+  
+  a:focus-visible,
+  .nav-links a:focus-visible {
+    box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.5) !important;
+  }
+  
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3) !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  button:focus,
+  .btn-primary:focus,
+  .btn-secondary:focus,
+  .btn-outline:focus {
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.6) !important;
+    border: 2px solid var(--aurora-purple) !important;
+  }
+  
+  a:focus,
+  .nav-links a:focus {
+    box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.7) !important;
+    background: rgba(124, 58, 237, 0.1) !important;
+  }
+}
+
 .status-icon svg,
 .history-icon svg,
 .activity-icon svg,
@@ -66,8 +205,8 @@ svg {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  color: #8A2BE2; /* Fallback color */
-  background: linear-gradient(135deg, #8A2BE2, #FF1493, #FFD700);
+  color: #3b82f6; /* Fallback color */
+  background: linear-gradient(135deg, #3b82f6, #7c3aed, #a855f7, #c084fc, #ec4899, #f472b6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -76,14 +215,14 @@ svg {
 /* Enhanced fallback for compatibility header */
 .compatibility-header h2 {
   /* Ensure text is always visible */
-  color: #8A2BE2 !important;
+  color: #3b82f6 !important;
 }
 
 .compatibility-header h2:not([style*="background-clip"]) {
   /* If background-clip doesn't work, ensure text is visible */
   background: none !important;
   -webkit-text-fill-color: initial !important;
-  color: #8A2BE2 !important;
+  color: #3b82f6 !important;
 }
 
 .compatibility-header p {
@@ -129,12 +268,12 @@ svg {
 }
 
 .ai-logo svg {
-  color: #8A2BE2;
+  color: #3b82f6;
   transition: color 0.3s ease;
 }
 
 .ai-logo:hover svg {
-  color: #FF1493;
+  color: #ec4899;
 }
 
 .ai-logo span {

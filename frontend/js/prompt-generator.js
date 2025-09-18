@@ -807,6 +807,7 @@ const showDemoModeOption = (comment) => {
 // Event listeners
 promptForm.addEventListener('submit', (e) => {
   e.preventDefault();
+  e.stopPropagation();
   const comment = document.getElementById('prompt-input').value.trim();
   if (comment) {
     generatePrompt(comment);

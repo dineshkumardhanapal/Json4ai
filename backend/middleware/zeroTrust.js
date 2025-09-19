@@ -647,10 +647,10 @@ const zeroTrustMiddleware = async (req, res, next) => {
     const skipEndpoints = [
       '/api/health', 
       '/api/status',
-      '/api/register',
-      '/api/login',
-      '/api/forgot-password',
-      '/api/reset-password',
+      '/api/auth/register',
+      '/api/auth/login',
+      '/api/auth/forgot-password',
+      '/api/auth/reset-password',
       '/api/verify-email',
       '/api/verify',  // Add this to skip /api/verify/:token
       '/api/resend-verification',
@@ -671,7 +671,7 @@ const zeroTrustMiddleware = async (req, res, next) => {
     });
     
     if (shouldSkip) {
-      console.log(`Zero Trust: Skipping authentication for ${req.path}`);
+      // Zero Trust: Skipping authentication
       return next();
     }
     

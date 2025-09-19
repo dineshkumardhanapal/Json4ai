@@ -1,7 +1,7 @@
 {
   "name": "json4ai-backend",
   "version": "1.0.0",
-  "description": "JSON4AI backend (email-verified)",
+  "description": "JSON4AI Production Backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

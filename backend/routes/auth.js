@@ -18,14 +18,13 @@ const { OAuth2Client } = require('google-auth-library');
 // POST /api/register
 router.post('/register', validateRegistration, async (req, res) => {
   try {
-    console.log('Registration request body:', JSON.stringify(req.body, null, 2));
-    console.log('Registration request keys:', Object.keys(req.body || {}));
+    // Processing registration request
     
     const { firstName, lastName, email, password } = req.body;
     
     // Validate required fields
     if (!firstName || !lastName || !email || !password) {
-      console.log('Missing required fields:', { firstName: !!firstName, lastName: !!lastName, email: !!email, password: !!password });
+      // Missing required fields
       return res.status(400).json({ 
         message: 'Missing required fields',
         errors: [
@@ -140,16 +139,18 @@ router.post('/register', validateRegistration, async (req, res) => {
         `
       );
       
-      console.log(`Verification email result:`, emailResult);
+      // Verification email sent
     } catch (emailError) {
-      console.error('Failed to send verification email:', emailError);
+      // Failed to send verification email
       // Don't fail registration if email fails - user can resend later
     }
 
-    res.json({ message: 'Registration successful! Please check your email to verify your account before logging in.' });
+    // Fix: Redirect to subscribe page after successful registration
+    // This ensures users are directed to the subscription flow after account creation
+    res.redirect(302, '/subscribe');
   } catch (err) {
-    console.error('Registration error:', err);
-    console.error('Error stack:', err.stack);
+    // Registration error
+    // Error stack logged
     res.status(500).json({ 
       message: 'Registration failed due to server error',
       error: err.message,
@@ -696,7 +697,7 @@ router.post('/forgot-password', async (req, res) => {
     
     res.json({ message: 'Password reset email sent successfully!' });
   } catch (err) {
-    console.error('Forgot password error:', err);
+    // Forgot password error
     res.status(500).json({ message: 'Failed to send reset email. Please try again.' });
   }
 });

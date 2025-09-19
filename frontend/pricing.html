@@ -111,7 +111,7 @@
   <script src="js/notifications.js" defer></script>
   <script src="js/utils.js" defer></script>
   <script src="js/session-manager.js" defer></script>
-  <script src="js/pricing.js" defer></script>
+  <script src="js/pricing-clean.js" defer></script>
   <script src="js/mobile-nav.js" defer></script>
 
 </head>
@@ -390,84 +390,6 @@
   </div>
 </main>
 
-<script>
-// Plan selection functionality
-document.addEventListener('DOMContentLoaded', function() {
-  const planCards = document.querySelectorAll('.plan-card');
-  
-  planCards.forEach(card => {
-    card.addEventListener('click', function() {
-      // Remove selected class from all cards
-      planCards.forEach(c => c.classList.remove('selected'));
-      
-      // Add selected class to clicked card
-      this.classList.add('selected');
-      
-      // Update button text based on selection
-      updateButtonText(this);
-      
-      // Add subtle animation
-      this.style.animation = 'none';
-      this.offsetHeight; // Trigger reflow
-      this.style.animation = 'planGlow 2s ease-in-out infinite alternate';
-    });
-    
-    // Add hover effects
-    card.addEventListener('mouseenter', function() {
-      if (!this.classList.contains('selected')) {
-        this.style.transform = 'translateY(-4px)';
-        this.style.boxShadow = 'var(--shadow-strong)';
-        this.style.borderColor = 'var(--aurora-cyan)';
-      }
-    });
-    
-    card.addEventListener('mouseleave', function() {
-      if (!this.classList.contains('selected')) {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = 'var(--shadow-medium)';
-        this.style.borderColor = 'var(--glass-border)';
-      }
-    });
-  });
-  
-  function updateButtonText(selectedCard) {
-    const planName = selectedCard.querySelector('h3').textContent;
-    const buttons = selectedCard.querySelectorAll('.btn-primary');
-    
-    buttons.forEach(button => {
-      if (button.textContent.includes('Current Plan')) {
-        button.textContent = 'Current Plan';
-        button.style.background = 'var(--aurora-green)';
-        button.style.cursor = 'default';
-      } else {
-        button.textContent = `Select ${planName} Plan`;
-        button.style.background = 'var(--accent-gradient)';
-        button.style.cursor = 'pointer';
-      }
-    });
-  }
-  
-  // Initialize with first plan selected (optional)
-  // planCards[0].classList.add('selected');
-  // updateButtonText(planCards[0]);
-});
-
-// Enhanced button interactions
-document.querySelectorAll('.btn-primary').forEach(button => {
-  button.addEventListener('click', function(e) {
-    if (this.textContent.includes('Current Plan')) {
-      e.preventDefault();
-      return;
-    }
-    
-    // Add click animation
-    this.style.transform = 'scale(0.95)';
-    setTimeout(() => {
-      this.style.transform = 'translateY(-2px)';
-    }, 150);
-  });
-});
-</script>
 
 <!-- Cookie Consent Banner -->
 <div id="cookie-consent" class="cookie-consent">

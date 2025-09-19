@@ -295,7 +295,7 @@ select:focus {
   --text-muted: #94a3b8;           /* Slate-400 */
   --text-light: #e2e8f0;           /* Slate-200 */
   --text-accent: var(--aurora-cyan);
-  --text-gradient: linear-gradient(135deg, var(--aurora-cyan), var(--aurora-blue), var(--aurora-purple), var(--aurora-pink));
+  --text-gradient: linear-gradient(135deg, #3b82f6, #7c3aed, #a855f7);
   
   /* Premium Font Stack for SEO & CTR Optimization */
   --font-heading: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -837,33 +837,67 @@ code, pre, .code-block {
 }
 
 .text-gradient { 
-  color: #ffffff; /* Fallback color - white */
-  background: linear-gradient(90deg, #ffffff, #ffffff, #ffffff, #ffffff, #ffffff);
-  -webkit-background-clip: text; 
-  -webkit-text-fill-color: transparent; 
-  background-clip: text;
-  background-size: 200% 100%;
-  animation: gradientShift 8s ease-in-out infinite;
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  color: #3b82f6 !important; /* Aurora Cyan fallback color */
+  background: #3b82f6 !important; /* Aurora Cyan color for main text */
+  -webkit-background-clip: text !important; 
+  -webkit-text-fill-color: transparent !important; 
+  background-clip: text !important;
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.4) !important;
 }
 
 /* Enhanced fallback for text-gradient */
 .text-gradient {
-  /* Ensure text is always visible */
+  /* Ensure text is always visible with pink fallback */
+  color: #3b82f6 !important;
+}
+
+/* Force pink color for main heading */
+.hero-content h1.text-gradient,
+h1.text-gradient {
+  color: #3b82f6 !important;
+  background: #ff69b4 !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-shadow: 0 0 20px rgba(255, 105, 180, 0.3) !important;
+}
+
+/* Aurora Cyan for "Generate" and "prompt with" */
+.text-gradient .pink-text,
+.hero-content h1.text-gradient .pink-text,
+h1.text-gradient .pink-text {
+  background: #3b82f6 !important; /* Aurora Cyan */
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.4) !important;
+  color: #3b82f6 !important;
+}
+
+/* White color for "your accurate" */
+.text-gradient .white-text,
+.hero-content h1.text-gradient .white-text,
+h1.text-gradient .white-text {
+  background: #ffffff !important; /* White color */
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.5) !important;
   color: #ffffff !important;
 }
 
-/* AI-themed gradient for JSON4AI highlight */
-.text-gradient .highlight {
-  background: linear-gradient(90deg, #7c3aed 0%, #7c3aed 50%, #ec4899 50%, #ec4899 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  background-size: 200% 100%;
-  animation: gradientShift 6s ease-in-out infinite;
-  text-shadow: 0 0 25px rgba(124, 58, 237, 0.7);
-  font-weight: 900;
-  position: relative;
+/* Aurora Purple-Cyan gradient for JSON4AI */
+.text-gradient .highlight,
+.hero-content h1.text-gradient .highlight,
+h1.text-gradient .highlight {
+  background: linear-gradient(135deg, #7c3aed, #3b82f6, #a855f7) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-shadow: 0 0 25px rgba(124, 58, 237, 0.4) !important;
+  font-weight: 900 !important;
+  position: relative !important;
+  color: #7c3aed !important; /* Fallback color */
 }
 
 /* Enhanced fallback for highlight */
@@ -877,22 +911,28 @@ code, pre, .code-block {
   color: #7c3aed !important;
 }
 
-/* AI Pink Text for specified texts */
+/* AI Pink-Yellow Gradient Text for specified texts */
 .ai-gradient-text {
-  color: #ec4899 !important; /* Pure pink color */
-  text-shadow: 0 0 25px rgba(236, 72, 153, 0.5) !important;
+  background: linear-gradient(135deg, #ff1493, #ffd700, #ff69b4, #ffff00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 100%;
+  animation: gradientShift 8s ease-in-out infinite;
+  text-shadow: 0 0 25px rgba(255, 20, 147, 0.5) !important;
   font-weight: 700 !important;
+  color: #ff1493 !important; /* Fallback color */
 }
 
 /* Enhanced fallback for ai-gradient-text */
 .ai-gradient-text {
-  color: #ec4899 !important;
+  color: #ff1493 !important;
 }
 
 .ai-gradient-text:not([style*="background-clip"]) {
   background: none !important;
   -webkit-text-fill-color: initial !important;
-  color: #ec4899 !important;
+  color: #ff1493 !important;
 }
 
 /* Specific styling for use case headings */
@@ -6453,7 +6493,7 @@ footer { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border-
 .workflow-step.active {
   opacity: 1;
   transform: scale(1.02);
-  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.2);
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
 }
 
 .step-label {
@@ -6516,12 +6556,12 @@ footer { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border-
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--aurora-purple), var(--aurora-pink));
+  background: linear-gradient(135deg, #7c3aed, #3b82f6, #a855f7);
   display: flex;
   align-items: center;
   justify-content: center;
   animation: pulse 2s ease-in-out infinite;
-  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
 
 .processing-dots {
@@ -6626,16 +6666,16 @@ footer { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border-
 .arrow-line {
   width: 50px;
   height: 3px;
-  background: linear-gradient(90deg, var(--aurora-purple), var(--aurora-pink));
+  background: linear-gradient(90deg, #7c3aed, #3b82f6, #a855f7);
   border-radius: 2px;
-  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
 }
 
 .arrow-head {
   font-size: 1.8rem;
-  color: var(--aurora-purple);
+  color: #7c3aed;
   animation: arrowPulse 2s ease-in-out infinite;
-  text-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
+  text-shadow: 0 2px 8px rgba(59, 130, 246, 0.5);
 }
 
 .animation-step {
@@ -6752,7 +6792,7 @@ footer { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border-
   background: rgba(0, 0, 0, 0.3);
   padding: 1.5rem;
   border-radius: 10px;
-  border: 1px solid rgba(236, 72, 153, 0.3);
+  border: 1px solid rgba(59, 130, 246, 0.4);
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.9rem;
   line-height: 1.6;
@@ -6783,7 +6823,7 @@ footer { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border-
 .step-4 .success-icon {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #ec4899, #7c3aed);
+  background: linear-gradient(135deg, #7c3aed, #3b82f6, #a855f7);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -6800,7 +6840,7 @@ footer { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border-
 }
 
 .success-text {
-  color: #ec4899;
+  color: #3b82f6;
   font-size: 1.2rem;
   font-weight: 600;
   animation: successFade 2s ease-in-out infinite;

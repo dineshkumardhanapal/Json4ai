@@ -50,7 +50,7 @@ class AdminAuth {
                 throw new Error(data.message || 'Admin login failed');
             }
         } catch (error) {
-            console.error('Admin login error:', error);
+            // Admin login error handled silently
             throw error;
         }
     }
@@ -82,7 +82,7 @@ class AdminAuth {
 
             return true;
         } catch (error) {
-            console.error('Error checking admin token:', error);
+            // Token check error handled silently
             this.clearAdminSession();
             return false;
         }
@@ -95,7 +95,7 @@ class AdminAuth {
             try {
                 return JSON.parse(adminUserData);
             } catch (error) {
-                console.error('Error parsing admin user data:', error);
+                // User data parsing error handled silently
                 return null;
             }
         }
@@ -115,11 +115,11 @@ class AdminAuth {
                 });
 
                 if (!response.ok) {
-                    console.warn('Admin session invalid, logging out...');
+                    // Admin session invalid
                     this.adminLogout();
                 }
             } catch (error) {
-                console.error('Admin session check failed:', error);
+                // Session check failed
                 this.adminLogout();
             }
         }, 5 * 60 * 1000); // 5 minutes
@@ -138,11 +138,11 @@ class AdminAuth {
                 });
 
                 if (!response.ok) {
-                    console.warn('Admin session heartbeat failed, logging out...');
+                    // Session heartbeat failed
                     this.adminLogout();
                 }
             } catch (error) {
-                console.error('Admin session heartbeat error:', error);
+                // Session heartbeat error
                 this.adminLogout();
             }
         }, 10 * 60 * 1000); // 10 minutes
@@ -162,7 +162,7 @@ class AdminAuth {
                 });
             }
         } catch (error) {
-            console.error('Admin logout request failed:', error);
+            // Logout request failed
         } finally {
             this.clearAdminSession();
         }
@@ -225,7 +225,7 @@ class AdminAuth {
                 throw new Error(data.message || 'Token refresh failed');
             }
         } catch (error) {
-            console.error('Admin token refresh failed:', error);
+            // Token refresh failed
             this.clearAdminSession();
             throw error;
         }
@@ -244,7 +244,7 @@ class AdminAuth {
                 token = await this.refreshAdminToken();
             }
         } catch (error) {
-            console.error('Error checking token expiration:', error);
+            // Token expiration check error
             token = await this.refreshAdminToken();
         }
 
@@ -280,7 +280,7 @@ class AdminAuth {
                 throw new Error(data.message || 'Failed to get admin activity log');
             }
         } catch (error) {
-            console.error('Error getting admin activity log:', error);
+            // Activity log error
             throw error;
         }
     }

@@ -156,7 +156,7 @@ class CookieConsent {
         return consentData.preferences || this.cookiePreferences;
       }
     } catch (error) {
-      console.error('Error loading cookie preferences:', error);
+      // Error loading cookie preferences
     }
     return this.cookiePreferences;
   }

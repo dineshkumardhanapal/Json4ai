@@ -15,7 +15,7 @@ class PasswordPolicyManager {
       this.setupEventListeners();
       this.createPasswordStrengthIndicator();
     } catch (error) {
-      console.error('Password policy initialization failed:', error);
+      // Password policy initialization failed
     }
   }
   
@@ -27,11 +27,11 @@ class PasswordPolicyManager {
         this.policy = await response.json();
         // Password policy loaded
       } else {
-        console.warn('Failed to load password policy, using defaults');
+        // Failed to load password policy, using defaults
         this.setDefaultPolicy();
       }
     } catch (error) {
-      console.error('Error loading password policy:', error);
+      // Error loading password policy
       this.setDefaultPolicy();
     }
   }
@@ -149,7 +149,7 @@ class PasswordPolicyManager {
         this.validationResults = validation;
       }
     } catch (error) {
-      console.error('Password validation error:', error);
+      // Password validation error
       // Fallback to client-side validation
       const validation = this.validatePasswordClientSide(password);
       this.updatePasswordIndicator(inputElement, validation);
@@ -373,7 +373,7 @@ class PasswordPolicyManager {
         throw new Error('Failed to generate password');
       }
     } catch (error) {
-      console.error('Password generation error:', error);
+      // Password generation error
       this.showErrorMessage(inputElement, 'Failed to generate secure password');
     }
   }

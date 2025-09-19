@@ -15,7 +15,7 @@ class EnhancedAdminDashboard {
     }
 
     async init() {
-        console.log('🚀 Initializing Enhanced Admin Dashboard...');
+        // Initializing Enhanced Admin Dashboard
         
         // Check authentication first
         if (!this.checkAuthentication()) {
@@ -31,7 +31,7 @@ class EnhancedAdminDashboard {
         // Start auto-refresh
         this.startAutoRefresh();
         
-        console.log('✅ Enhanced Admin Dashboard initialized successfully');
+        // Enhanced Admin Dashboard initialized successfully
     }
 
     checkAuthentication() {
@@ -136,7 +136,7 @@ class EnhancedAdminDashboard {
             this.initializeCharts(overviewData);
 
         } catch (error) {
-            console.error('Failed to load dashboard data:', error);
+            // Failed to load dashboard data
             this.showError('Failed to load dashboard data');
         } finally {
             this.isLoading = false;
@@ -166,7 +166,7 @@ class EnhancedAdminDashboard {
                     break;
             }
         } catch (error) {
-            console.error(`Failed to load ${section} data:`, error);
+            // Failed to load section data
             this.showError(`Failed to load ${section} data`);
         }
     }
@@ -650,7 +650,7 @@ class EnhancedAdminDashboard {
         control.classList.add('active');
 
         // Update chart data based on period
-        console.log(`Updating chart period to: ${period}`);
+        // Updating chart period
         // Implementation would depend on specific chart requirements
     }
 
@@ -673,7 +673,7 @@ class EnhancedAdminDashboard {
     async refreshData() {
         if (this.isLoading) return;
         
-        console.log('🔄 Refreshing dashboard data...');
+        // Refreshing dashboard data
         await this.loadSectionData(this.currentSection);
         
         // Update last refresh time
@@ -731,19 +731,19 @@ class EnhancedAdminDashboard {
     }
 
     showError(message) {
-        console.error('Admin Dashboard Error:', message);
+        // Admin Dashboard Error
         // Implementation for showing error notifications
-        alert(message); // Replace with proper notification system
+        // Show notification instead of alert
     }
 
     // User management actions
     viewUser(userId) {
-        console.log('Viewing user:', userId);
+        // Viewing user
         // Implementation for viewing user details
     }
 
     editUser(userId) {
-        console.log('Editing user:', userId);
+        // Editing user
         // Implementation for editing user
     }
 }

@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (toggle) {
     toggle.addEventListener('change', function() {
       const isYearly = this.checked;
-      console.log('Pricing toggle changed to:', isYearly ? 'Yearly' : 'Monthly');
+      // Pricing toggle updated
       updatePricingDisplay(isYearly);
       
       // Force update after a short delay to ensure CSS is applied
@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Initialize with monthly pricing
-    console.log('Initializing pricing display with monthly pricing');
+    // Initializing pricing display
     updatePricingDisplay(false);
     
     // Force initial state after DOM is fully loaded
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
       updatePricingDisplay(false);
     }, 500);
   } else {
-    console.error('Pricing toggle element not found!');
+    // Pricing toggle element not found
   }
 
   // Initialize payment buttons
@@ -108,43 +108,43 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Add global test function for debugging
   window.testYearlyPricing = function() {
-    console.log('Testing yearly pricing...');
+    // Testing yearly pricing
     const toggle = document.getElementById('pricing-toggle');
     if (toggle) {
       toggle.checked = true;
       updatePricingDisplay(true);
-      console.log('Yearly pricing should now be visible');
+      // Yearly pricing should now be visible
     } else {
-      console.error('Toggle not found');
+      // Toggle not found
     }
   };
   
   window.testMonthlyPricing = function() {
-    console.log('Testing monthly pricing...');
+    // Testing monthly pricing
     const toggle = document.getElementById('pricing-toggle');
     if (toggle) {
       toggle.checked = false;
       updatePricingDisplay(false);
-      console.log('Monthly pricing should now be visible');
+      // Monthly pricing should now be visible
     } else {
-      console.error('Toggle not found');
+      // Toggle not found
     }
   };
 });
 
 function updatePricingDisplay(isYearly) {
-  console.log('updatePricingDisplay called with isYearly:', isYearly);
+  // Updating pricing display
   
   // Get all plan cards
   const planCards = document.querySelectorAll('.plan-card');
-  console.log('Found plan cards:', planCards.length);
+  // Processing plan cards
   
   planCards.forEach((card, index) => {
     const yearlyPrice = card.querySelector('.yearly-price');
     const yearlyBillingInfo = card.querySelector('.yearly-billing-info');
     const planName = card.querySelector('h3')?.textContent;
     
-    console.log(`Plan ${index + 1} (${planName}):`, {
+    // Processing plan:
       hasYearlyPrice: !!yearlyPrice,
       hasYearlyBillingInfo: !!yearlyBillingInfo,
       yearlyPriceElement: yearlyPrice
@@ -180,7 +180,7 @@ function updatePricingDisplay(isYearly) {
         if (monthlyAmount) monthlyAmount.style.display = 'none';
         if (monthlyPeriod) monthlyPeriod.style.display = 'none';
         
-        console.log(`Showing yearly price for ${planName}`);
+        // Showing yearly price
       } else {
         // Remove yearly-pricing class to show monthly pricing
         card.classList.remove('yearly-pricing');
@@ -205,10 +205,10 @@ function updatePricingDisplay(isYearly) {
         if (monthlyAmount) monthlyAmount.style.display = 'inline';
         if (monthlyPeriod) monthlyPeriod.style.display = 'inline';
         
-        console.log(`Showing monthly price for ${planName}`);
+        // Showing monthly price
       }
     } else {
-      console.log(`No yearly price found for ${planName}`);
+      // No yearly price found
     }
   });
   

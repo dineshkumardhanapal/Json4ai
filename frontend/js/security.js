@@ -220,7 +220,7 @@ class SecurityUtils {
 
       return await response.json();
     } catch (error) {
-      console.error('Secure form submission error:', error);
+      // Secure form submission error
       throw error;
     }
   }
@@ -360,7 +360,7 @@ class SecurityUtils {
     
     // Check for suspicious patterns first
     if (this.detectSuspiciousInput(input)) {
-      console.warn('Suspicious input detected and sanitized:', input);
+      // Suspicious input detected and sanitized
       return this.sanitizeText(input);
     }
     
@@ -385,7 +385,7 @@ class SecurityUtils {
         const sanitizedValue = SecurityUtils.sanitizeText(JSON.stringify(value));
         localStorage.setItem(sanitizedKey, sanitizedValue);
       } catch (error) {
-        console.error('Error storing data securely:', error);
+        // Error storing data securely
       }
     },
     
@@ -395,7 +395,7 @@ class SecurityUtils {
         const value = localStorage.getItem(sanitizedKey);
         return value ? JSON.parse(value) : null;
       } catch (error) {
-        console.error('Error retrieving data securely:', error);
+        // Error retrieving data securely
         return null;
       }
     },
@@ -405,7 +405,7 @@ class SecurityUtils {
         const sanitizedKey = SecurityUtils.sanitizeText(key);
         localStorage.removeItem(sanitizedKey);
       } catch (error) {
-        console.error('Error removing data securely:', error);
+        // Error removing data securely
       }
     }
   };
@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       if (originalValue !== sanitizedValue) {
         this.value = sanitizedValue;
-        console.warn('Input sanitized:', originalValue, '->', sanitizedValue);
+        // Input sanitized
       }
     });
   });
@@ -438,13 +438,13 @@ document.addEventListener('DOMContentLoaded', function() {
       inputs.forEach(input => {
         if (SecurityUtils.detectSuspiciousInput(input.value)) {
           hasSuspiciousInput = true;
-          console.warn('Suspicious input detected in form:', input.name, input.value);
+          // Suspicious input detected in form
         }
       });
       
       if (hasSuspiciousInput) {
         e.preventDefault();
-        alert('Suspicious input detected. Please check your input and try again.');
+        // Show user-friendly notification
         return false;
       }
     });

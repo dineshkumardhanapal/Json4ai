@@ -14,11 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check if session manager is available
     if (!window.sessionManager) {
       if (retryCount >= maxRetries) {
-        console.error('Session manager failed to load after maximum retries');
+        // Session manager failed to load
         showAuthError('Authentication system failed to load. Please refresh the page.');
         return;
       }
-      console.warn(`Session manager not available, retrying... (${retryCount}/${maxRetries})`);
+      // Session manager not available, retrying
       setTimeout(checkAuth, 100);
       return;
     }
@@ -35,13 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       // If tokens exist but session manager says not logged in, refresh the session manager
-      console.warn('Tokens exist but session manager reports not logged in - refreshing session manager');
+      // Refreshing session manager
       window.sessionManager.refreshTokensFromStorage();
       
       // Wait a moment for the session manager to update
       setTimeout(() => {
         if (!window.sessionManager.isLoggedIn()) {
-          console.error('Session manager still not logged in after refresh, redirecting to login');
+          // Session manager still not logged in, redirecting
           location.href = 'login.html';
           return;
         }
@@ -263,7 +263,7 @@ const loadProfile = async () => {
     hideLoadingState();
     
   } catch (error) {
-    console.error('❌ Error loading profile:', error);
+    // Error loading profile
     
     // Hide loading state
     hideLoadingState();
@@ -293,7 +293,7 @@ const loadRecentActivity = async () => {
     });
     
     if (!res.ok) {
-      console.error('Failed to load activity history');
+      // Failed to load activity history
       return;
     }
     
@@ -351,7 +351,7 @@ const loadRecentActivity = async () => {
       `;
     }
   } catch (error) {
-    console.error('Error loading activity:', error);
+    // Error loading activity
   }
 };
 
@@ -375,7 +375,7 @@ const showLoadingState = () => {
   if (loadingSpinner) {
     loadingSpinner.style.display = 'block';
   } else {
-    console.warn('⚠️ Loading spinner element not found');
+    // Loading spinner element not found
   }
   
   // Disable inputs and buttons but keep Logout usable
@@ -402,7 +402,7 @@ const hideLoadingState = () => {
   if (loadingSpinner) {
     loadingSpinner.style.display = 'none';
   } else {
-    console.warn('⚠️ Loading spinner element not found');
+    // Loading spinner element not found
   }
   
   // Enable inputs and buttons
@@ -583,7 +583,7 @@ document.getElementById('profile-form')?.addEventListener('submit', async e => {
     loadProfile();
     
   } catch (error) {
-    console.error('Error updating profile:', error);
+    // Error updating profile
     showError('Failed to update profile. Please try again.');
   } finally {
     submitBtn.disabled = false;

@@ -22,7 +22,7 @@ function migrateOldTokens() {
       showMigrationNotification();
       
     } catch (error) {
-      console.error('Token migration failed:', error);
+      // Token migration failed
     }
   }
 }

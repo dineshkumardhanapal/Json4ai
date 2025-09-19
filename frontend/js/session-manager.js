@@ -222,7 +222,7 @@ class SessionManager {
         throw new Error('Failed to refresh token');
       }
     } catch (error) {
-      console.error('Session extension failed:', error);
+      // Session extension failed
       this.forceLogout('Failed to extend session');
     }
   }
@@ -301,7 +301,7 @@ class SessionManager {
         this.refreshAccessToken();
       }
     } catch (error) {
-      console.error('Error checking token expiration:', error);
+      // Token expiration check error
       this.forceLogout('Invalid token format');
     }
   }
@@ -335,7 +335,7 @@ class SessionManager {
         throw new Error('Token refresh failed');
       }
     } catch (error) {
-      console.error('Token refresh failed:', error);
+      // Token refresh failed
       this.forceLogout('Token refresh failed');
     } finally {
       this.isRefreshing = false;
@@ -372,7 +372,7 @@ class SessionManager {
         return user;
       }
     } catch (error) {
-      console.error('Error refreshing user plan:', error);
+      // User plan refresh error
     }
     return null;
   }
@@ -384,7 +384,7 @@ class SessionManager {
       try {
           return JSON.parse(userPlan);
       } catch (e) {
-        console.error('Error parsing user plan:', e);
+        // User plan parsing error
       }
     }
     return null;
@@ -450,7 +450,7 @@ class SessionManager {
       try {
         return JSON.parse(this.userData);
       } catch (error) {
-        console.error('Error parsing user data:', error);
+        // User data parsing error
         return null;
       }
     }
@@ -471,7 +471,7 @@ class SessionManager {
         
       }
     } catch (error) {
-      console.error('Logout request failed:', error);
+      // Logout request failed
     } finally {
       this.forceLogout('User logged out');
     }

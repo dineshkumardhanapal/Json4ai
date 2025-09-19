@@ -5,7 +5,7 @@ const safeAsync = async (asyncFn, fallback = null) => {
   try {
     return await asyncFn();
   } catch (error) {
-    console.error('Async operation failed:', error);
+    // Handle error silently or show user-friendly message
     return fallback;
   }
 };

@@ -14,11 +14,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if session manager is available
     if (!window.sessionManager) {
       if (retryCount >= maxRetries) {
-        console.error('Session manager failed to load after maximum retries');
+        // Session manager failed to load
         showAuthError('Authentication system failed to load. Please refresh the page.');
         return;
       }
-      console.warn(`Session manager not available, retrying... (${retryCount}/${maxRetries})`);
+      // Session manager not available, retrying
       setTimeout(checkAuth, 100);
       return;
     }
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       // If tokens exist but session manager says not logged in, there might be an issue
-      console.warn('Tokens exist but session manager reports not logged in - proceeding anyway');
+      // Proceeding with tokens
     }
     
     // Show content and initialize page if authenticated
@@ -155,7 +155,7 @@ const validateToken = async () => {
     window.apiUnavailable = false;
     return true;
   } catch (error) {
-    console.error('Token validation error:', error);
+    // Token validation error
     return false;
   }
 };
@@ -242,7 +242,7 @@ const loadUsageStatus = async () => {
     updateUsageStatus(usage);
     
   } catch (error) {
-    console.error('Error loading usage:', error);
+    // Error loading usage
     showError('Failed to load usage information');
   }
 };
@@ -352,7 +352,7 @@ const generatePrompt = async (comment) => {
     await streamPromptViaSSE(comment, accessToken);
     
   } catch (error) {
-    console.error('Error generating prompt:', error);
+    // Error generating prompt
     showError(error.message || 'Failed to generate prompt. Please try again.');
     // No progress UI to hide
   } finally {
@@ -384,7 +384,7 @@ const streamPromptViaSSE = async (comment, accessToken) => {
         loadRecentHistory();
         showSuccess('Prompt generated successfully!');
       } catch (err) {
-        console.error('Failed to parse SSE result:', err);
+        // Failed to parse SSE result
       }
     });
 
@@ -615,7 +615,7 @@ const copyToClipboard = async () => {
     await navigator.clipboard.writeText(jsonOutput.textContent);
     showSuccess('JSON copied to clipboard!');
   } catch (error) {
-    console.error('Failed to copy:', error);
+    // Failed to copy
     showError('Failed to copy to clipboard');
   }
 };
@@ -661,7 +661,7 @@ const loadRecentHistory = async () => {
         window.sessionManager.forceLogout('Token expired during history load');
         return;
       }
-      console.error('Failed to load history');
+      // Failed to load history
       return;
     }
     
@@ -698,7 +698,7 @@ const loadRecentHistory = async () => {
     }
     
   } catch (error) {
-    console.error('Error loading history:', error);
+    // Error loading history
     historyList.innerHTML = `
       <div class="history-item">
         <div class="history-icon">
@@ -842,7 +842,7 @@ const initializePage = async () => {
     await loadUsageStatus();
     await loadRecentHistory();
   } catch (error) {
-    console.error('Error loading page content:', error);
+    // Error loading page content
     // Show error message to user
     if (usageStatus) {
       usageStatus.className = 'usage-status-card status-limit-reached';
